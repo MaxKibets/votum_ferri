@@ -1,0 +1,8 @@
+---
+description: Rules for determining if a component should be private or shared, and where to place them based on their use-case.
+globs: src/**/*
+---
+
+- Private Components: For components used only within specific pages, you can create a \_components folder within the relevant /app subdirectory.
+- Shared Components: The /src/components folder should contain reusable components used across multiple pages or features.
+- Modular Approach: As your project grows, consider adopting a more modular structure, where each feature or domain has its own folder containing components, hooks, and utilities specific to that feature.
