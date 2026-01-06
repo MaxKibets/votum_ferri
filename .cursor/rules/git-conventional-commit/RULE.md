@@ -1,6 +1,7 @@
 ---
 alwaysApply: true
 ---
+
 Use the Conventional Commit Messages specification to generate commit messages
 
 The commit message should be structured as follows:
