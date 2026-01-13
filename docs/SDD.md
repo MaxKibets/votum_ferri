@@ -817,9 +817,17 @@ src/app/actions/
 
 **Клієнт:**
 
-- `@supabase/supabase-js` - основний клієнт
-- `@supabase/ssr` - для Next.js Server Components та Server Actions
-- Створення клієнтів для браузера та сервера
+- `@supabase/supabase-js` - основний клієнт (встановлено)
+- `@supabase/ssr` - для Next.js Server Components та Server Actions (встановлено)
+- Створення клієнтів для браузера (`src/lib/supabase/client.ts`) та сервера (`src/lib/supabase/server.ts`)
+
+**Змінні середовища:**
+
+- `NEXT_PUBLIC_SUPABASE_URL` - URL проекту Supabase
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` - Publishable API key (використовується для клієнтського коду)
+- `SUPABASE_SECRET_KEY` - Secret API key (використовується тільки для серверних операцій з повними правами)
+
+**Примітка:** Supabase переходить на нову систему API ключів (publishable/secret замість legacy anon/service_role). Використовуються нові ключі для кращої безпеки та сумісності з майбутніми версіями.
 
 **Безпека:**
 
@@ -936,10 +944,12 @@ src/app/actions/
 }
 ```
 
-**Планові додаткові залежності:**
+**Встановлені залежності:**
 
-- `@supabase/supabase-js` - Supabase клієнт
-- `@supabase/ssr` - Supabase для Next.js SSR
+- ✅ `@supabase/supabase-js` - Supabase клієнт (встановлено)
+- ✅ `@supabase/ssr` - Supabase для Next.js SSR (встановлено)
+
+**Планові додаткові залежності:**
 - `zod` - валідація даних
 - `react-hook-form` - управління формами
 - `@hookform/resolvers` - інтеграція zod з react-hook-form
@@ -3294,7 +3304,7 @@ export async function middleware(request: NextRequest) {
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll() {
@@ -3668,20 +3678,23 @@ console.error("Database connection failed", { error, userId });
 
 **Задачі:**
 
-1. Налаштування Supabase
+1. Налаштування Supabase ✅
 
-   - Створення проекту в Supabase
-   - Отримання API ключів (URL, anon key, service role key)
-   - Налаштування змінних середовища (.env.local)
-   - Створення Supabase клієнтів (client.ts, server.ts)
+   - ✅ Створення проекту в Supabase
+   - ✅ Отримання API ключів (URL, publishable key, secret key)
+   - ✅ Налаштування змінних середовища (.env.local)
+     - `NEXT_PUBLIC_SUPABASE_URL` - URL проекту
+     - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` - Publishable key (для клієнтського коду)
+     - `SUPABASE_SECRET_KEY` - Secret key (тільки для серверних операцій)
+   - ✅ Створення Supabase клієнтів (client.ts, server.ts)
 
-2. Створення схеми БД
+2. Створення схеми БД ✅
 
-   - Створення таблиць (profiles, trainings, exercises, exercise_sets)
-   - Налаштування foreign keys та constraints
-   - Створення індексів
-   - Налаштування Row Level Security (RLS) policies
-   - SQL міграції
+   - ✅ Створення таблиць (profiles, trainings, exercises, exercise_sets)
+   - ✅ Налаштування foreign keys та constraints
+   - ✅ Створення індексів
+   - ✅ Налаштування Row Level Security (RLS) policies
+   - ✅ SQL міграції (001_initial_schema.sql, 002_fix_function_search_path.sql)
 
 3. Налаштування автентифікації
 
@@ -4076,12 +4089,14 @@ graph TB
 
 ### 10.6 Наступні кроки
 
-1. **Налаштувати інфраструктуру**
+1. **Налаштувати інфраструктуру** ✅
 
-   - Створити проект у Supabase (якщо ще не створено)
-   - Налаштувати підключення до Supabase (URL, API ключі)
-   - Створити схему бази даних (таблиці, індекси, RLS policies)
-   - Налаштувати Supabase Auth
+   - ✅ Створено проект у Supabase
+   - ✅ Налаштовано підключення до Supabase (URL, publishable key, secret key)
+   - ✅ Створено схему бази даних (таблиці, індекси, RLS policies, тригери)
+   - ✅ Створено міграції бази даних
+   - ✅ Налаштовано Supabase клієнти (browser та server)
+   - ⏳ Налаштувати Supabase Auth (Email provider вже увімкнений за замовчуванням)
 
 2. **Почати з Фази 0: Підготовка**
 
