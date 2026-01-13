@@ -2,9 +2,105 @@
 
 ## Трекер тренувань - votum_ferri
 
-**Версія:** 1.0  
+**Версія:** 1.1  
 **Дата:** 2025-01-27  
 **Статус:** В розробці
+
+**Оновлення v1.1:**
+
+- Визначено базу даних: Supabase (PostgreSQL)
+- Визначено backend: Next.js Server Actions
+- Визначено автентифікацію: Supabase Auth
+- Оновлено всі відповідні розділи SDD
+
+---
+
+## Зміст
+
+- [1. Вступ та загальний опис](#1-вступ-та-загальний-опис)
+  - [1.1 Мета документа](#11-мета-документа)
+  - [1.2 Область застосування](#12-область-застосування)
+  - [1.3 Опис проекту](#13-опис-проекту)
+  - [1.4 Термінологія та скорочення](#14-термінологія-та-скорочення)
+- [2. Функціональні вимоги](#2-функціональні-вимоги)
+  - [2.1 Реєстрація користувача](#21-реєстрація-користувача)
+  - [2.2 Автентифікація](#22-автентифікація)
+  - [2.3 Дошка тренувань (календарне відображення)](#23-дошка-тренувань-календарне-відображення)
+  - [2.4 Створення тренувань](#24-створення-тренувань)
+  - [2.5 Редагування тренувань](#25-редагування-тренувань)
+  - [2.6 Видалення тренувань](#26-видалення-тренувань)
+  - [2.7 Відстеження вправ](#27-відстеження-вправ)
+  - [2.8 Перегляд минулих тренувань](#28-перегляд-минулих-тренувань)
+  - [2.9 Взаємодія з даними](#29-взаємодія-з-даними)
+  - [2.10 Приймальні критерії загальні](#210-приймальні-критерії-загальні)
+- [3. Архітектура системи](#3-архітектура-системи)
+  - [3.1 Високорівнева архітектура](#31-високорівнева-архітектура)
+  - [3.2 Діаграма компонентів системи](#32-діаграма-компонентів-системи)
+  - [3.3 Архітектурні патерни](#33-архітектурні-патерни)
+  - [3.4 Потік даних між компонентами](#34-потік-даних-між-компонентами)
+  - [3.5 Модульна структура](#35-модульна-структура)
+  - [3.6 Залежності та інтеграції](#36-залежності-та-інтеграції)
+- [4. Технічний стек](#4-технічний-стек)
+  - [4.1 Frontend технології](#41-frontend-технології)
+  - [4.2 Backend технології](#42-backend-технології)
+  - [4.3 База даних](#43-база-даних)
+  - [4.4 Автентифікація](#44-автентифікація)
+  - [4.5 Інструменти розробки](#45-інструменти-розробки)
+  - [4.6 Залежності проекту](#46-залежності-проекту)
+  - [4.7 Середовища розробки](#47-середовища-розробки)
+  - [4.8 Резюме технічного стеку](#48-резюме-технічного-стеку)
+- [5. Модель даних](#5-модель-даних)
+  - [5.1 Структура даних користувача](#51-структура-даних-користувача)
+  - [5.2 Структура даних тренування](#52-структура-даних-тренування)
+  - [5.3 Структура даних вправи](#53-структура-даних-вправи)
+  - [5.4 Entity-Relationship діаграма](#54-entity-relationship-діаграма)
+  - [5.5 Індекси бази даних](#55-індекси-бази-даних)
+  - [5.6 Типи для API responses](#56-типи-для-api-responses)
+  - [5.7 Валідація даних](#57-валідація-даних)
+  - [5.8 TODO: Схема бази даних](#58-todo-схема-бази-даних)
+- [6. UI/UX специфікації](#6-uiux-специфікації)
+  - [6.1 Загальні принципи дизайну](#61-загальні-принципи-дизайну)
+  - [6.2 Схема навігації](#62-схема-навігації)
+  - [6.3 Сторінки та інтерфейси](#63-сторінки-та-інтерфейси)
+  - [6.4 shadcn/ui компоненти - детальний опис використання](#64-shadcnui-компоненти---детальний-опис-використання)
+  - [6.5 Responsive Design](#65-responsive-design)
+  - [6.6 Темна тема](#66-темна-тема)
+  - [6.7 Доступність (Accessibility)](#67-доступність-accessibility)
+  - [6.8 Інтерактивність та Feedback](#68-інтерактивність-та-feedback)
+- [7. API специфікації](#7-api-специфікації)
+  - [7.1 Загальні принципи API](#71-загальні-принципи-api)
+  - [7.2 Server Actions для автентифікації](#72-server-actions-для-автентифікації)
+  - [7.3 Server Actions для тренувань (CRUD)](#73-server-actions-для-тренувань-crud)
+  - [7.4 Server Actions для вправ](#74-server-actions-для-вправ)
+  - [7.5 Авторизація та безпека](#75-авторизація-та-безпека)
+  - [7.6 Error Handling](#76-error-handling)
+  - [7.7 Деталізація Server Actions](#77-деталізація-server-actions)
+- [8. Компоненти та модулі](#8-компоненти-та-модулі)
+  - [8.1 Структура компонентів React](#81-структура-компонентів-react)
+  - [8.2 Використання shadcn/ui компонентів](#82-використання-shadcnui-компонентів)
+  - [8.3 Основні компоненти](#83-основні-компоненти)
+  - [8.4 Модулі та сервіси](#84-модулі-та-сервіси)
+  - [8.5 Діаграма залежностей компонентів](#85-діаграма-залежностей-компонентів)
+  - [8.6 Інтеграція компонентів](#86-інтеграція-компонентів)
+  - [8.7 Деталізація модулів](#87-деталізація-модулів)
+- [9. Безпека та автентифікація](#9-безпека-та-автентифікація)
+  - [9.1 Стратегія автентифікації](#91-стратегія-автентифікації)
+  - [9.2 Управління сесіями](#92-управління-сесіями)
+  - [9.3 Захист маршрутів](#93-захист-маршрутів)
+  - [9.4 Захист даних](#94-захист-даних)
+  - [9.5 HTTPS та Secure Cookies](#95-https-та-secure-cookies)
+  - [9.6 Error Handling та Logging](#96-error-handling-та-logging)
+  - [9.7 Rate Limiting](#97-rate-limiting)
+  - [9.8 Data Privacy](#98-data-privacy)
+  - [9.9 Деталізація безпеки](#99-деталізація-безпеки)
+- [10. План реалізації](#10-план-реалізації)
+  - [10.1 Послідовність реалізації](#101-послідовність-реалізації)
+  - [10.2 Залежності між компонентами](#102-залежності-між-компонентами)
+  - [10.3 Мілестоуни](#103-мілестоуни)
+  - [10.4 Пріоритети реалізації](#104-пріоритети-реалізації)
+  - [10.5 TODO: Визначені рішення](#105-todo-визначені-рішення)
+  - [10.6 Наступні кроки](#106-наступні-кроки)
+- [Додатки](#додатки)
 
 ---
 
@@ -286,23 +382,33 @@ SDD охоплює:
                          │
                          │ HTTP/HTTPS
                          │
-         ┌───────────────┴──────────────┐
-         │                              │
-┌────────┴────────┐            ┌────────┴────────┐
-│   Frontend      │            │    Backend      │
-│   (Next.js)     │            │   (TODO: TBD)   │
-│                 │            │                 │
-│ - React 19      │            │ - API Routes    │
-│ - TypeScript    │            │ - Auth Logic    │
-│ - shadcn/ui     │            │ - Business Logic│
-│ - Tailwind CSS  │            │                 │
-└─────────────────┘            └────────┬────────┘
-                                        │
-                                        │
-                               ┌────────┴────────┐
-                               │   База даних    │
-                               │   (TODO: TBD)   │
-                               └─────────────────┘
+┌────────────────────────┴────────────────────────────────┐
+│              Next.js Application                        │
+│                                                         │
+│  ┌──────────────────┐          ┌──────────────────┐     │
+│  │  Client          │          │  Server          │     │
+│  │  Components      │────────▶│  Actions         │    │
+│  │  (React 19)      │          │  (Server         │     │
+│  │                  │          │   Functions)      │    │
+│  │ - shadcn/ui      │          │                  │    │
+│  │ - Forms          │          │ - Auth Logic     │    │
+│  │ - State          │          │ - Business Logic │    │
+│  └──────────────────┘          └────────┬─────────┘    │
+│                                         │               │
+│                                         │ Supabase SDK  │
+│                                         │               │
+└─────────────────────────────────────────┼───────────────┘
+                                          │
+                                          │ HTTPS
+                                          │
+                                 ┌────────┴────────┐
+                                 │   Supabase      │
+                                 │                 │
+                                 │ - PostgreSQL    │
+                                 │ - Auth          │
+                                 │ - Storage       │
+                                 │ - Realtime      │
+                                 └─────────────────┘
 ```
 
 **Основні компоненти:**
@@ -311,19 +417,22 @@ SDD охоплює:
 
    - Клієнтська частина на React 19
    - Server-Side Rendering (SSR) та Static Site Generation (SSG)
-   - API Routes для backend логіки
+   - Server Actions для backend логіки (замість API Routes)
    - Інтерфейс користувача з shadcn/ui
 
-2. **Backend (TODO: визначити пізніше)**
+2. **Backend (Next.js Server Actions)**
 
-   - API endpoints для взаємодії з даними
-   - Логіка автентифікації та авторизації
+   - Server Actions в `src/app/actions/` для взаємодії з даними
+   - Логіка автентифікації через Supabase Auth
    - Бізнес-логіка тренувань та вправ
+   - Валідація через Zod
+   - Автоматичне revalidation через `revalidatePath`
 
-3. **База даних (TODO: визначити пізніше)**
-   - Зберігання даних користувачів
-   - Зберігання тренувань та вправ
-   - Управління сесіями
+3. **База даних (Supabase)**
+   - PostgreSQL для зберігання даних
+   - Supabase Auth для управління користувачами та сесіями
+   - Row Level Security (RLS) для безпеки даних
+   - Realtime підписки (за потреби)
 
 ### 3.2 Діаграма компонентів системи
 
@@ -336,39 +445,31 @@ graph TB
         Forms[Forms<br/>Training, Exercise]
     end
 
-    subgraph API["API Layer"]
-        AuthAPI[Auth API]
-        TrainingAPI[Training API]
-        ExerciseAPI[Exercise API]
+    subgraph Server["Server Actions"]
+        AuthActions[Auth Actions]
+        TrainingActions[Training Actions]
+        ExerciseActions[Exercise Actions]
     end
 
-    subgraph Business["Business Logic"]
-        AuthService[Auth Service]
-        TrainingService[Training Service]
-        ExerciseService[Exercise Service]
-    end
-
-    subgraph Data["Data Layer"]
-        DB[(Database)]
-        Cache[Cache/Session]
+    subgraph Supabase["Supabase"]
+        SupabaseAuth[Supabase Auth]
+        SupabaseDB[(PostgreSQL)]
+        SupabaseRLS[Row Level Security]
     end
 
     UI --> Pages
     Pages --> State
     Pages --> Forms
-    Forms --> AuthAPI
-    Forms --> TrainingAPI
-    Forms --> ExerciseAPI
+    Forms --> AuthActions
+    Forms --> TrainingActions
+    Forms --> ExerciseActions
 
-    AuthAPI --> AuthService
-    TrainingAPI --> TrainingService
-    ExerciseAPI --> ExerciseService
+    AuthActions --> SupabaseAuth
+    TrainingActions --> SupabaseDB
+    ExerciseActions --> SupabaseDB
 
-    AuthService --> DB
-    TrainingService --> DB
-    ExerciseService --> DB
-
-    AuthService --> Cache
+    SupabaseDB --> SupabaseRLS
+    SupabaseAuth --> SupabaseDB
 ```
 
 ### 3.3 Архітектурні патерни
@@ -391,17 +492,21 @@ graph TB
 - Використання композиції для побудови складних UI
 - shadcn/ui компоненти як базові будівельні блоки
 
-#### 3.3.2 Backend патерни (TODO: уточнити після вибору backend)
+#### 3.3.2 Backend патерни
 
-**RESTful API** (передбачувано)
+**Server Actions Pattern**
 
-- REST архітектура для API endpoints
-- Стандартні HTTP методи (GET, POST, PUT, DELETE)
+- Server Actions замість REST API endpoints
+- Прямі виклики функцій з Client Components
+- Типобезпека між клієнтом та сервером
+- Автоматична серіалізація/десеріалізація
 
-**Service Layer Pattern**
+**Action Layer Pattern**
 
-- Відокремлення бізнес-логіки в сервіси
-- API endpoints як тонкий шар над сервісами
+- Відокремлення бізнес-логіки в Server Actions
+- Actions в окремих файлах за доменами (auth, training, exercise)
+- Уніфікований формат відповіді `{ data, error }`
+- Валідація через Zod перед обробкою
 
 ### 3.4 Потік даних між компонентами
 
@@ -411,20 +516,19 @@ graph TB
 sequenceDiagram
     participant User as Користувач
     participant UI as UI Component
-    participant Page as Page Component
-    participant API as API Route
-    participant Service as Training Service
-    participant DB as База даних
+    participant Action as Server Action
+    participant Supabase as Supabase
+    participant DB as PostgreSQL
 
     User->>UI: Заповнює форму тренування
-    UI->>Page: Відправляє дані форми
-    Page->>API: POST /api/trainings
-    API->>Service: createTraining(data)
-    Service->>DB: Зберігає тренування
-    DB-->>Service: Підтвердження збереження
-    Service-->>API: Training object
-    API-->>Page: Success response
-    Page->>UI: Оновлює стан
+    UI->>Action: createTraining(data)
+    Action->>Action: Валідація (Zod)
+    Action->>Supabase: Перевірка автентифікації
+    Supabase-->>Action: User authenticated
+    Action->>DB: INSERT training + exercises + sets
+    DB-->>Action: Підтвердження збереження
+    Action->>Action: revalidatePath('/dashboard')
+    Action-->>UI: { data: training, error: null }
     UI-->>User: Показує успіх
 ```
 
@@ -434,21 +538,20 @@ sequenceDiagram
 sequenceDiagram
     participant User as Користувач
     participant LoginForm as Форма входу
-    participant AuthAPI as Auth API
-    participant AuthService as Auth Service
-    participant DB as База даних
-    participant Session as Session Store
+    participant AuthAction as Auth Action
+    participant SupabaseAuth as Supabase Auth
+    participant DB as PostgreSQL
 
     User->>LoginForm: Вводить email/пароль
-    LoginForm->>AuthAPI: POST /api/auth/login
-    AuthAPI->>AuthService: authenticate(credentials)
-    AuthService->>DB: Перевіряє користувача
-    DB-->>AuthService: User data
-    AuthService->>Session: Створює сесію
-    Session-->>AuthService: Session token
-    AuthService-->>AuthAPI: Auth response
-    AuthAPI-->>LoginForm: Success + token
-    LoginForm->>User: Перенаправляє на головну
+    LoginForm->>AuthAction: loginUser({ email, password })
+    AuthAction->>AuthAction: Валідація (Zod)
+    AuthAction->>SupabaseAuth: signInWithPassword()
+    SupabaseAuth->>DB: Перевіряє користувача
+    DB-->>SupabaseAuth: User data
+    SupabaseAuth->>SupabaseAuth: Створює JWT токени
+    SupabaseAuth-->>AuthAction: { user, session }
+    AuthAction-->>LoginForm: { data: { user }, error: null }
+    LoginForm->>User: Перенаправляє на /dashboard
 ```
 
 #### 3.4.3 Потік відображення дошки тренувань
@@ -458,18 +561,18 @@ sequenceDiagram
     participant User as Користувач
     participant Calendar as Calendar Component
     participant Page as Dashboard Page
-    participant API as Training API
-    participant Service as Training Service
-    participant DB as База даних
+    participant Action as Server Action
+    participant Supabase as Supabase
+    participant DB as PostgreSQL
 
     User->>Calendar: Відкриває дошку тренувань
-    Calendar->>Page: Завантажує сторінку
-    Page->>API: GET /api/trainings?month=XXX
-    API->>Service: getTrainingsByMonth(userId, month)
-    Service->>DB: Запит тренувань
-    DB-->>Service: List of trainings
-    Service-->>API: Formatted trainings
-    API-->>Page: Trainings data
+    Calendar->>Page: Завантажує сторінку (Server Component)
+    Page->>Action: getTrainings({ month: '2025-01' })
+    Action->>Supabase: Перевірка автентифікації
+    Supabase-->>Action: User authenticated
+    Action->>DB: SELECT trainings + exercises + sets (з RLS)
+    DB-->>Action: List of trainings
+    Action-->>Page: { data: { trainings }, error: null }
     Page->>Calendar: Передає дані
     Calendar-->>User: Відображає календар з тренуваннями
 ```
@@ -483,10 +586,11 @@ votum_ferri/
 │   │   ├── (auth)/            # Auth routes (login, register)
 │   │   ├── dashboard/         # Dashboard/Calendar page
 │   │   ├── training/          # Training pages
-│   │   └── api/               # API routes
-│   │       ├── auth/          # Authentication endpoints
-│   │       ├── trainings/     # Training CRUD endpoints
-│   │       └── exercises/     # Exercise endpoints
+│   │   ├── actions/           # Server Actions
+│   │   │   ├── auth.ts        # Auth actions
+│   │   │   ├── training.ts    # Training actions
+│   │   │   └── exercise.ts    # Exercise actions
+│   │   └── middleware.ts      # Route protection
 │   ├── components/            # React components
 │   │   ├── ui/               # shadcn/ui components
 │   │   ├── training/         # Training-specific components
@@ -498,8 +602,9 @@ votum_ferri/
 │   │   │   └── ExerciseForm/  # Exercise form
 │   │   └── auth/             # Auth components
 │   ├── lib/                   # Utilities & helpers
-│   │   ├── db/               # Database client/ORM (TODO)
-│   │   ├── auth/             # Auth utilities
+│   │   ├── supabase/         # Supabase clients
+│   │   │   ├── client.ts      # Browser client
+│   │   │   └── server.ts      # Server client
 │   │   └── utils/            # General utilities
 │   ├── types/                 # TypeScript types
 │   │   ├── training.ts
@@ -516,19 +621,24 @@ votum_ferri/
 
 **Внутрішні залежності:**
 
-- Компоненти → Pages
-- Pages → API Routes
-- API Routes → Services/Business Logic
-- Services → Database Layer
+- Client Components → Server Actions
+- Server Actions → Supabase клієнт
+- Supabase клієнт → Supabase (PostgreSQL + Auth)
+- Pages → Server Components → Server Actions
+- Forms → Server Actions (через form actions)
 
 **Зовнішні залежності:**
 
-- Next.js framework
-- React library
-- shadcn/ui components
-- Tailwind CSS
-- Database (TODO: визначити)
-- Authentication provider (TODO: визначити)
+- **Next.js 16** - framework та Server Actions
+- **React 19** - UI бібліотека
+- **shadcn/ui** - UI компоненти
+- **Tailwind CSS 4** - стилізація
+- **Supabase** - база даних (PostgreSQL) та автентифікація
+- **@supabase/supabase-js** - Supabase JavaScript клієнт
+- **@supabase/ssr** - Supabase для Next.js SSR
+- **zod** - валідація даних
+- **react-hook-form** - управління формами
+- **date-fns** - робота з датами
 
 ---
 
@@ -545,15 +655,15 @@ votum_ferri/
 
 - App Router для сучасного роутингу
 - Server-Side Rendering (SSR) та Static Site Generation (SSG)
-- Вбудована підтримка API routes
+- Server Actions для backend логіки
 - Оптимізація продуктивності "з коробки"
 - SEO-friendly архітектура
 
 **Використання:**
 
 - Маршрутизація (App Router)
-- API endpoints
-- Server Components
+- Server Actions для backend логіки
+- Server Components для серверного рендерингу
 - Оптимізація зображень та шрифтів
 
 #### 4.1.2 React 19
@@ -644,75 +754,119 @@ votum_ferri/
 
 ### 4.2 Backend технології
 
-**TODO: Визначити пізніше**
+**Вибір:** Next.js Server Actions (Server Functions)
 
-**Варіанти для розгляду:**
+**Обґрунтування:**
 
-- Next.js API Routes (serverless functions)
-- Standalone Node.js server (Express, Fastify)
-- Backend as a Service (Supabase, Firebase)
-- Serverless functions (Vercel Functions, AWS Lambda)
+- Нативна інтеграція з Next.js 16 App Router
+- Типобезпечні функції з TypeScript
+- Автоматична оптимізація та кешування
+- Простота розробки без окремих API routes
+- Пряма інтеграція з React компонентами
+- Менше boilerplate коду
 
-**Критерії вибору:**
+**Архітектура:**
 
-- Простота інтеграції з Next.js
-- Підтримка автентифікації
-- Масштабованість
-- Вартість хостингу
-- Developer experience
+- Server Actions виконуються на сервері
+- Викликаються напряму з Client Components
+- Автоматична серіалізація/десеріалізація даних
+- Вбудована обробка помилок
+- Підтримка `useFormState` та `useFormStatus` hooks
+
+**Структура:**
+
+```
+src/app/actions/
+├── auth.ts          # Auth actions (login, register, logout)
+├── training.ts      # Training CRUD actions
+└── exercise.ts      # Exercise actions
+```
+
+**Переваги:**
+
+- Типобезпека між клієнтом та сервером
+- Менше HTTP запитів (прямі виклики функцій)
+- Кращий developer experience
+- Автоматичне кешування та revalidation
 
 ### 4.3 База даних
 
-**TODO: Визначити пізніше**
+**Вибір:** Supabase (PostgreSQL)
 
-**Варіанти для розгляду:**
+**Версія:** Остання стабільна версія  
+**Призначення:** База даних та Backend as a Service
 
-1. **PostgreSQL**
+**Обґрунтування:**
 
-   - Реляційна БД
-   - Надійність та ACID транзакції
-   - Підтримка складних запитів
-   - ORM: Prisma, Drizzle, TypeORM
+- PostgreSQL з повною підтримкою SQL
+- Вбудована автентифікація (Supabase Auth)
+- Row Level Security (RLS) для безпеки даних
+- Realtime підписки на зміни
+- Автоматичне створення REST API
+- Безкоштовний tier для розробки
+- Проста інтеграція з Next.js
+- TypeScript підтримка з автогенерацією типів
 
-2. **MongoDB**
+**Структура БД:**
 
-   - NoSQL документна БД
-   - Гнучкість схеми
-   - Легка інтеграція з Node.js
-   - ODM: Mongoose
+- PostgreSQL реляційна база даних
+- Таблиці: `profiles`, `trainings`, `exercises`, `exercise_sets`
+- Зв'язки через foreign keys
+- Каскадне видалення
+- Індекси для оптимізації запитів
 
-3. **Supabase (PostgreSQL + Backend)**
+**Клієнт:**
 
-   - PostgreSQL з готовим backend
-   - Вбудована автентифікація
-   - Realtime підтримка
-   - REST API з коробки
+- `@supabase/supabase-js` - основний клієнт
+- `@supabase/ssr` - для Next.js Server Components та Server Actions
+- Створення клієнтів для браузера та сервера
 
-4. **Firebase (Firestore)**
-   - NoSQL cloud БД
-   - Вбудована автентифікація
-   - Realtime синхронізація
-   - Легка інтеграція
+**Безпека:**
 
-**Критерії вибору:**
+- Row Level Security (RLS) policies
+- Автоматична ізоляція даних користувачів
+- Безпека на рівні БД, а не тільки на рівні додатку
 
-- Складність структури даних
-- Потреба в транзакціях
-- Масштабованість
-- Вартість
-- Зручність розробки
+**Міграції:**
+
+- SQL міграції через Supabase Dashboard
+- Версійний контроль міграцій
+- Автоматичне застосування змін
 
 ### 4.4 Автентифікація
 
-**TODO: Визначити пізніше (залежить від backend та БД)**
+**Вибір:** Supabase Auth
 
-**Варіанти для розгляду:**
+**Обґрунтування:**
 
-- NextAuth.js (Auth.js) - універсальне рішення
-- Supabase Auth - якщо використовується Supabase
-- Firebase Auth - якщо використовується Firebase
-- Custom JWT solution
-- Session-based authentication
+- Вбудована в Supabase
+- Підтримка email/password автентифікації
+- JWT токени з автоматичним оновленням
+- Безпечне зберігання сесій
+- Middleware для захисту маршрутів
+- Проста інтеграція з Next.js
+
+**Функціональність:**
+
+- Реєстрація користувачів
+- Вхід/вихід
+- Управління сесіями
+- Оновлення профілю
+- Захист маршрутів через middleware
+
+**Реалізація:**
+
+- Server Actions для auth операцій
+- Supabase Auth клієнт для сервера та клієнта
+- Cookies для збереження сесії
+- Middleware для перевірки автентифікації
+
+**Безпека:**
+
+- Хешування паролів (bcrypt) - автоматично в Supabase
+- Secure cookies
+- HTTPS only в production
+- Захист від CSRF через SameSite cookies
 
 ### 4.5 Інструменти розробки
 
@@ -784,10 +938,13 @@ votum_ferri/
 
 **Планові додаткові залежності:**
 
+- `@supabase/supabase-js` - Supabase клієнт
+- `@supabase/ssr` - Supabase для Next.js SSR
+- `zod` - валідація даних
+- `react-hook-form` - управління формами
+- `@hookform/resolvers` - інтеграція zod з react-hook-form
+- `date-fns` - робота з датами
 - shadcn/ui компоненти (будуть додані за потреби)
-- Библиотека для роботи з датами (date-fns або dayjs)
-- Форма валідація (react-hook-form + zod)
-- Інші залежності залежать від вибору backend та БД
 
 ### 4.7 Середовища розробки
 
@@ -812,18 +969,19 @@ votum_ferri/
 
 ### 4.8 Резюме технічного стеку
 
-| Категорія      | Технологія     | Статус     |
-| -------------- | -------------- | ---------- |
-| Framework      | Next.js 16     | ✅ Вибрано |
-| UI Library     | React 19       | ✅ Вибрано |
-| Мова           | TypeScript 5   | ✅ Вибрано |
-| Стилі          | Tailwind CSS 4 | ✅ Вибрано |
-| UI Components  | shadcn/ui      | ✅ Вибрано |
-| Linting        | Biome 2.2.0    | ✅ Вибрано |
-| Backend        | TBD            | ⏳ TODO    |
-| База даних     | TBD            | ⏳ TODO    |
-| Автентифікація | TBD            | ⏳ TODO    |
-| ORM/ODM        | TBD            | ⏳ TODO    |
+| Категорія      | Технологія             | Статус     |
+| -------------- | ---------------------- | ---------- |
+| Framework      | Next.js 16             | ✅ Вибрано |
+| UI Library     | React 19               | ✅ Вибрано |
+| Мова           | TypeScript 5           | ✅ Вибрано |
+| Стилі          | Tailwind CSS 4         | ✅ Вибрано |
+| UI Components  | shadcn/ui              | ✅ Вибрано |
+| Linting        | Biome 2.2.0            | ✅ Вибрано |
+| Backend        | Next.js Server Actions | ✅ Вибрано |
+| База даних     | Supabase (PostgreSQL)  | ✅ Вибрано |
+| Автентифікація | Supabase Auth          | ✅ Вибрано |
+| Валідація      | Zod                    | ✅ Вибрано |
+| Форми          | react-hook-form        | ✅ Вибрано |
 
 ---
 
@@ -1012,31 +1170,38 @@ erDiagram
 
 ### 5.5 Індекси бази даних
 
-**Планові індекси (TODO: уточнити після вибору БД):**
+**Реалізовані індекси для Supabase PostgreSQL:**
 
-1. **User таблиця:**
+1. **profiles таблиця:**
 
-   - PRIMARY KEY: `id`
-   - UNIQUE INDEX: `email`
-   - INDEX: `createdAt` (для сортування)
+   - PRIMARY KEY: `id` (UUID)
+   - UNIQUE INDEX: `email` (якщо потрібно)
+   - Автоматичні індекси через foreign key на `auth.users`
 
-2. **Training таблиця:**
+2. **trainings таблиця:**
 
-   - PRIMARY KEY: `id`
-   - FOREIGN KEY INDEX: `userId`
-   - COMPOSITE INDEX: `(userId, date)` (для швидкого пошуку тренувань користувача за датою)
-   - INDEX: `date` (для сортування)
+   - PRIMARY KEY: `id` (UUID)
+   - FOREIGN KEY INDEX: `user_id` (автоматично)
+   - COMPOSITE INDEX: `trainings_user_id_date_idx` на `(user_id, date)` - для швидкого пошуку тренувань користувача за датою
 
-3. **Exercise таблиця:**
+3. **exercises таблиця:**
 
-   - PRIMARY KEY: `id`
-   - FOREIGN KEY INDEX: `trainingId`
-   - INDEX: `(trainingId, order)` (для сортування вправ в тренуванні)
+   - PRIMARY KEY: `id` (UUID)
+   - FOREIGN KEY INDEX: `training_id` (автоматично)
+   - COMPOSITE INDEX: `exercises_training_id_order_idx` на `(training_id, order_number)` - для сортування вправ в тренуванні
 
-4. **ExerciseSet таблиця:**
-   - PRIMARY KEY: `id`
-   - FOREIGN KEY INDEX: `exerciseId`
-   - INDEX: `(exerciseId, setNumber)` (для сортування підходів)
+4. **exercise_sets таблиця:**
+   - PRIMARY KEY: `id` (UUID)
+   - FOREIGN KEY INDEX: `exercise_id` (автоматично)
+   - COMPOSITE INDEX: `exercise_sets_exercise_id_set_number_idx` на `(exercise_id, set_number)` - для сортування підходів
+
+**SQL для створення індексів:**
+
+```sql
+CREATE INDEX trainings_user_id_date_idx ON public.trainings(user_id, date);
+CREATE INDEX exercises_training_id_order_idx ON public.exercises(training_id, order_number);
+CREATE INDEX exercise_sets_exercise_id_set_number_idx ON public.exercise_sets(exercise_id, set_number);
+```
 
 ### 5.6 Типи для API responses
 
@@ -1119,24 +1284,147 @@ interface ExerciseSetResponse {
 - `restTime`: опціональне, невід'ємне число (секунди)
 - `notes`: опціональне, максимум 500 символів
 
-### 5.8 TODO: Схема бази даних
+### 5.8 Схема бази даних
 
-**TODO: Визначити точну схему БД після вибору бази даних**
+**База даних:** Supabase (PostgreSQL)
 
-**Розглянуті варіанти:**
+**Структура таблиць:**
 
-- SQL схема (PostgreSQL, MySQL)
-- NoSQL структура (MongoDB документи)
-- Supabase (PostgreSQL з особливостями)
-- Firebase Firestore (колекції та документи)
+#### 5.8.1 Таблиця profiles
 
-**Детальна схема буде додана після вибору:**
+**Призначення:** Додаткові дані профілю користувача (основні дані в `auth.users`)
 
-- Точні типи даних (VARCHAR, INTEGER, DECIMAL, DATE, TIMESTAMP)
-- Обмеження (constraints)
-- Тригери (якщо потрібно)
-- Міграції
-- ORM/ODM моделі (Prisma, Mongoose, Drizzle тощо)
+```sql
+CREATE TABLE public.profiles (
+  id UUID REFERENCES auth.users(id) PRIMARY KEY,
+  email TEXT,
+  name TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+**Типи даних:**
+
+- `id`: UUID (PRIMARY KEY, FK на auth.users)
+- `email`: TEXT (унікальний)
+- `name`: TEXT (опціонально)
+- `created_at`: TIMESTAMP WITH TIME ZONE
+- `updated_at`: TIMESTAMP WITH TIME ZONE
+
+#### 5.8.2 Таблиця trainings
+
+```sql
+CREATE TABLE public.trainings (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  date DATE NOT NULL,
+  name TEXT,
+  description TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+**Типи даних:**
+
+- `id`: UUID (PRIMARY KEY)
+- `user_id`: UUID (FOREIGN KEY на auth.users, CASCADE DELETE)
+- `date`: DATE (обов'язкове)
+- `name`: TEXT (опціонально, максимум 255 символів)
+- `description`: TEXT (опціонально, максимум 1000 символів)
+- `created_at`: TIMESTAMP WITH TIME ZONE
+- `updated_at`: TIMESTAMP WITH TIME ZONE
+
+#### 5.8.3 Таблиця exercises
+
+```sql
+CREATE TABLE public.exercises (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  training_id UUID REFERENCES public.trainings(id) ON DELETE CASCADE NOT NULL,
+  name TEXT NOT NULL,
+  order_number INTEGER NOT NULL,
+  notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+**Типи даних:**
+
+- `id`: UUID (PRIMARY KEY)
+- `training_id`: UUID (FOREIGN KEY на trainings, CASCADE DELETE)
+- `name`: TEXT (обов'язкове, максимум 255 символів)
+- `order_number`: INTEGER (обов'язкове, для сортування)
+- `notes`: TEXT (опціонально, максимум 500 символів)
+- `created_at`: TIMESTAMP WITH TIME ZONE
+- `updated_at`: TIMESTAMP WITH TIME ZONE
+
+#### 5.8.4 Таблиця exercise_sets
+
+```sql
+CREATE TABLE public.exercise_sets (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  exercise_id UUID REFERENCES public.exercises(id) ON DELETE CASCADE NOT NULL,
+  set_number INTEGER NOT NULL,
+  reps INTEGER NOT NULL,
+  weight DECIMAL(10, 2) NOT NULL,
+  rest_time INTEGER,
+  completed BOOLEAN DEFAULT false,
+  notes TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+```
+
+**Типи даних:**
+
+- `id`: UUID (PRIMARY KEY)
+- `exercise_id`: UUID (FOREIGN KEY на exercises, CASCADE DELETE)
+- `set_number`: INTEGER (обов'язкове, унікальне в межах вправи)
+- `reps`: INTEGER (обов'язкове, >= 1)
+- `weight`: DECIMAL(10, 2) (обов'язкове, >= 0)
+- `rest_time`: INTEGER (опціонально, секунди)
+- `completed`: BOOLEAN (опціонально, за замовчуванням false)
+- `notes`: TEXT (опціонально, максимум 500 символів)
+- `created_at`: TIMESTAMP WITH TIME ZONE
+- `updated_at`: TIMESTAMP WITH TIME ZONE
+
+#### 5.8.5 Індекси
+
+```sql
+-- Composite index для швидкого пошуку тренувань користувача за датою
+CREATE INDEX trainings_user_id_date_idx ON public.trainings(user_id, date);
+
+-- Index для сортування вправ в тренуванні
+CREATE INDEX exercises_training_id_order_idx ON public.exercises(training_id, order_number);
+
+-- Index для сортування підходів
+CREATE INDEX exercise_sets_exercise_id_set_number_idx ON public.exercise_sets(exercise_id, set_number);
+```
+
+#### 5.8.6 Row Level Security (RLS)
+
+**Включення RLS:**
+
+```sql
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.trainings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.exercises ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.exercise_sets ENABLE ROW LEVEL SECURITY;
+```
+
+**Policies:**
+
+- Користувачі можуть переглядати/створювати/оновлювати/видаляти тільки свої дані
+- RLS автоматично фільтрує запити по `user_id` поточного користувача
+- Детальні policies описані в розділі 9.4.1
+
+#### 5.8.7 Міграції
+
+- SQL міграції виконуються через Supabase Dashboard або CLI
+- Версійний контроль міграцій через Git
+- Автоматичне застосування при деплої
 
 ---
 
@@ -1680,545 +1968,490 @@ interface ExerciseSetResponse {
 
 ## 7. API специфікації
 
-### 7.1 Загальні принципи API
+### 7.1 Загальні принципи Server Actions
 
-**Тип API:** RESTful API  
-**Формат даних:** JSON  
-**Автентифікація:** TODO - визначити після вибору backend (JWT, Session, тощо)
+**Тип API:** Next.js Server Actions  
+**Формат даних:** TypeScript типи (автоматична серіалізація)  
+**Автентифікація:** Supabase Auth (JWT токени в cookies)
 
-**Базовий URL:** `/api`
+**Структура:**
 
-**Статус коди HTTP:**
-
-- `200 OK` - успішний запит
-- `201 Created` - успішно створено ресурс
-- `204 No Content` - успішне видалення
-- `400 Bad Request` - невалідні дані
-- `401 Unauthorized` - неавторизований користувач
-- `403 Forbidden` - доступ заборонено
-- `404 Not Found` - ресурс не знайдено
-- `500 Internal Server Error` - серверна помилка
+- Server Actions знаходяться в `src/app/actions/`
+- Кожна action - це async функція з міткою `'use server'`
+- Викликаються напряму з Client Components
+- Автоматична типобезпека між клієнтом та сервером
 
 **Формат відповіді:**
 
 ```typescript
 // Успішна відповідь
 {
-  "success": true,
-  "data": { ... },
-  "message"?: string
+  data: { ... },
+  error?: null
 }
 
 // Помилка
 {
-  "success": false,
-  "error": {
-    "code": string,
-    "message": string,
-    "details"?: any
+  data: null,
+  error: {
+    code: string,
+    message: string,
+    details?: any
   }
 }
 ```
 
-### 7.2 Endpoints для автентифікації
+**Переваги Server Actions:**
 
-#### 7.2.1 POST /api/auth/register
+- Типобезпека - TypeScript перевіряє типи на етапі компіляції
+- Менше boilerplate - не потрібні HTTP endpoints
+- Автоматична серіалізація - Next.js обробляє передачу даних
+- Пряма інтеграція з React - використання `useFormState`, `useFormStatus`
+- Автоматичне revalidation - `revalidatePath` та `revalidateTag`
+
+### 7.2 Server Actions для автентифікації
+
+**Файл:** `src/app/actions/auth.ts`
+
+#### 7.2.1 registerUser
 
 **Призначення:** Реєстрація нового користувача
 
-**Request Body:**
+**Сигнатура:**
 
 ```typescript
-{
-  email: string;           // Обов'язкове, валідний email
-  password: string;        // Обов'язкове, мінімум 8 символів
-  name?: string;          // Опціональне
-}
+async function registerUser(data: {
+  email: string;
+  password: string;
+  name?: string;
+}): Promise<{
+  data: { user: PublicUser } | null;
+  error: { code: string; message: string } | null;
+}>;
 ```
 
-**Response (201 Created):**
+**Валідація:**
 
-```typescript
-{
-  "success": true,
-  "data": {
-    "user": {
-      "id": string,
-      "email": string,
-      "name"?: string
-    },
-    "token"?: string      // TODO: залежить від типу автентифікації
-  }
-}
-```
+- `email`: обов'язкове, валідний email формат
+- `password`: обов'язкове, мінімум 8 символів
+- `name`: опціональне, максимум 255 символів
 
-**Помилки:**
+**Повертає:**
 
-- `400` - невалідні дані (email вже існує, слабкий пароль)
-- `500` - серверна помилка
+- `data.user` - інформація про створеного користувача
+- `error` - помилка валідації або реєстрації
 
 ---
 
-#### 7.2.2 POST /api/auth/login
+#### 7.2.2 loginUser
 
 **Призначення:** Вхід в систему
 
-**Request Body:**
+**Сигнатура:**
 
 ```typescript
-{
-  email: string;
-  password: string;
-}
+async function loginUser(data: { email: string; password: string }): Promise<{
+  data: { user: PublicUser } | null;
+  error: { code: string; message: string } | null;
+}>;
 ```
 
-**Response (200 OK):**
+**Валідація:**
 
-```typescript
-{
-  "success": true,
-  "data": {
-    "user": {
-      "id": string,
-      "email": string,
-      "name"?: string
-    },
-    "token"?: string      // TODO: залежить від типу автентифікації
-  }
-}
-```
+- `email`: обов'язкове, валідний email формат
+- `password`: обов'язкове
 
-**Помилки:**
+**Повертає:**
 
-- `400` - невалідні дані
-- `401` - невірний email або пароль
-- `500` - серверна помилка
+- `data.user` - інформація про користувача
+- `error` - помилка автентифікації
+
+**Примітка:** Сесія зберігається автоматично через Supabase cookies
 
 ---
 
-#### 7.2.3 POST /api/auth/logout
+#### 7.2.3 logoutUser
 
 **Призначення:** Вихід з системи
 
-**Headers:**
-
-```
-Authorization: Bearer <token>  // TODO: залежить від типу автентифікації
-```
-
-**Response (200 OK):**
+**Сигнатура:**
 
 ```typescript
-{
-  "success": true,
-  "message": "Successfully logged out"
-}
+async function logoutUser(): Promise<{
+  data: { success: boolean } | null;
+  error: { code: string; message: string } | null;
+}>;
 ```
 
-**Помилки:**
+**Повертає:**
 
-- `401` - неавторизований
+- `data.success` - успішний вихід
+- `error` - помилка (якщо неавторизований)
 
 ---
 
-#### 7.2.4 GET /api/auth/me
+#### 7.2.4 getCurrentUser
 
 **Призначення:** Отримання поточної інформації про користувача
 
-**Headers:**
-
-```
-Authorization: Bearer <token>
-```
-
-**Response (200 OK):**
+**Сигнатура:**
 
 ```typescript
-{
-  "success": true,
-  "data": {
-    "user": {
-      "id": string,
-      "email": string,
-      "name"?: string,
-      "createdAt": string,
-      "updatedAt": string
-    }
-  }
-}
+async function getCurrentUser(): Promise<{
+  data: { user: PublicUser } | null;
+  error: { code: string; message: string } | null;
+}>;
 ```
 
-**Помилки:**
+**Повертає:**
 
-- `401` - неавторизований
+- `data.user` - інформація про поточного користувача
+- `error` - помилка (якщо неавторизований)
 
-### 7.3 Endpoints для тренувань (CRUD)
+### 7.3 Server Actions для тренувань (CRUD)
 
-#### 7.3.1 GET /api/trainings
+**Файл:** `src/app/actions/training.ts`
+
+#### 7.3.1 getTrainings
 
 **Призначення:** Отримання списку тренувань користувача
 
-**Headers:**
-
-```
-Authorization: Bearer <token>
-```
-
-**Query Parameters:**
-
-```
-?month=2025-01         // Фільтр по місяцю (YYYY-MM)
-?date=2025-01-15       // Фільтр по конкретній даті (YYYY-MM-DD)
-?limit=50              // Ліміт результатів (опціонально)
-?offset=0              // Зміщення для пагінації (опціонально)
-```
-
-**Response (200 OK):**
+**Сигнатура:**
 
 ```typescript
-{
-  "success": true,
-  "data": {
-    "trainings": TrainingResponse[],
-    "total"?: number      // Для пагінації
-  }
-}
+async function getTrainings(params?: {
+  month?: string; // Фільтр по місяцю (YYYY-MM)
+  date?: string; // Фільтр по конкретній даті (YYYY-MM-DD)
+  limit?: number; // Ліміт результатів
+  offset?: number; // Зміщення для пагінації
+}): Promise<{
+  data: { trainings: TrainingResponse[]; total?: number } | null;
+  error: { code: string; message: string } | null;
+}>;
 ```
 
-**Помилки:**
+**Повертає:**
 
-- `401` - неавторизований
+- `data.trainings` - масив тренувань з вправами та підходами
+- `data.total` - загальна кількість (для пагінації)
+- `error` - помилка авторизації або запиту
 
 ---
 
-#### 7.3.2 GET /api/trainings/:id
+#### 7.3.2 getTraining
 
 **Призначення:** Отримання деталей конкретного тренування
 
-**Headers:**
-
-```
-Authorization: Bearer <token>
-```
-
-**Response (200 OK):**
+**Сигнатура:**
 
 ```typescript
-{
-  "success": true,
-  "data": {
-    "training": TrainingResponse
-  }
-}
+async function getTraining(id: string): Promise<{
+  data: { training: TrainingResponse } | null;
+  error: { code: string; message: string } | null;
+}>;
 ```
 
-**Помилки:**
+**Повертає:**
 
-- `401` - неавторизований
-- `403` - тренування належить іншому користувачу
-- `404` - тренування не знайдено
+- `data.training` - детальна інформація про тренування з вправами
+- `error` - помилка (неавторизований, не знайдено, доступ заборонено)
 
 ---
 
-#### 7.3.3 POST /api/trainings
+#### 7.3.3 createTraining
 
 **Призначення:** Створення нового тренування
 
-**Headers:**
-
-```
-Authorization: Bearer <token>
-Content-Type: application/json
-```
-
-**Request Body:**
+**Сигнатура:**
 
 ```typescript
-CreateTrainingDTO {
-  date: string;                  // ISO date string (YYYY-MM-DD)
-  name?: string;
-  description?: string;
-  exercises: CreateExerciseDTO[];
-}
+async function createTraining(data: CreateTrainingDTO): Promise<{
+  data: { training: TrainingResponse } | null;
+  error: { code: string; message: string; details?: any } | null;
+}>;
 ```
 
-**Response (201 Created):**
+**Валідація:**
 
-```typescript
-{
-  "success": true,
-  "data": {
-    "training": TrainingResponse
-  }
-}
-```
+- `date`: обов'язкове, валідна дата (ISO string)
+- `name`: опціональне, максимум 255 символів
+- `description`: опціональне, максимум 1000 символів
+- `exercises`: обов'язкове, мінімум 1 вправа
 
-**Помилки:**
+**Повертає:**
 
-- `400` - невалідні дані (відсутня дата, немає вправ, тощо)
-- `401` - неавторизований
+- `data.training` - створене тренування
+- `error` - помилка валідації або авторизації
+
+**Примітка:** Автоматично викликає `revalidatePath('/dashboard')` після успішного створення
 
 ---
 
-#### 7.3.4 PUT /api/trainings/:id
+#### 7.3.4 updateTraining
 
 **Призначення:** Оновлення існуючого тренування
 
-**Headers:**
-
-```
-Authorization: Bearer <token>
-Content-Type: application/json
-```
-
-**Request Body:**
+**Сигнатура:**
 
 ```typescript
-UpdateTrainingDTO {
-  date?: string;
-  name?: string;
-  description?: string;
-  exercises?: CreateExerciseDTO[];
-}
+async function updateTraining(
+  id: string,
+  data: UpdateTrainingDTO
+): Promise<{
+  data: { training: TrainingResponse } | null;
+  error: { code: string; message: string; details?: any } | null;
+}>;
 ```
 
-**Response (200 OK):**
+**Валідація:**
 
-```typescript
-{
-  "success": true,
-  "data": {
-    "training": TrainingResponse
-  }
-}
-```
+- Всі поля опціональні
+- Якщо передано `exercises`, вони повністю замінюють існуючі
 
-**Помилки:**
+**Повертає:**
 
-- `400` - невалідні дані
-- `401` - неавторизований
-- `403` - тренування належить іншому користувачу
-- `404` - тренування не знайдено
+- `data.training` - оновлене тренування
+- `error` - помилка (неавторизований, не знайдено, доступ заборонено)
+
+**Примітка:** Автоматично викликає `revalidatePath` для відповідних сторінок
 
 ---
 
-#### 7.3.5 DELETE /api/trainings/:id
+#### 7.3.5 deleteTraining
 
 **Призначення:** Видалення тренування
 
-**Headers:**
+**Сигнатура:**
 
-```
-Authorization: Bearer <token>
-```
-
-**Response (204 No Content):**
-
-```
-(без тіла відповіді)
+```typescript
+async function deleteTraining(id: string): Promise<{
+  data: { success: boolean } | null;
+  error: { code: string; message: string } | null;
+}>;
 ```
 
-**Помилки:**
+**Повертає:**
 
-- `401` - неавторизований
-- `403` - тренування належить іншому користувачу
-- `404` - тренування не знайдено
+- `data.success` - успішне видалення
+- `error` - помилка (неавторизований, не знайдено, доступ заборонено)
 
-### 7.4 Endpoints для вправ
+**Примітка:** Каскадне видалення вправ та підходів через foreign keys. Автоматично викликає `revalidatePath('/dashboard')`
 
-**Примітка:** Вправи можуть оброблятися через Training endpoints (в складі тренування), або мати окремі endpoints. Залежить від архітектури backend.
+### 7.4 Server Actions для вправ
 
-#### 7.4.1 GET /api/trainings/:trainingId/exercises
+**Файл:** `src/app/actions/exercise.ts`
+
+**Примітка:** Вправи обробляються через окремі Server Actions, але зазвичай створюються/оновлюються разом з тренуванням через `createTraining` та `updateTraining`. Окремі actions для вправ використовуються для додавання/видалення вправ до існуючого тренування.
+
+#### 7.4.1 getExercises
 
 **Призначення:** Отримання списку вправ для тренування
 
-**Headers:**
-
-```
-Authorization: Bearer <token>
-```
-
-**Response (200 OK):**
+**Сигнатура:**
 
 ```typescript
-{
-  "success": true,
-  "data": {
-    "exercises": ExerciseResponse[]
-  }
-}
+async function getExercises(trainingId: string): Promise<{
+  data: { exercises: ExerciseResponse[] } | null;
+  error: { code: string; message: string } | null;
+}>;
 ```
 
-**Помилки:**
+**Повертає:**
 
-- `401` - неавторизований
-- `403` - тренування належить іншому користувачу
-- `404` - тренування не знайдено
+- `data.exercises` - масив вправ з підходами, відсортований по `order`
+- `error` - помилка (неавторизований, тренування не знайдено, доступ заборонено)
 
 ---
 
-#### 7.4.2 GET /api/trainings/:trainingId/exercises/:id
+#### 7.4.2 getExercise
 
 **Призначення:** Отримання деталей вправи
 
-**Headers:**
-
-```
-Authorization: Bearer <token>
-```
-
-**Response (200 OK):**
+**Сигнатура:**
 
 ```typescript
-{
-  "success": true,
-  "data": {
-    "exercise": ExerciseResponse
-  }
-}
+async function getExercise(
+  trainingId: string,
+  exerciseId: string
+): Promise<{
+  data: { exercise: ExerciseResponse } | null;
+  error: { code: string; message: string } | null;
+}>;
 ```
 
-**Помилки:**
+**Повертає:**
 
-- `401` - неавторизований
-- `403` - тренування належить іншому користувачу
-- `404` - вправа не знайдена
+- `data.exercise` - детальна інформація про вправу з підходами
+- `error` - помилка (неавторизований, не знайдено, доступ заборонено)
 
 ---
 
-#### 7.4.3 POST /api/trainings/:trainingId/exercises
+#### 7.4.3 createExercise
 
-**Призначення:** Додавання вправи до тренування
+**Призначення:** Додавання вправи до існуючого тренування
 
-**Headers:**
-
-```
-Authorization: Bearer <token>
-Content-Type: application/json
-```
-
-**Request Body:**
+**Сигнатура:**
 
 ```typescript
-CreateExerciseDTO {
-  name: string;
-  sets: CreateExerciseSetDTO[];
-  order: number;
-  notes?: string;
-}
+async function createExercise(
+  trainingId: string,
+  data: CreateExerciseDTO
+): Promise<{
+  data: { exercise: ExerciseResponse } | null;
+  error: { code: string; message: string; details?: any } | null;
+}>;
 ```
 
-**Response (201 Created):**
+**Валідація:**
 
-```typescript
-{
-  "success": true,
-  "data": {
-    "exercise": ExerciseResponse
-  }
-}
-```
+- `name`: обов'язкове, не порожнє, максимум 255 символів
+- `sets`: обов'язкове, мінімум 1 підхід
+- `order`: обов'язкове, позитивне число
 
-**Помилки:**
+**Повертає:**
 
-- `400` - невалідні дані
-- `401` - неавторизований
-- `403` - тренування належить іншому користувачу
-- `404` - тренування не знайдено
+- `data.exercise` - створена вправа
+- `error` - помилка валідації або авторизації
 
 ---
 
-#### 7.4.4 PUT /api/trainings/:trainingId/exercises/:id
+#### 7.4.4 updateExercise
 
 **Призначення:** Оновлення вправи
 
-**Headers:**
-
-```
-Authorization: Bearer <token>
-Content-Type: application/json
-```
-
-**Request Body:**
+**Сигнатура:**
 
 ```typescript
-CreateExerciseDTO; // Всі поля опціональні для оновлення
+async function updateExercise(
+  trainingId: string,
+  exerciseId: string,
+  data: Partial<CreateExerciseDTO>
+): Promise<{
+  data: { exercise: ExerciseResponse } | null;
+  error: { code: string; message: string; details?: any } | null;
+}>;
 ```
 
-**Response (200 OK):**
+**Валідація:**
 
-```typescript
-{
-  "success": true,
-  "data": {
-    "exercise": ExerciseResponse
-  }
-}
-```
+- Всі поля опціональні
+- Якщо передано `sets`, вони повністю замінюють існуючі
 
-**Помилки:**
+**Повертає:**
 
-- `400` - невалідні дані
-- `401` - неавторизований
-- `403` - тренування належить іншому користувачу
-- `404` - вправа не знайдена
+- `data.exercise` - оновлена вправа
+- `error` - помилка (неавторизований, не знайдено, доступ заборонено)
 
 ---
 
-#### 7.4.5 DELETE /api/trainings/:trainingId/exercises/:id
+#### 7.4.5 deleteExercise
 
 **Призначення:** Видалення вправи з тренування
 
-**Headers:**
+**Сигнатура:**
 
+```typescript
+async function deleteExercise(
+  trainingId: string,
+  exerciseId: string
+): Promise<{
+  data: { success: boolean } | null;
+  error: { code: string; message: string } | null;
+}>;
 ```
-Authorization: Bearer <token>
-```
 
-**Response (204 No Content):**
+**Повертає:**
 
-```
-(без тіла відповіді)
-```
+- `data.success` - успішне видалення
+- `error` - помилка (неавторизований, не знайдено, доступ заборонено)
 
-**Помилки:**
-
-- `401` - неавторизований
-- `403` - тренування належить іншому користувачу
-- `404` - вправа не знайдена
+**Примітка:** Каскадне видалення підходів через foreign keys
 
 ### 7.5 Авторизація та безпека
 
-#### 7.5.1 Авторизація запитів
+#### 7.5.1 Авторизація Server Actions
 
-**TODO: Уточнити після вибору backend рішення**
+**Реалізація:**
 
-**Варіанти:**
+- Кожна Server Action перевіряє автентифікацію через Supabase Auth
+- Використання `createClient()` з `@supabase/ssr` для отримання поточного користувача
+- Якщо користувач неавторизований, повертається `error` з кодом `UNAUTHORIZED`
 
-- JWT токени в заголовку `Authorization: Bearer <token>`
-- Session cookies
-- API keys (менш ймовірно для користувацьких endpoints)
+**Приклад:**
+
+```typescript
+"use server";
+
+import { createClient } from "@/lib/supabase/server";
+
+export async function getTrainings() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return {
+      data: null,
+      error: { code: "UNAUTHORIZED", message: "Not authenticated" },
+    };
+  }
+
+  // ... логіка отримання тренувань
+}
+```
 
 #### 7.5.2 Перевірка прав доступу
 
-- Користувач має доступ тільки до своїх тренувань
-- Перевірка `userId` при кожному запиті
-- `403 Forbidden` якщо спроба доступу до чужих даних
+**Реалізація:**
+
+- Row Level Security (RLS) в Supabase забезпечує безпеку на рівні БД
+- Додаткова перевірка `userId` в Server Actions для подвійного захисту
+- Перевірка належності тренування користувачу перед операціями
+
+**RLS Policies:**
+
+- Автоматична фільтрація по `user_id` через RLS
+- Неможливий доступ до чужих даних навіть при прямому SQL запиті
+- `403 Forbidden` через RLS якщо спроба доступу до чужих даних
 
 #### 7.5.3 Валідація даних
 
-- Валідація на рівні API
+**Реалізація:**
+
+- Валідація через Zod схеми в Server Actions
 - Перевірка обов'язкових полів
 - Перевірка типів даних
-- Перевірка обмежень (мінімум/максимум значень)
+- Перевірка обмежень (мінімум/максимум значень, формати)
+
+**Приклад:**
+
+```typescript
+import { z } from 'zod'
+
+const createTrainingSchema = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  name: z.string().max(255).optional(),
+  exercises: z.array(z.object({...})).min(1)
+})
+
+export async function createTraining(data: unknown) {
+  const validated = createTrainingSchema.safeParse(data)
+  if (!validated.success) {
+    return { data: null, error: { code: 'VALIDATION_ERROR', message: 'Invalid data', details: validated.error } }
+  }
+  // ... логіка створення
+}
+```
 
 #### 7.5.4 Rate Limiting
 
-**TODO: Розглянути після вибору backend**
+**Реалізація:**
 
-- Захист від DDoS атак
-- Обмеження кількості запитів з одного IP
-- Обмеження на автентифікаційні endpoints
+- Supabase має вбудований rate limiting
+- Додатковий rate limiting можна додати через middleware (за потреби)
+- Обмеження на автентифікаційні actions (login, register)
 
 ### 7.6 Error Handling
 
@@ -2247,17 +2480,33 @@ Authorization: Bearer <token>
 - `DUPLICATE_ENTRY` - дублікат (наприклад, email вже існує)
 - `SERVER_ERROR` - серверна помилка
 
-### 7.7 TODO: Деталізація після вибору backend
+### 7.7 Деталізація Server Actions
 
-**Після вибору backend рішення потрібно уточнити:**
+**Визначені рішення:**
 
-- Точний формат автентифікації (JWT, Sessions, тощо)
-- Middleware для авторизації
-- Валідація через конкретні бібліотеки (zod, joi, тощо)
-- ORM/ODM інтеграція
-- База даних конкретні типи запитів
-- Міграції бази даних
-- Тестування API endpoints
+- **Автентифікація:** Supabase Auth (JWT токени в cookies)
+- **Middleware:** Next.js middleware з Supabase для захисту маршрутів
+- **Валідація:** Zod для валідації даних в Server Actions
+- **База даних:** Supabase PostgreSQL з прямими SQL запитами через Supabase клієнт
+- **Міграції:** SQL міграції через Supabase Dashboard або CLI
+- **Тестування:** Unit тести для Server Actions, інтеграційні тести для повного flow
+
+**Структура Server Actions:**
+
+```
+src/app/actions/
+├── auth.ts          # registerUser, loginUser, logoutUser, getCurrentUser
+├── training.ts      # getTrainings, getTraining, createTraining, updateTraining, deleteTraining
+└── exercise.ts      # getExercises, getExercise, createExercise, updateExercise, deleteExercise
+```
+
+**Паттерни використання:**
+
+- Всі actions мають уніфікований формат відповіді `{ data, error }`
+- Автоматична перевірка автентифікації в кожній action
+- Валідація через Zod перед обробкою
+- `revalidatePath` для оновлення кешу після змін
+- Обробка помилок з детальними повідомленнями
 
 ---
 
@@ -2694,23 +2943,20 @@ interface TrainingDetailProps {
 
 ```
 src/
+├── app/
+│   └── actions/                 # Server Actions
+│       ├── auth.ts               # Auth actions
+│       ├── training.ts           # Training actions
+│       └── exercise.ts           # Exercise actions
+│
 ├── lib/
-│   ├── api/                      # API клиент
-│   │   ├── client.ts             # HTTP client
-│   │   ├── auth.ts               # Auth API
-│   │   ├── training.ts           # Training API
-│   │   └── exercise.ts           # Exercise API
-│   │
-│   ├── db/                       # Database client (TODO)
-│   │   └── ...
-│   │
-│   ├── auth/                     # Auth utilities
-│   │   ├── auth.ts               # Auth logic
-│   │   └── session.ts            # Session management
+│   ├── supabase/                 # Supabase clients
+│   │   ├── client.ts             # Browser client
+│   │   └── server.ts             # Server client
 │   │
 │   └── utils/                    # General utilities
 │       ├── date.ts               # Date utilities
-│       └── validation.ts         # Validation helpers
+│       └── validation.ts         # Validation helpers (Zod schemas)
 │
 ├── hooks/                        # Custom React hooks
 │   ├── useAuth.ts                # Auth hook
@@ -2721,55 +2967,74 @@ src/
     ├── training.ts
     ├── exercise.ts
     ├── user.ts
-    └── api.ts
+    └── supabase.ts               # Supabase generated types
 ```
 
-#### 8.4.2 API Client Module
+#### 8.4.2 Supabase Client Module
 
-**Файл:** `src/lib/api/client.ts`
+**Файл:** `src/lib/supabase/client.ts`
 
-**Призначення:** HTTP client для API запитів
+**Призначення:** Supabase клієнт для браузера
 
 **Функціональність:**
 
-- Базовий HTTP client (fetch або axios)
-- Додавання авторизаційних заголовків
-- Обробка помилок
-- Трансформація відповідей
-- Retry логіка (за потреби)
+- Створення браузерного клієнта через `createBrowserClient`
+- Використання в Client Components
+- Автоматичне управління cookies
+
+**Файл:** `src/lib/supabase/server.ts`
+
+**Призначення:** Supabase клієнт для сервера
+
+**Функціональність:**
+
+- Створення серверного клієнта через `createServerClient`
+- Використання в Server Actions та Server Components
+- Управління cookies через Next.js cookies API
 
 ---
 
-#### 8.4.3 Auth Module
+#### 8.4.3 Auth Module (Server Actions)
 
-**Файл:** `src/lib/auth/auth.ts`
+**Файл:** `src/app/actions/auth.ts`
 
-**Призначення:** Логіка автентифікації
+**Призначення:** Server Actions для автентифікації
 
 **Функціональність:**
 
-- Вхід (login)
-- Реєстрація (register)
-- Вихід (logout)
-- Перевірка авторизації
-- Отримання поточного користувача
-- Збереження токену/сесії
+- `registerUser` - реєстрація нового користувача
+- `loginUser` - вхід в систему
+- `logoutUser` - вихід з системи
+- `getCurrentUser` - отримання поточного користувача
+
+**Реалізація:**
+
+- Використання Supabase Auth API
+- Валідація через Zod
+- Уніфікований формат відповіді `{ data, error }`
 
 ---
 
-#### 8.4.4 Training Module
+#### 8.4.4 Training Module (Server Actions)
 
-**Файл:** `src/lib/api/training.ts`
+**Файл:** `src/app/actions/training.ts`
 
-**Призначення:** API для тренувань
+**Призначення:** Server Actions для тренувань
 
 **Функціональність:**
 
-- Отримання списку тренувань
-- Отримання деталей тренування
-- Створення тренування
-- Оновлення тренування
-- Видалення тренування
+- `getTrainings` - отримання списку тренувань (з фільтрами)
+- `getTraining` - отримання деталей тренування
+- `createTraining` - створення тренування з вправами та підходами
+- `updateTraining` - оновлення тренування
+- `deleteTraining` - видалення тренування
+
+**Реалізація:**
+
+- Прямі SQL запити через Supabase клієнт
+- Валідація через Zod
+- Автоматичне revalidation через `revalidatePath`
+- Перевірка прав доступу через RLS та додаткова перевірка в коді
 
 ---
 
@@ -2909,15 +3174,22 @@ graph TB
 - Context для глобального стану (auth, theme)
 - Custom hooks для спільної логіки
 
-### 8.7 TODO: Деталізація після вибору backend
+### 8.7 Деталізація модулів
 
-**Після вибору backend рішення потрібно уточнити:**
+**Визначені рішення:**
 
-- Точна структура API модулів
-- Інтеграція з ORM/ODM (якщо потрібно)
-- Структура database модулів
-- Детальна реалізація custom hooks
-- State management (якщо потрібен глобальний стан)
+- **Структура Server Actions:** Модулі в `src/app/actions/` за доменами (auth, training, exercise)
+- **Інтеграція з БД:** Прямі SQL запити через Supabase клієнт (не потрібен ORM)
+- **Структура Supabase модулів:** Окремі клієнти для браузера та сервера
+- **Custom hooks:** Використання Server Actions через hooks для зручності
+- **State management:** React state + Server Actions (не потрібен глобальний state manager для MVP)
+
+**Паттерни використання:**
+
+- Server Actions викликаються напряму з Client Components
+- Hooks обгортають Server Actions для зручності та додаткової логіки
+- Валідація через Zod перед викликом Server Actions
+- Error handling через уніфікований формат `{ data, error }`
 
 ---
 
@@ -2925,77 +3197,77 @@ graph TB
 
 ### 9.1 Стратегія автентифікації
 
-**TODO: Визначити після вибору backend рішення**
+**Вибір:** Supabase Auth
 
-**Варіанти для розгляду:**
+**Тип:** JWT (JSON Web Tokens) з автоматичним оновленням
 
-1. **JWT (JSON Web Tokens)**
+**Обґрунтування:**
 
-   - Безсерверна автентифікація
-   - Токени в заголовках або cookies
-   - Refresh tokens для оновлення
-   - Підхід: NextAuth.js, custom JWT
+- Вбудована в Supabase - не потрібна додаткова інфраструктура
+- JWT токени з автоматичним refresh
+- Безпечне зберігання в HTTP-only cookies
+- Проста інтеграція з Next.js через `@supabase/ssr`
+- Автоматичне управління сесіями
+- Підтримка email/password та OAuth провайдерів (за потреби)
 
-2. **Session-based Authentication**
+**Реалізація:**
 
-   - Серверні сесії
-   - Cookies для збереження сесії
-   - Підхід: NextAuth.js sessions, custom sessions
+- Server Actions для auth операцій (`registerUser`, `loginUser`, `logoutUser`)
+- Supabase Auth клієнт для сервера та клієнта
+- Middleware для захисту маршрутів
+- Автоматичне оновлення токенів через Supabase
 
-3. **Backend as a Service Auth**
+**Безпека:**
 
-   - Supabase Auth - якщо використовується Supabase
-   - Firebase Auth - якщо використовується Firebase
-   - Вбудована автентифікація
-
-4. **NextAuth.js (Auth.js)**
-   - Універсальне рішення
-   - Підтримка різних провайдерів
-   - JWT та Session стратегії
-
-**Критерії вибору:**
-
-- Тип backend рішення
-- Потреба в серверних сесіях
-- Масштабованість
-- Простота інтеграції
-- Безпека
+- Хешування паролів (bcrypt) - автоматично в Supabase
+- Secure, HttpOnly, SameSite cookies
+- HTTPS only в production
+- Захист від CSRF через SameSite cookies
 
 ### 9.2 Управління сесіями
 
-**TODO: Уточнити після вибору типу автентифікації**
+**Реалізація через Supabase Auth:**
 
 #### 9.2.1 Збереження сесій
 
-**JWT підхід:**
+**Supabase Auth підхід:**
 
-- Access token в localStorage або cookies
-- Refresh token для оновлення
-- Термін дії токенів
+- Access token та refresh token в HTTP-only cookies
+- Автоматичне управління через `@supabase/ssr`
+- Термін дії access token: 1 година (за замовчуванням)
+- Термін дії refresh token: налаштовується в Supabase
 
-**Session підхід:**
+**Безпека cookies:**
 
-- Session ID в cookies
-- Сесія на сервері (в БД або cache)
-- Термін дії сесії
+- `Secure` flag - тільки через HTTPS
+- `HttpOnly` flag - недоступні через JavaScript
+- `SameSite=Strict` - захист від CSRF
 
 #### 9.2.2 Оновлення сесій
 
-**JWT:**
+**Автоматичне оновлення:**
 
-- Оновлення через refresh token
-- Автоматичне оновлення перед закінченням
+- Supabase автоматично оновлює access token через refresh token
+- Оновлення відбувається прозоро для додатку
+- Якщо refresh token застарів, користувач повинен увійти знову
 
-**Session:**
+**Реалізація:**
 
-- Продовження сесії при активності
-- Автоматичне закриття при неактивності
+- `@supabase/ssr` автоматично обробляє оновлення токенів
+- Не потрібна додаткова логіка в коді
 
 #### 9.2.3 Завершення сесій
 
-- Вихід користувача (logout)
-- Завершення при неактивності
-- Завершення при закритті браузера (опціонально)
+**Вихід користувача:**
+
+- `logoutUser` Server Action викликає `supabase.auth.signOut()`
+- Видаляє всі cookies та токени
+- Перенаправляє на сторінку входу
+
+**Автоматичне завершення:**
+
+- При застарілому refresh token
+- При неактивності (залежить від налаштувань Supabase)
 
 ### 9.3 Захист маршрутів
 
@@ -3007,40 +3279,103 @@ graph TB
 - Redirect на `/login` якщо неавторизований
 - Збереження запрошеного URL для перенаправлення після входу
 
-**Middleware (middleware.ts):**
+**Middleware (src/middleware.ts):**
 
 ```typescript
-// Псевдокод
-export function middleware(request: Request) {
-  const isAuthenticated = checkAuth(request);
-  const isProtectedRoute =
-    request.url.startsWith("/dashboard") || request.url.startsWith("/training");
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
 
-  if (isProtectedRoute && !isAuthenticated) {
-    return redirect("/login?redirect=" + request.url);
+export async function middleware(request: NextRequest) {
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  });
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            request.cookies.set(name, value)
+          );
+          response = NextResponse.next({
+            request,
+          });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const isProtectedRoute =
+    request.nextUrl.pathname.startsWith("/dashboard") ||
+    request.nextUrl.pathname.startsWith("/training");
+
+  if (isProtectedRoute && !user) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
+
+  if (
+    user &&
+    (request.nextUrl.pathname === "/login" ||
+      request.nextUrl.pathname === "/register")
+  ) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
+  return response;
 }
+
+export const config = {
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
+};
 ```
 
-#### 9.3.2 API Routes Protection
+#### 9.3.2 Server Actions Protection
 
-**Захист API endpoints:**
+**Захист Server Actions:**
 
-- Перевірка авторизації в кожному API route
-- Middleware для API routes
-- Повернення `401 Unauthorized` якщо неавторизований
-- Повернення `403 Forbidden` якщо немає прав доступу
+- Перевірка авторизації в кожній Server Action
+- Використання `createClient()` з `@supabase/ssr` для отримання користувача
+- Повернення `{ data: null, error: { code: 'UNAUTHORIZED', message: '...' } }` якщо неавторизований
+- Повернення `{ data: null, error: { code: 'FORBIDDEN', message: '...' } }` якщо немає прав доступу
 
 **Приклад:**
 
 ```typescript
-// Псевдокод
-export async function GET(request: Request) {
-  const user = await getCurrentUser(request);
-  if (!user) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
+"use server";
+
+import { createClient } from "@/lib/supabase/server";
+
+export async function getTrainings() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    return {
+      data: null,
+      error: { code: "UNAUTHORIZED", message: "Not authenticated" },
+    };
   }
-  // ... обробка запиту
+
+  // ... обробка запиту з перевіркою прав доступу
 }
 ```
 
@@ -3062,19 +3397,18 @@ export async function GET(request: Request) {
 
 #### 9.4.2 Хешування паролів
 
-**Принцип:**
+**Реалізація через Supabase:**
 
 - Паролі ніколи не зберігаються в plain text
-- Використання secure hashing алгоритмів
-- Salt для додаткової безпеки
+- Автоматичне хешування через Supabase Auth
+- Використання bcrypt з автоматичним salt
+- Не потрібна додаткова реалізація - все обробляється Supabase
 
-**Алгоритми:**
+**Безпека:**
 
-- bcrypt (рекомендовано)
-- Argon2 (більш сучасний)
-- scrypt (альтернатива)
-
-**TODO: Уточнити після вибору backend**
+- Supabase використовує industry-standard алгоритми
+- Автоматичне управління salt
+- Захист від rainbow table атак
 
 #### 9.4.3 Валідація даних
 
@@ -3094,18 +3428,18 @@ export async function GET(request: Request) {
 
 #### 9.4.4 SQL Injection Protection
 
-**TODO: Уточнити після вибору БД**
+**Реалізація через Supabase:**
 
-**Якщо SQL БД:**
+- Supabase клієнт автоматично екранує всі параметри
+- Використання параметризованих запитів через Supabase API
+- Неможливість виконання raw SQL без параметрів через клієнт
+- Row Level Security (RLS) додатково захищає від небезпечних запитів
 
-- Використання параметризованих запитів
-- ORM для автоматичного екранування
-- Не використання raw SQL без параметрів
+**Практики:**
 
-**Якщо NoSQL БД:**
-
-- Використання ODM для автоматичного екранування
-- Уникнення eval та функцій з небезпечним кодом
+- Використання Supabase query builder замість raw SQL
+- Валідація всіх вхідних даних через Zod перед запитами
+- Уникнення динамічного SQL (якщо потрібно - тільки через параметризовані запити)
 
 #### 9.4.5 XSS Protection
 
@@ -3123,13 +3457,17 @@ export async function GET(request: Request) {
 
 #### 9.4.6 CSRF Protection
 
-**TODO: Уточнить після вибору backend**
+**Реалізація через Supabase:**
 
-**Якщо потрібно:**
+- **SameSite=Strict cookies** - автоматично в Supabase Auth
+- Захист від CSRF через SameSite attribute
+- Додаткова перевірка Origin header через middleware (за потреби)
+- Server Actions мають вбудований захист від CSRF через Next.js
 
-- CSRF tokens для форм
-- SameSite cookies
-- Перевірка Origin header
+**Налаштування:**
+
+- Supabase автоматично встановлює SameSite=Strict для auth cookies
+- Не потрібні додаткові CSRF tokens для Server Actions
 
 ### 9.5 HTTPS та Secure Cookies
 
@@ -3186,24 +3524,29 @@ console.error("Database connection failed", { error, userId });
 
 #### 9.6.2 Logging
 
-**TODO: Уточнити після вибору backend**
+**Реалізація:**
 
-**Принципи:**
-
-- Логування важливих подій (login, logout, помилки)
-- НЕ логування чутливих даних (паролі, токени)
-- Structured logging для легшого аналізу
-- Ротація логів
+- **Розробка:** Console logs для важливих подій (login, logout, помилки)
+- **Production:** Структуровані логи через console (Vercel автоматично збирає логи)
+- **Принципи:**
+  - НЕ логування чутливих даних (паролі, токени, персональні дані)
+  - Structured logging для легшого аналізу
+  - Логування помилок з контекстом (userId, action, тощо)
+- **Рекомендація:** Додати Sentry або аналогічний сервіс для error tracking
 
 ### 9.7 Rate Limiting
 
-**TODO: Уточнити після вибору backend**
+**Реалізація через Supabase:**
 
-**Призначення:**
+- **Вбудований rate limiting:** Supabase має вбудований rate limiting для всіх запитів
+- **Налаштування:** Конфігурація через Supabase Dashboard
+- **Додатковий захист:** Next.js middleware може додати додатковий rate limiting (за потреби)
 
-- Захист від DDoS атак
-- Обмеження кількості запитів з одного IP
-- Обмеження на автентифікаційні endpoints
+**Ліміти (рекомендовані):**
+
+- Login: 5 спроб за 15 хвилин
+- Register: 3 спроби за годину
+- Server Actions: 100 запитів за хвилину на користувача
 
 **Реалізація:**
 
@@ -3242,42 +3585,45 @@ console.error("Database connection failed", { error, userId });
 - Видалення всіх даних користувача (каскадне видалення)
 - Підтвердження видалення
 
-### 9.9 TODO: Деталізація після вибору backend
+### 9.9 Деталізація безпеки
 
-**Після вибору backend рішення потрібно уточнити:**
+**Визначені рішення:**
 
-1. **Конкретну стратегію автентифікації:**
+1. **Стратегія автентифікації:**
 
-   - JWT, Session, або BaaS Auth
-   - Конкретні бібліотеки (NextAuth.js, custom, тощо)
-   - Точна реалізація
+   - **Тип:** Supabase Auth (JWT токени)
+   - **Реалізація:** Server Actions для auth операцій
+   - **Зберігання:** HTTP-only cookies через `@supabase/ssr`
 
 2. **Управління сесіями:**
 
-   - Де зберігаються сесії (БД, cache, cookies)
-   - Терміни дії сесій
-   - Оновлення та завершення сесій
+   - **Зберігання:** Cookies (access token + refresh token)
+   - **Термін дії:** Access token - 1 година, Refresh token - налаштовується
+   - **Оновлення:** Автоматичне через Supabase
+   - **Завершення:** Через `logoutUser` action або при застарілому refresh token
 
 3. **Хешування паролів:**
 
-   - Конкретний алгоритм (bcrypt, Argon2, тощо)
-   - Параметри (salt rounds, тощо)
+   - **Алгоритм:** bcrypt (автоматично в Supabase)
+   - **Управління:** Повністю автоматичне через Supabase Auth
 
 4. **Захист від атак:**
 
-   - SQL Injection (якщо SQL БД)
-   - CSRF protection (якщо потрібно)
-   - Rate limiting (конкретна реалізація)
+   - **SQL Injection:** Автоматичний захист через Supabase клієнт + RLS
+   - **CSRF:** SameSite=Strict cookies
+   - **Rate Limiting:** Вбудований в Supabase, додатковий через middleware (за потреби)
+   - **XSS:** React автоматичне екранування + валідація через Zod
 
 5. **HTTPS та Cookies:**
 
-   - Конфігурація HTTPS
-   - Параметри cookies
+   - **HTTPS:** Обов'язковий в production (Vercel автоматично)
+   - **Cookies:** Secure, HttpOnly, SameSite=Strict
 
 6. **Logging та Monitoring:**
-   - Система логування
-   - Monitoring та alerting
-   - Error tracking (Sentry, тощо)
+
+   - **Logging:** Console logs для розробки, структуровані логи для production
+   - **Monitoring:** Supabase Dashboard для БД метрик
+   - **Error Tracking:** Рекомендовано додати Sentry або аналогічний сервіс
 
 ---
 
@@ -3322,26 +3668,27 @@ console.error("Database connection failed", { error, userId });
 
 **Задачі:**
 
-1. TODO: Визначити backend та БД
+1. Налаштування Supabase
 
-   - Вибір бази даних
-   - Вибір backend рішення
-   - Налаштування БД
-   - Налаштування ORM/ODM (якщо потрібно)
+   - Створення проекту в Supabase
+   - Отримання API ключів (URL, anon key, service role key)
+   - Налаштування змінних середовища (.env.local)
+   - Створення Supabase клієнтів (client.ts, server.ts)
 
-2. TODO: Налаштування автентифікації
+2. Створення схеми БД
 
-   - Вибір стратегії автентифікації (JWT/Session)
-   - Налаштування NextAuth.js або custom solution
-   - Реалізація login/register/logout
+   - Створення таблиць (profiles, trainings, exercises, exercise_sets)
+   - Налаштування foreign keys та constraints
+   - Створення індексів
+   - Налаштування Row Level Security (RLS) policies
+   - SQL міграції
+
+3. Налаштування автентифікації
+
+   - Використання Supabase Auth
+   - Створення Server Actions для auth (registerUser, loginUser, logoutUser, getCurrentUser)
    - Middleware для protected routes
-
-3. API Infrastructure
-
-   - Створення API client
-   - Базові API utilities
-   - Error handling
-   - TypeScript типи для API
+   - Валідація через Zod
 
 4. Auth Components
 
@@ -3350,32 +3697,31 @@ console.error("Database connection failed", { error, userId });
    - LogoutButton компонент
    - Auth pages (/login, /register)
 
-5. Auth Hooks & Services
-   - useAuth hook
-   - Auth service/API
-   - Session management
+5. Auth Hooks & Utilities
+   - useAuth hook (опціонально, для зручності)
+   - Auth utilities
+   - Session management (автоматично через Supabase)
 
 **Залежності:**
 
-- Потребує визначення backend та БД
-- Потребує shadcn/ui налаштування
+- Потребує shadcn/ui налаштування (Фаза 0)
+- Потребує базові типи (Фаза 0)
 
 **Мілестоун:** Автентифікація працює, користувачі можуть реєструватися та входити
 
 ---
 
-#### 10.1.3 Фаза 2: Модель даних та API
+#### 10.1.3 Фаза 2: Модель даних та Server Actions
 
-**Мета:** Створення моделей даних та API endpoints
+**Мета:** Створення моделей даних та Server Actions
 
 **Задачі:**
 
-1. TODO: Database Schema
+1. Database Schema (якщо не зроблено в Фазі 1)
 
-   - Створення таблиць/колекцій (User, Training, Exercise, ExerciseSet)
-   - Міграції (якщо потрібно)
-   - Індекси
-   - Constraints та relationships
+   - Перевірка та доповнення таблиць
+   - Додаткові індекси (якщо потрібно)
+   - Оптимізація RLS policies
 
 2. TypeScript Types
 
@@ -3383,37 +3729,37 @@ console.error("Database connection failed", { error, userId });
    - Training types
    - Exercise types
    - ExerciseSet types
-   - API response types
-   - DTO types
+   - Server Action response types
+   - DTO types для валідації (Zod schemas)
 
-3. API Endpoints - Training
+3. Server Actions - Training
 
-   - GET /api/trainings (список тренувань)
-   - GET /api/trainings/:id (деталі тренування)
-   - POST /api/trainings (створення)
-   - PUT /api/trainings/:id (оновлення)
-   - DELETE /api/trainings/:id (видалення)
+   - `getTrainings` - список тренувань (з фільтрами)
+   - `getTraining` - деталі тренування
+   - `createTraining` - створення тренування
+   - `updateTraining` - оновлення тренування
+   - `deleteTraining` - видалення тренування
 
-4. API Endpoints - Exercise
+4. Server Actions - Exercise
 
-   - GET /api/trainings/:trainingId/exercises (список вправ)
-   - GET /api/trainings/:trainingId/exercises/:id (деталі вправи)
-   - POST /api/trainings/:trainingId/exercises (додавання)
-   - PUT /api/trainings/:trainingId/exercises/:id (оновлення)
-   - DELETE /api/trainings/:trainingId/exercises/:id (видалення)
+   - `getExercises` - список вправ для тренування
+   - `getExercise` - деталі вправи
+   - `createExercise` - додавання вправи
+   - `updateExercise` - оновлення вправи
+   - `deleteExercise` - видалення вправи
 
-5. API Services
-   - Training API service
-   - Exercise API service
-   - Error handling
-   - Валідація даних
+5. Валідація та обробка помилок
+   - Zod схеми для всіх DTO
+   - Уніфікований формат відповіді `{ data, error }`
+   - Error handling в Server Actions
+   - Revalidation через `revalidatePath`
 
 **Залежності:**
 
-- Потребує Фази 1 (автентифікація)
-- Потребує визначення БД
+- Потребує Фази 1 (автентифікація та БД)
+- Потребує базові типи (Фаза 0)
 
-**Мілестоун:** API endpoints працюють, дані зберігаються та отримуються
+**Мілестоун:** Server Actions працюють, дані зберігаються та отримуються
 
 ---
 
@@ -3666,16 +4012,16 @@ graph TB
 
 ### 10.3 Мілестоуни
 
-| Мілестоун                   | Опис                                                               | Фаза   |
-| --------------------------- | ------------------------------------------------------------------ | ------ |
-| **M1: Setup Complete**      | Проект налаштований, shadcn/ui готовий                             | Фаза 0 |
-| **M2: Auth Working**        | Автентифікація працює, користувачі можуть реєструватися та входити | Фаза 1 |
-| **M3: API Ready**           | API endpoints працюють, дані зберігаються та отримуються           | Фаза 2 |
-| **M4: UI Components Ready** | Базові UI компоненти готові                                        | Фаза 3 |
-| **M5: Dashboard Working**   | Дошка тренувань працює, тренування відображаються в календарі      | Фаза 4 |
-| **M6: CRUD Complete**       | Користувачі можуть створювати та редагувати тренування             | Фаза 5 |
-| **M7: Full Functionality**  | Користувачі можуть переглядати деталі та видаляти тренування       | Фаза 6 |
-| **M8: Production Ready**    | Базова версія системи готова до використання                       | Фаза 7 |
+| Мілестоун                    | Опис                                                               | Фаза   |
+| ---------------------------- | ------------------------------------------------------------------ | ------ |
+| **M1: Setup Complete**       | Проект налаштований, shadcn/ui готовий                             | Фаза 0 |
+| **M2: Auth Working**         | Автентифікація працює, користувачі можуть реєструватися та входити | Фаза 1 |
+| **M3: Server Actions Ready** | Server Actions працюють, дані зберігаються та отримуються          | Фаза 2 |
+| **M4: UI Components Ready**  | Базові UI компоненти готові                                        | Фаза 3 |
+| **M5: Dashboard Working**    | Дошка тренувань працює, тренування відображаються в календарі      | Фаза 4 |
+| **M6: CRUD Complete**        | Користувачі можуть створювати та редагувати тренування             | Фаза 5 |
+| **M7: Full Functionality**   | Користувачі можуть переглядати деталі та видаляти тренування       | Фаза 6 |
+| **M8: Production Ready**     | Базова версія системи готова до використання                       | Фаза 7 |
 
 ### 10.4 Пріоритети реалізації
 
@@ -3700,30 +4046,33 @@ graph TB
 - Розширений UX
 - Додаткові функції
 
-### 10.5 TODO: Визначені рішення
+### 10.5 Визначені рішення
 
-**Перед початком реалізації потрібно визначити:**
+**✅ Всі критичні рішення прийняті:**
 
 1. **База даних:**
 
-   - Яку БД використовувати (PostgreSQL, MongoDB, Supabase, Firebase, тощо)
-   - Схема БД
-   - ORM/ODM (Prisma, Mongoose, Drizzle, тощо)
+   - **Вибір:** Supabase (PostgreSQL)
+   - **Схема БД:** Реляційна структура з таблицями profiles, trainings, exercises, exercise_sets
+   - **ORM/ODM:** Прямі SQL запити через Supabase клієнт (не потрібен ORM)
 
 2. **Backend:**
 
-   - Яке backend рішення (Next.js API Routes, standalone server, BaaS, тощо)
-   - Архітектура backend
+   - **Вибір:** Next.js Server Actions
+   - **Архітектура:** Server Actions в `src/app/actions/` замість окремих API routes
+   - **Переваги:** Типобезпека, менше boilerplate, пряма інтеграція з React
 
 3. **Автентифікація:**
-   - Яку стратегію використовувати (JWT, Session, BaaS Auth)
-   - Конкретне рішення (NextAuth.js, custom, тощо)
 
-**Після визначення:**
+   - **Стратегія:** Supabase Auth (JWT токени)
+   - **Реалізація:** Server Actions для auth операцій
+   - **Управління сесіями:** Автоматичне через Supabase cookies
 
-- Оновити відповідні розділи SDD
-- Деталізувати план реалізації
-- Почати реалізацію
+**Наступні кроки:**
+
+- ✅ Оновлено відповідні розділи SDD
+- ⏳ Деталізувати план реалізації
+- ⏳ Почати реалізацію з Фази 0
 
 ### 10.6 Наступні кроки
 
