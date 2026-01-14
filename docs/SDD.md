@@ -583,30 +583,32 @@ sequenceDiagram
 votum_ferri/
 ├── src/
 │   ├── app/                    # Next.js App Router
-│   │   ├── (auth)/            # Auth routes (login, register)
-│   │   ├── dashboard/         # Dashboard/Calendar page
-│   │   ├── training/          # Training pages
-│   │   ├── actions/           # Server Actions
-│   │   │   ├── auth.ts        # Auth actions
-│   │   │   ├── training.ts    # Training actions
-│   │   │   └── exercise.ts    # Exercise actions
-│   │   └── middleware.ts      # Route protection
-│   ├── components/            # React components
-│   │   ├── ui/               # shadcn/ui components
-│   │   ├── training/         # Training-specific components
-│   │   │   ├── TrainingBoard/ # Calendar/Dashboard
-│   │   │   ├── TrainingForm/  # Create/Edit form
-│   │   │   └── TrainingCard/  # Training display
-│   │   ├── exercise/         # Exercise components
-│   │   │   ├── ExerciseList/  # List of exercises
-│   │   │   └── ExerciseForm/  # Exercise form
-│   │   └── auth/             # Auth components
-│   ├── lib/                   # Utilities & helpers
-│   │   ├── supabase/         # Supabase clients
-│   │   │   ├── client.ts      # Browser client
-│   │   │   └── server.ts      # Server client
-│   │   └── utils/            # General utilities
-│   ├── types/                 # TypeScript types
+│   │   ├── (auth)/             # Auth routes (login, register)
+│   │   ├── dashboard/          # Dashboard/Calendar page
+│   │   ├── training/           # Training pages
+│   │   ├── actions/            # Server Actions
+│   │   │   ├── auth.ts         # Auth actions
+│   │   │   ├── training.ts     # Training actions
+│   │   │   └── exercise.ts     # Exercise actions
+│   │   └── middleware.ts       # Route protection
+│   ├── components/             # React components
+│   │   ├── ui/                 # shadcn/ui components
+│   │   ├── training/           # Training-specific components
+│   │   │   ├── TrainingBoard/  # Calendar/Dashboard
+│   │   │   ├── TrainingForm/   # Create/Edit form
+│   │   │   └── TrainingCard/   # Training display
+│   │   ├── exercise/           # Exercise components
+│   │   │   ├── ExerciseList/   # List of exercises
+│   │   │   └── ExerciseForm/   # Exercise form
+│   │   └── auth/               # Auth components
+│   ├── lib/                    # Utilities & helpers
+│   │   ├── supabase/           # Supabase clients
+│   │   │   ├── client.ts       # Browser client
+│   │   │   └── server.ts       # Server client
+│   │   └── utils/              # General utilities
+│   │       ├── cn.ts            # Class name utility
+│   │       └── index.ts         # Export all utilities
+│   ├── types/                  # TypeScript types
 │   │   ├── training.ts
 │   │   ├── exercise.ts
 │   │   └── user.ts
@@ -950,6 +952,7 @@ src/app/actions/
 - ✅ `@supabase/ssr` - Supabase для Next.js SSR (встановлено)
 
 **Планові додаткові залежності:**
+
 - `zod` - валідація даних
 - `react-hook-form` - управління формами
 - `@hookform/resolvers` - інтеграція zod з react-hook-form
@@ -2965,8 +2968,10 @@ src/
 │   │   └── server.ts             # Server client
 │   │
 │   └── utils/                    # General utilities
+│       ├── cn.ts                 # Class name utility (clsx + tailwind-merge)
 │       ├── date.ts               # Date utilities
-│       └── validation.ts         # Validation helpers (Zod schemas)
+│       ├── validation.ts         # Validation helpers (Zod schemas)
+│       └── index.ts              # Export all utilities (centralized exports)
 │
 ├── hooks/                        # Custom React hooks
 │   ├── useAuth.ts                # Auth hook
@@ -3048,7 +3053,67 @@ src/
 
 ---
 
-#### 8.4.5 Custom Hooks
+#### 8.4.5 Utilities Module
+
+**Структура:** `src/lib/utils/`
+
+**Принципи організації:**
+
+- Кожна утиліта - це окремий файл з назвою утиліти
+- Всі утиліти експортуються через `index.ts` для централізованого доступу
+- Імпорти завжди відбуваються через `@/lib/utils`, а не через прямі шляхи до файлів
+
+**Приклад структури:**
+
+```
+src/lib/utils/
+├── cn.ts              # Утиліта для об'єднання класів (clsx + tailwind-merge)
+├── date.ts            # Утиліти для роботи з датами
+├── validation.ts      # Валідаційні утиліти (Zod schemas)
+└── index.ts           # Централізований експорт всіх утиліт
+```
+
+**Файл:** `src/lib/utils/cn.ts`
+
+**Призначення:** Утиліта для об'єднання та обробки CSS класів
+
+**Функціональність:**
+
+- Об'єднання класів через `clsx`
+- Мердж Tailwind класів через `tailwind-merge`
+- Використовується в усіх shadcn/ui компонентах
+
+**Приклад використання:**
+
+```typescript
+import { cn } from "@/lib/utils";
+
+// В компоненті
+<div className={cn("base-class", condition && "conditional-class")} />;
+```
+
+**Файл:** `src/lib/utils/index.ts`
+
+**Призначення:** Централізований експорт всіх утиліт
+
+**Правила:**
+
+- Всі утиліти мають експортуватися через `index.ts`
+- Імпорти завжди використовують `@/lib/utils`, не прямі шляхи до файлів
+- При додаванні нової утиліти вона має бути додана до `index.ts`
+
+**Приклад:**
+
+```typescript
+// src/lib/utils/index.ts
+export { cn } from "./cn";
+export { formatDate, parseDate } from "./date";
+export { validateTraining } from "./validation";
+```
+
+---
+
+#### 8.4.6 Custom Hooks
 
 **useAuth** (`src/hooks/useAuth.ts`)
 
