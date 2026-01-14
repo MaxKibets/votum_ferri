@@ -3714,26 +3714,26 @@ console.error("Database connection failed", { error, userId });
 
 **Задачі:**
 
-1. ✅ Налаштування проекту (вже зроблено)
+1. ✅ Налаштування проекту
 
    - Next.js 16 налаштування
    - TypeScript конфігурація
    - Tailwind CSS налаштування
    - Biome налаштування
 
-2. Налаштування shadcn/ui
+2. ✅ Налаштування shadcn/ui
 
    - Ініціалізація shadcn/ui
    - Налаштування компонентів
    - Кастомізація теми
    - Додавання базових компонентів (Button, Card, Input, тощо)
 
-3. Структура проекту
+3. ✅ Структура проекту
    - Створення структури папок
    - Налаштування TypeScript paths
    - Створення базових типів (types/)
 
-**Мілестоун:** Проект готовий до розробки компонентів
+**Мілестоун:** Проект готовий до розробки компонентів (Фаза 0 завершена)
 
 ---
 
@@ -3743,7 +3743,7 @@ console.error("Database connection failed", { error, userId });
 
 **Задачі:**
 
-1. Налаштування Supabase ✅
+1. ✅ Налаштування Supabase
 
    - ✅ Створення проекту в Supabase
    - ✅ Отримання API ключів (URL, publishable key, secret key)
@@ -3753,7 +3753,7 @@ console.error("Database connection failed", { error, userId });
      - `SUPABASE_SECRET_KEY` - Secret key (тільки для серверних операцій)
    - ✅ Створення Supabase клієнтів (client.ts, server.ts)
 
-2. Створення схеми БД ✅
+2. ✅ Створення схеми БД
 
    - ✅ Створення таблиць (profiles, trainings, exercises, exercise_sets)
    - ✅ Налаштування foreign keys та constraints
@@ -3761,7 +3761,7 @@ console.error("Database connection failed", { error, userId });
    - ✅ Налаштування Row Level Security (RLS) policies
    - ✅ SQL міграції (001_initial_schema.sql, 002_fix_function_search_path.sql)
 
-3. Налаштування автентифікації
+3. ✅ Налаштування автентифікації
 
    - Використання Supabase Auth
    - Створення Server Actions для auth (registerUser, loginUser, logoutUser, getCurrentUser)
