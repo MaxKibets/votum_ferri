@@ -1,0 +1,29 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Biome: Format Document",
+      "type": "shell",
+      "command": "npx @biomejs/biome format --write ${file}",
+      "problemMatcher": []
+    },
+    {
+      "label": "Biome: Check and Fix",
+      "type": "shell",
+      "command": "npx @biomejs/biome check --write ${file}",
+      "problemMatcher": []
+    },
+    {
+      "label": "Biome: Check All Files",
+      "type": "shell",
+      "command": "npm run lint",
+      "problemMatcher": []
+    },
+    {
+      "label": "Biome: Format All Files",
+      "type": "shell",
+      "command": "npm run format",
+      "problemMatcher": []
+    }
+  ]
+}
