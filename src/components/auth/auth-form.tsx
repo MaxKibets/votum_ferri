@@ -4,11 +4,9 @@ import { startTransition, useActionState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { loginUser, registerUser } from "@/actions/auth";
 import { Button, FieldGroup, FormField } from "@/components/ui";
-import { DASHBOARD_PATH } from "@/constants/routes";
 import { LOGIN_SCHEMA, REGISTER_SCHEMA_WITH_CONFIRM_PASSWORD } from "@/constants/authValidationSchemas";
 import { LOGIN_FIELDS_DATA, REGISTER_FIELDS_DATA } from "./constants";
 
@@ -19,12 +17,11 @@ interface AuthFormProps {
   fields: typeof LOGIN_FIELDS_DATA | typeof REGISTER_FIELDS_DATA;
   action: typeof loginUser | typeof registerUser;
   schema: typeof LOGIN_SCHEMA | typeof REGISTER_SCHEMA_WITH_CONFIRM_PASSWORD;
+  disabled: boolean;
 }
 
-export function AuthForm({ buttonText, fields, action, schema }: AuthFormProps) {
-  const router = useRouter();
-
-  const [{ data, error }, formAction, isPending] = useActionState(action, {
+export function AuthForm({ buttonText, fields, action, schema, disabled }: AuthFormProps) {
+  const [{ error }, formAction, isPending] = useActionState(action, {
     data: null,
     error: null,
   });
@@ -49,23 +46,17 @@ export function AuthForm({ buttonText, fields, action, schema }: AuthFormProps) 
   );
 
   useEffect(() => {
-    if (error) {
-      toast.error(error.message);
-    }
-
-    if (data?.success) {
-      router.push(DASHBOARD_PATH);
-    }
-  }, [error, data, router]);
+    if (error) toast.error(error.message)
+  }, [error]);
 
   return (
     <form onSubmit={handleSubmitForm}>
       <FieldGroup>
         {fields.map(({ name, ...rest }) => (
-          <FormField key={name} name={name} control={control} disabled={isPending} {...rest} />
+          <FormField key={name} name={name} control={control} disabled={isPending || disabled} {...rest} />
         ))}
 
-        <Button type="submit" className="w-full" disabled={isPending}>
+        <Button type="submit" className="w-full" disabled={isPending || disabled}>
           {buttonText}
         </Button>
       </FieldGroup>

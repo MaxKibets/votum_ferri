@@ -1,2 +1,2 @@
 export { LogoutButton } from "./logout-button";
-export { AuthFormLayout } from "./auth-form-layout";
+export { AuthFormContainer } from "./auth-form-container";
