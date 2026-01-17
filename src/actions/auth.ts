@@ -1,22 +1,25 @@
 "use server";
 
-import { redirect, RedirectType } from "next/navigation";
+import { RedirectType, redirect } from "next/navigation";
+import {
+  LOGIN_SCHEMA,
+  REGISTER_SCHEMA,
+} from "@/constants/authValidationSchemas";
+import { ROUTE } from "@/constants/routes";
 import { createClient } from "@/lib/supabase/server";
 import type { PublicUser } from "@/types/user";
-import { LOGIN_SCHEMA, REGISTER_SCHEMA } from "@/constants/authValidationSchemas";
-import { ROUTE } from "@/constants/routes";
 
 // Response types
 type AuthResponse<T> = {
   data: T | null;
-  error: { code: string; message: string, field?: string } | null;
+  error: { code: string; message: string; field?: string } | null;
 };
 
 /**
  * Register a new user
  */
 export async function registerUser(
-  prevState: AuthResponse<{ success: boolean }> | null,
+  _prevState: AuthResponse<{ success: boolean }> | null,
   formData: FormData,
 ): Promise<AuthResponse<{ success: boolean }>> {
   const supabase = await createClient();
@@ -58,7 +61,10 @@ export async function registerUser(
   }
 
   // Check if user already exists (Supabase returns user object but with empty identities or no session)
-  if (authData.user && (!authData.user.identities || authData.user.identities.length === 0)) {
+  if (
+    authData.user &&
+    (!authData.user.identities || authData.user.identities.length === 0)
+  ) {
     return {
       data: null,
       error: {
@@ -87,14 +93,14 @@ export async function registerUser(
  * Login user
  */
 export async function loginUser(
-  prevState: AuthResponse<{ success: boolean }> | null,
+  _prevState: AuthResponse<{ success: boolean }> | null,
   formData: FormData,
 ): Promise<AuthResponse<{ success: boolean }>> {
   const supabase = await createClient();
 
   const { success, error, data } = LOGIN_SCHEMA.safeParse({
     email: formData.get("email"),
-    password: formData.get("password")
+    password: formData.get("password"),
   });
 
   if (!success) {
@@ -107,10 +113,11 @@ export async function loginUser(
     };
   }
 
-  const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-    email: data.email,
-    password: data.password,
-  });
+  const { data: authData, error: authError } =
+    await supabase.auth.signInWithPassword({
+      email: data.email,
+      password: data.password,
+    });
 
   if (authError) {
     return {
@@ -138,41 +145,31 @@ export async function loginUser(
 /**
  * Logout user
  */
-export async function logoutUser(): Promise<AuthResponse<{ success: boolean }>> {
-  try {
-    const supabase = await createClient();
+export async function logoutUser(): Promise<
+  AuthResponse<{ success: boolean }>
+> {
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signOut();
 
-    const { error } = await supabase.auth.signOut();
-
-    if (error) {
-      return {
-        data: null,
-        error: {
-          code: error.name || "LOGOUT_ERROR",
-          message: error.message,
-        },
-      };
-    }
-
-    return {
-      data: { success: true },
-      error: null,
-    };
-  } catch (error) {
+  if (error) {
     return {
       data: null,
       error: {
-        code: "UNKNOWN_ERROR",
-        message: error instanceof Error ? error.message : "An unknown error occurred",
+        code: error.name || "LOGOUT_ERROR",
+        message: error.message,
       },
     };
   }
+
+  redirect("/", RedirectType.replace);
 }
 
 /**
  * Get current user
  */
-export async function getCurrentUser(): Promise<AuthResponse<{ user: PublicUser }>> {
+export async function getCurrentUser(): Promise<
+  AuthResponse<{ user: PublicUser }>
+> {
   try {
     const supabase = await createClient();
 
@@ -223,7 +220,8 @@ export async function getCurrentUser(): Promise<AuthResponse<{ user: PublicUser 
       data: null,
       error: {
         code: "UNKNOWN_ERROR",
-        message: error instanceof Error ? error.message : "An unknown error occurred",
+        message:
+          error instanceof Error ? error.message : "An unknown error occurred",
       },
     };
   }

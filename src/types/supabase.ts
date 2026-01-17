@@ -7,4 +7,3 @@ export interface SupabaseProfile {
   createdAt: string;
   updatedAt: string;
 }
-
