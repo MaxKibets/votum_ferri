@@ -1,13 +1,13 @@
 import { getCurrentUser } from "@/actions/auth";
 import { LogoutButton } from "@/components/auth";
-import { AUTH_ROUTES } from "@/constants/routes";
+import { ROUTE } from "@/constants/routes";
 import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
   const { data, error } = await getCurrentUser();
 
   if (error || !data) {
-    redirect(AUTH_ROUTES.LOGIN);
+    redirect(ROUTE.LOGIN);
   }
 
   return (
