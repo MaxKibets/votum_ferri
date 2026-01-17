@@ -2,9 +2,25 @@
 
 ## Трекер тренувань - votum_ferri
 
-**Версія:** 1.1  
-**Дата:** 2025-01-27  
+**Версія:** 1.3  
+**Дата:** 2025-01-28  
 **Статус:** В розробці
+
+**Оновлення v1.3:**
+
+- Оновлено структуру маршрутів: використання окремих сторінок /login та /register замість /auth?mode=
+- Оновлено компоненти: AuthFormContainer замість AuthFormLayout (використання пропса isLogin замість query параметра)
+- Оновлено константи маршрутів: ROUTE.LOGIN, ROUTE.REGISTER, ROUTE.DASHBOARD
+- Оновлено всі відповідні розділи SDD з фактичною реалізацією структури проєкту
+
+**Оновлення v1.2:**
+
+- Реалізовано систему автентифікації (Phase 1 завершено)
+- Реалізовано Server Actions для автентифікації з використанням FormData та useActionState
+- Реалізовано компоненти автентифікації: AuthForm, AuthFormContainer, LogoutButton
+- Реалізовано сторінки: /login, /register, /dashboard
+- Додано UI компоненти: FormField, Separator, Sonner (Toaster)
+- Оновлено всі відповідні розділи SDD з фактичною реалізацією
 
 **Оновлення v1.1:**
 
@@ -387,13 +403,13 @@ SDD охоплює:
 │                                                         │
 │  ┌──────────────────┐          ┌──────────────────┐     │
 │  │  Client          │          │  Server          │     │
-│  │  Components      │────────▶│  Actions         │    │
+│  │  Components      │────────▶│  Actions         │     │
 │  │  (React 19)      │          │  (Server         │     │
-│  │                  │          │   Functions)      │    │
-│  │ - shadcn/ui      │          │                  │    │
-│  │ - Forms          │          │ - Auth Logic     │    │
-│  │ - State          │          │ - Business Logic │    │
-│  └──────────────────┘          └────────┬─────────┘    │
+│  │                  │          │   Functions)     │     │
+│  │ - shadcn/ui      │          │                  │     │
+│  │ - Forms          │          │ - Auth Logic     │     │
+│  │ - State          │          │ - Business Logic │     │
+│  └──────────────────┘          └────────┬─────────┘     │
 │                                         │               │
 │                                         │ Supabase SDK  │
 │                                         │               │
@@ -422,11 +438,11 @@ SDD охоплює:
 
 2. **Backend (Next.js Server Actions)**
 
-   - Server Actions в `src/app/actions/` для взаємодії з даними
-   - Логіка автентифікації через Supabase Auth
-   - Бізнес-логіка тренувань та вправ
-   - Валідація через Zod
-   - Автоматичне revalidation через `revalidatePath`
+- Server Actions в `src/actions/` для взаємодії з даними
+  - Логіка автентифікації через Supabase Auth
+  - Бізнес-логіка тренувань та вправ
+  - Валідація через Zod
+  - Автоматичне revalidation через `revalidatePath`
 
 3. **База даних (Supabase)**
    - PostgreSQL для зберігання даних
@@ -583,30 +599,41 @@ sequenceDiagram
 votum_ferri/
 ├── src/
 │   ├── app/                    # Next.js App Router
-│   │   ├── (auth)/            # Auth routes (login, register)
-│   │   ├── dashboard/         # Dashboard/Calendar page
-│   │   ├── training/          # Training pages
-│   │   ├── actions/           # Server Actions
-│   │   │   ├── auth.ts        # Auth actions
-│   │   │   ├── training.ts    # Training actions
-│   │   │   └── exercise.ts    # Exercise actions
-│   │   └── middleware.ts      # Route protection
-│   ├── components/            # React components
-│   │   ├── ui/               # shadcn/ui components
-│   │   ├── training/         # Training-specific components
-│   │   │   ├── TrainingBoard/ # Calendar/Dashboard
-│   │   │   ├── TrainingForm/  # Create/Edit form
-│   │   │   └── TrainingCard/  # Training display
-│   │   ├── exercise/         # Exercise components
-│   │   │   ├── ExerciseList/  # List of exercises
-│   │   │   └── ExerciseForm/  # Exercise form
-│   │   └── auth/             # Auth components
-│   ├── lib/                   # Utilities & helpers
-│   │   ├── supabase/         # Supabase clients
-│   │   │   ├── client.ts      # Browser client
-│   │   │   └── server.ts      # Server client
-│   │   └── utils/            # General utilities
-│   ├── types/                 # TypeScript types
+│   │   ├── (auth)/             # Auth routes (login, register)
+│   │   │   ├── login/
+│   │   │   │   └── page.tsx
+│   │   │   └── register/
+│   │   │       └── page.tsx
+│   │   ├── dashboard/          # Dashboard/Calendar page
+│   │   ├── training/           # Training pages
+│   │   └── middleware.ts       # Route protection
+│   ├── actions/                # Server Actions (one level above app/)
+│   │   ├── auth.ts             # Auth actions
+│   │   ├── training.ts         # Training actions
+│   │   └── exercise.ts         # Exercise actions
+│   ├── components/             # React components
+│   │   ├── ui/                 # shadcn/ui components
+│   │   ├── training/           # Training-specific components
+│   │   │   ├── TrainingBoard/  # Calendar/Dashboard
+│   │   │   ├── TrainingForm/   # Create/Edit form
+│   │   │   └── TrainingCard/   # Training display
+│   │   ├── exercise/           # Exercise components
+│   │   │   ├── ExerciseList/   # List of exercises
+│   │   │   └── ExerciseForm/   # Exercise form
+│   │   └── auth/               # Auth components
+│   │       ├── auth-form-container.tsx
+│   │       ├── auth-form.tsx
+│   │       ├── logout-button.tsx
+│   │       ├── constants.ts
+│   │       └── index.ts
+│   ├── lib/                    # Utilities & helpers
+│   │   ├── supabase/           # Supabase clients
+│   │   │   ├── client.ts       # Browser client
+│   │   │   └── server.ts       # Server client
+│   │   └── utils/              # General utilities
+│   │       ├── cn.ts            # Class name utility
+│   │       └── index.ts         # Export all utilities
+│   ├── types/                  # TypeScript types
 │   │   ├── training.ts
 │   │   ├── exercise.ts
 │   │   └── user.ts
@@ -738,7 +765,7 @@ votum_ferri/
 - `Button` - кнопки
 - `Card` - картки для відображення тренувань
 - `Dialog` - модальні вікна для форм
-- `Form` - форми з валідацією
+- `Field` - поля форм з валідацією
 - `Input` - поля вводу
 - `Select` - випадаючі списки
 - `Calendar` - календар для дошки тренувань
@@ -776,7 +803,7 @@ votum_ferri/
 **Структура:**
 
 ```
-src/app/actions/
+src/actions/
 ├── auth.ts          # Auth actions (login, register, logout)
 ├── training.ts      # Training CRUD actions
 └── exercise.ts      # Exercise actions
@@ -950,6 +977,7 @@ src/app/actions/
 - ✅ `@supabase/ssr` - Supabase для Next.js SSR (встановлено)
 
 **Планові додаткові залежності:**
+
 - `zod` - валідація даних
 - `react-hook-form` - управління формами
 - `@hookform/resolvers` - інтеграція zod з react-hook-form
@@ -1264,13 +1292,68 @@ interface ExerciseSetResponse {
 
 ### 5.7 Валідація даних
 
-#### 5.7.1 Валідаційні правила (загальні)
+#### 5.7.1 Валідаційні схеми (Zod)
 
-**User:**
+**Файл:** `src/constants/authValidationSchemas.ts`
 
-- `email`: обов'язкове поле, валідний email формат, унікальне
-- `password`: обов'язкове поле, мінімум 8 символів
+Валідація даних виконується через Zod схеми, які використовуються як на клієнті (через react-hook-form), так і на сервері (в Server Actions).
+
+**Схеми автентифікації:**
+
+1. **LOGIN_SCHEMA** - валідація для входу:
+
+```typescript
+z.object({
+  email: z.email("Invalid email format"),
+  password: z.string().min(1, "Password is required"),
+});
+```
+
+2. **REGISTER_SCHEMA** - валідація для реєстрації (без confirmPassword):
+
+```typescript
+z.object({
+  email: z.email("Invalid email format"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  name: z.string().max(255, "Name must be at most 255 characters").optional(),
+});
+```
+
+3. **REGISTER_SCHEMA_WITH_CONFIRM_PASSWORD** - валідація для реєстрації з підтвердженням пароля (використовується на клієнті):
+
+```typescript
+z.object({
+  email: z.email("Invalid email format"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  confirmPassword: z.string().min(1, "Please confirm your password"),
+  name: z.string().max(255, "Name must be at most 255 characters").optional(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
+```
+
+**Константи полів:**
+
+**Файл:** `src/constants/authFieldNames.ts`
+
+```typescript
+export const AUTH_FIELD_NAME = {
+  NAME: "name",
+  EMAIL: "email",
+  PASSWORD: "password",
+  CONFIRM_PASSWORD: "confirmPassword",
+} as const;
+```
+
+**Валідаційні правила (загальні):**
+
+**User (Автентифікація):**
+
+- `email`: обов'язкове поле, валідний email формат, унікальне (перевіряється в БД)
+- `password`: обов'язкове поле, мінімум 8 символів (для реєстрації)
 - `name`: опціональне, максимум 255 символів
+- `confirmPassword`: обов'язкове для реєстрації, має співпадати з `password`
 
 **Training:**
 
@@ -1497,11 +1580,28 @@ ALTER TABLE public.exercise_sets ENABLE ROW LEVEL SECURITY;
 
 #### 6.2.1 Структура маршрутів
 
+**Файл:** `src/constants/routes.ts`
+
+```typescript
+export const ROUTE = {
+  LOGIN: "/login",
+  REGISTER: "/register",
+  DASHBOARD: "/dashboard",
+} as const;
 ```
-/                          # Redirect до /dashboard (якщо авторизований) або /login
+
+**Реалізовані маршрути:**
+
+```
+/                          # Головна сторінка (Next.js default template)
 /login                     # Сторінка входу
 /register                  # Сторінка реєстрації
-/dashboard                 # Дошка тренувань (календар)
+/dashboard                 # Дошка тренувань (захищена, перевірка через getCurrentUser)
+```
+
+**Планові маршрути (Phase 2+):**
+
+```
 /training/new              # Створення нового тренування
 /training/[id]             # Деталі тренування
 /training/[id]/edit        # Редагування тренування
@@ -1526,28 +1626,85 @@ ALTER TABLE public.exercise_sets ENABLE ROW LEVEL SECURITY;
 
 #### 6.3.1 Сторінка входу (/login)
 
+**Файл:** `src/app/(auth)/login/page.tsx`
+
+**Реалізація:** Використовує компонент `AuthFormContainer` з пропсом `isLogin={true}`.
+
 **Компоненти:**
 
-- `Card` (shadcn/ui) - контейнер форми
-- `Form` (shadcn/ui) - форма входу
-- `Input` (shadcn/ui) - поля email та пароль
-- `Button` (shadcn/ui) - кнопка входу
-- `Label` (shadcn/ui) - мітки полів
+- `AuthFormContainer` - обгортка форми з заголовком, описом та футером
+- `AuthForm` - уніфікована форма автентифікації (вхід/реєстрація)
+- `FormField` (shadcn/ui) - поля форми
+- `Button` (shadcn/ui) - кнопка відправки
 
-**Макет:**
+**Структура:**
+
+```typescript
+// src/app/(auth)/login/page.tsx
+import { AuthFormContainer } from "@/components/auth";
+
+export default function LoginPage() {
+  return <AuthFormContainer isLogin />;
+}
+```
+
+**AuthFormContainer** визначає режим через пропс `isLogin`:
+
+```typescript
+const {
+  title,
+  description,
+  footerText,
+  footerLinkText,
+  footerLinkHref,
+  formData,
+} = isLogin ? LOGIN_FORM_DATA : REGISTER_FORM_DATA;
+```
+
+**Маршрут:**
+
+- `/login` - сторінка входу
+
+**Макет (Login mode):**
 
 ```
 ┌─────────────────────────────────────┐
 │                                     │
 │      ┌───────────────────┐          │
-│      │   Login Form      │          │
+│      │   Sign in         │          │
+│      │   (description)   │          │
 │      │                   │          │
-│      │  Email: [____]    │          │
-│      │  Password: [____] │          │
+│      │  EMAIL: [____]    │          │
+│      │  PASSWORD: [____] │          │
 │      │                   │          │
-│      │   [Login Button]  │          │
+│      │   [Sign in Button]│          │
 │      │                   │          │
-│      │  Link to Register │          │
+│      │  Don't have an    │          │
+│      │  account? Sign up │          │
+│      └───────────────────┘          │
+│                                     │
+└─────────────────────────────────────┘
+```
+
+**Макет (Register mode):**
+
+```
+┌─────────────────────────────────────┐
+│                                     │
+│      ┌───────────────────┐          │
+│      │ Create an account │          │
+│      │   (description)   │          │
+│      │                   │          │
+│      │  Name: [____]     │          │
+│      │  EMAIL: [____]    │          │
+│      │  PASSWORD: [____] │          │
+│      │  Confirm Password:│          │
+│      │  [____]           │          │
+│      │                   │          │
+│      │ [Create account]  │          │
+│      │                   │          │
+│      │  Already have an  │          │
+│      │  account? Sign in │          │
 │      └───────────────────┘          │
 │                                     │
 └─────────────────────────────────────┘
@@ -1555,61 +1712,99 @@ ALTER TABLE public.exercise_sets ENABLE ROW LEVEL SECURITY;
 
 **Функціональність:**
 
-- Валідація полів (email формат, обов'язкові поля)
-- Показ помилок валідації
-- Показ помилок автентифікації
-- Loading стан кнопки під час запиту
-- Посилання на реєстрацію
+- Динамічна конфігурація форми залежно від режиму (login/register)
+- Валідація полів через Zod схеми:
+  - Login: email, password
+  - Register: name (optional), email, password, confirmPassword
+- Показ помилок валідації через `FormField`
+- Показ помилок автентифікації через Sonner toast
+- Loading стан кнопки (`isPending`) під час запиту
+- Автоматичне перенаправлення на `/dashboard` після успішної автентифікації
+- Посилання на реєстрацію (у футері `AuthCard`)
 
 #### 6.3.2 Сторінка реєстрації (/register)
 
-**Компоненти:**
+**Файл:** `src/app/(auth)/register/page.tsx`
 
-- Аналогічно до login
-- Додаткове поле для імені (опціонально)
-- Підтвердження пароля
+**Реалізація:** Використовує компонент `AuthFormContainer` без пропса `isLogin` (за замовчуванням `isLogin={false}`).
 
-**Макет:**
+**Структура:**
 
-- Схожий до login, але з додатковими полями
+```typescript
+// src/app/(auth)/register/page.tsx
+import { AuthFormContainer } from "@/components/auth";
+
+export default function RegisterPage() {
+  return <AuthFormContainer />;
+}
+```
+
+**Маршрут:** `/register`
+
+**Поля форми (REGISTER_FIELDS_DATA):**
+
+- Name (опціонально) - `name`
+- EMAIL - `email`
+- PASSWORD - `password`
+- Confirm Password - `confirmPassword`
+
+**Валідація:**
+
+- Використовується `REGISTER_SCHEMA` з перевіркою через Zod
+- Перевірка унікальності email через Supabase Auth
+- Показ помилок через `FormField` та Sonner toast
+
+**Примітка:** Див. розділ 6.3.1 для деталей про структуру та функціональність, оскільки використовується той самий компонент `AuthFormContainer`.
 
 #### 6.3.3 Дошка тренувань / Dashboard (/dashboard)
 
+**Файл:** `src/app/dashboard/page.tsx`
+
+**Статус:** ✅ **РЕАЛІЗОВАНО** (базова версія, Phase 1)
+
 **Компоненти:**
 
-- `Calendar` (shadcn/ui) - календарний компонент
-- `Card` (shadcn/ui) - картки для днів з тренуваннями
-- `Badge` (shadcn/ui) - індикатори кількості тренувань
-- `Button` (shadcn/ui) - кнопка "Створити тренування"
+- `getCurrentUser` (Server Action) - перевірка авторизації
+- `LogoutButton` - кнопка виходу з системи
+- `Card` (shadcn/ui) - контейнер для контенту
 
-**Макет:**
+**Реалізація:**
 
+```typescript
+export default async function DashboardPage() {
+  const { data, error } = await getCurrentUser();
+
+  if (error || !data) {
+    redirect(ROUTE.LOGIN);
+  }
+
+  return (
+    <div className="container mx-auto py-8">
+      <div className="flex items-center justify-between mb-8">
+        <h1 className="text-3xl font-semibold">Dashboard</h1>
+        <LogoutButton />
+      </div>
+      <div className="rounded-lg border bg-white p-6 shadow-sm dark:bg-zinc-900 dark:border-zinc-800">
+        <p className="text-muted-foreground">
+          Welcome, {data.user.name || data.user.email}! This is your dashboard.
+        </p>
+        <p className="text-sm text-muted-foreground mt-2">
+          Training calendar and features will be available in Phase 4.
+        </p>
+      </div>
+    </div>
+  );
+}
 ```
-┌──────────────────────────────────────────────────┐
-│  Header: [Logo]  [Dashboard]  [Profile]  [Logout]│
-├──────────────────────────────────────────────────┤
-│                                                  │
-│  [< Prev Month]  [Month Year]  [Next Month >]    │
-│                                                  │
-│  ┌──────────────────────────────────────────┐    │
-│  │  Calendar Grid                           │    │
-│  │  ┌────┬────┬────┬────┬────┬────┬────┐    │    │
-│  │  │ Su │ Mo │ Tu │ We │ Th │ Fr │ Sa │    │    │
-│  │  ├────┼────┼────┼────┼────┼────┼────┤    │    │
-│  │  │    │    │  1 │  2 │  3 │  4 │  5 │    │    │
-│  │  │    │    │[2] │    │[1] │    │    │    │    │
-│  │  │  6 │  7 │  8 │  9 │ 10 │ 11 │ 12 │    │    │
-│  │  │    │[1] │    │    │    │[3] │    │    │    │
-│  │  │ ...                              │    │    │
-│  │  └──────────────────────────────────┘    │    │
-│  └──────────────────────────────────────────┘    │
-│                                                  │
-│  [Create New Training Button]                    │
-│                                                  │
-└──────────────────────────────────────────────────┘
-```
 
-**Функціональність:**
+**Функціональність (Phase 1):**
+
+- ✅ Захист маршруту - перевірка авторизації через `getCurrentUser`
+- ✅ Перенаправлення неавторизованих користувачів на `/login`
+- ✅ Відображення привітання з ім'ям/email користувача
+- ✅ Кнопка виходу з системи
+
+**Планові функції (Phase 4):**
 
 - Календар відображає поточний місяць
 - Дні з тренуваннями мають візуальну індикацію (Badge з кількістю)
@@ -1618,11 +1813,23 @@ ALTER TABLE public.exercise_sets ENABLE ROW LEVEL SECURITY;
 - Вибір дати відкриває форму створення тренування
 - Кнопка "Створити тренування" для швидкого створення
 
-**Інтерактивність:**
+**Макет (Phase 1 - поточна реалізація):**
 
-- Hover ефекти на дні календаря
-- Активний день (вибраний) - виділення
-- Дні з тренуваннями - підсвітка/індикатор
+```
+┌──────────────────────────────────────────────────┐
+│  Dashboard                    [Logout Button]    │
+├──────────────────────────────────────────────────┤
+│                                                  │
+│  ┌──────────────────────────────────────────┐    │
+│  │  Welcome, [User Name/Email]!            │    │
+│  │  This is your dashboard.                │    │
+│  │                                          │    │
+│  │  Training calendar and features         │    │
+│  │  will be available in Phase 4.          │    │
+│  └──────────────────────────────────────────┘    │
+│                                                  │
+└──────────────────────────────────────────────────┘
+```
 
 #### 6.3.4 Створення тренування (/training/new)
 
@@ -1811,17 +2018,26 @@ ALTER TABLE public.exercise_sets ENABLE ROW LEVEL SECURITY;
 - Закриття по ESC або кліку поза діалогом
 - Loading стани
 
-#### 6.4.3 Form
+#### 6.4.3 Field
 
 **Використання:**
 
 - Всі форми (login, register, training, exercise)
-- Інтеграція з react-hook-form та zod для валідації
+- Інтеграція з react-hook-form через Controller та zod для валідації
+
+**Компоненти:**
+
+- `Field` - контейнер для поля форми
+- `FieldLabel` - мітка поля
+- `FieldError` - відображення помилок валідації
+- `FieldGroup` - групування полів форми
+- `FieldDescription` - опис поля (опціонально)
 
 **Кастомізація:**
 
-- Валідація в реальному часі
-- Показ помилок
+- Валідація в реальному часі через `data-invalid` атрибут
+- Показ помилок через `FieldError` з масивом помилок
+- Підтримка `aria-invalid` для доступності
 - Loading стани
 
 #### 6.4.4 Card
@@ -1880,7 +2096,7 @@ ALTER TABLE public.exercise_sets ENABLE ROW LEVEL SECURITY;
 - Різні типи (text, number, email, password)
 - Placeholder текст
 - Icons (за потреби)
-- Валідація через Form компонент
+- Валідація через Field компонент з react-hook-form Controller
 
 #### 6.4.8 Select
 
@@ -1981,23 +2197,30 @@ ALTER TABLE public.exercise_sets ENABLE ROW LEVEL SECURITY;
 ### 7.1 Загальні принципи Server Actions
 
 **Тип API:** Next.js Server Actions  
-**Формат даних:** TypeScript типи (автоматична серіалізація)  
+**Формат даних:** FormData (для форм) або TypeScript типи (автоматична серіалізація)  
 **Автентифікація:** Supabase Auth (JWT токени в cookies)
 
 **Структура:**
 
-- Server Actions знаходяться в `src/app/actions/`
+- Server Actions знаходяться в `src/actions/`
 - Кожна action - це async функція з міткою `'use server'`
-- Викликаються напряму з Client Components
+- Викликаються напряму з Client Components через `useActionState` hook
 - Автоматична типобезпека між клієнтом та сервером
 
 **Формат відповіді:**
 
+Всі Server Actions повертають уніфікований формат `AuthResponse<T>`:
+
 ```typescript
+type AuthResponse<T> = {
+  data: T | null;
+  error: { code: string; message: string; field?: string } | null;
+};
+
 // Успішна відповідь
 {
   data: { ... },
-  error?: null
+  error: null
 }
 
 // Помилка
@@ -2006,9 +2229,20 @@ ALTER TABLE public.exercise_sets ENABLE ROW LEVEL SECURITY;
   error: {
     code: string,
     message: string,
-    details?: any
+    field?: string  // Опціонально, для валідації полів
   }
 }
+```
+
+**Використання на клієнті:**
+
+Server Actions викликаються через React `useActionState` hook:
+
+```typescript
+const [{ data, error }, formAction, isPending] = useActionState(serverAction, {
+  data: null,
+  error: null,
+});
 ```
 
 **Переваги Server Actions:**
@@ -2016,12 +2250,13 @@ ALTER TABLE public.exercise_sets ENABLE ROW LEVEL SECURITY;
 - Типобезпека - TypeScript перевіряє типи на етапі компіляції
 - Менше boilerplate - не потрібні HTTP endpoints
 - Автоматична серіалізація - Next.js обробляє передачу даних
-- Пряма інтеграція з React - використання `useFormState`, `useFormStatus`
+- Інтеграція з React Hook Form через `Controller` компонент
 - Автоматичне revalidation - `revalidatePath` та `revalidateTag`
+- Оптимістичні оновлення через `useActionState`
 
 ### 7.2 Server Actions для автентифікації
 
-**Файл:** `src/app/actions/auth.ts`
+**Файл:** `src/actions/auth.ts`
 
 #### 7.2.1 registerUser
 
@@ -2030,26 +2265,37 @@ ALTER TABLE public.exercise_sets ENABLE ROW LEVEL SECURITY;
 **Сигнатура:**
 
 ```typescript
-async function registerUser(data: {
-  email: string;
-  password: string;
-  name?: string;
-}): Promise<{
-  data: { user: PublicUser } | null;
-  error: { code: string; message: string } | null;
-}>;
+async function registerUser(
+  prevState: AuthResponse<{ success: boolean }> | null,
+  formData: FormData
+): Promise<AuthResponse<{ success: boolean }>>;
 ```
+
+**Вхідні дані (FormData):**
+
+- `email`: string - обов'язкове, валідний email формат
+- `password`: string - обов'язкове, мінімум 8 символів
+- `name`: string | null - опціональне, максимум 255 символів
+- `confirmPassword`: string - обов'язкове для валідації на клієнті
 
 **Валідація:**
 
+- Використовується `REGISTER_SCHEMA` з `@/constants/authValidationSchemas`
 - `email`: обов'язкове, валідний email формат
 - `password`: обов'язкове, мінімум 8 символів
 - `name`: опціональне, максимум 255 символів
 
 **Повертає:**
 
-- `data.user` - інформація про створеного користувача
-- `error` - помилка валідації або реєстрації
+- `data.success` - boolean, успішна реєстрація
+- `error` - помилка валідації або реєстрації з кодом та повідомленням
+
+**Примітки:**
+
+- Перевіряє унікальність email через таблицю `profiles`
+- Використовує `supabase.auth.signUp()` для створення користувача
+- Автоматично створює профіль користувача через Supabase trigger
+- Викликає `revalidatePath('/')` після успішної реєстрації
 
 ---
 
@@ -2060,23 +2306,33 @@ async function registerUser(data: {
 **Сигнатура:**
 
 ```typescript
-async function loginUser(data: { email: string; password: string }): Promise<{
-  data: { user: PublicUser } | null;
-  error: { code: string; message: string } | null;
-}>;
+async function loginUser(
+  prevState: AuthResponse<{ success: boolean }> | null,
+  formData: FormData
+): Promise<AuthResponse<{ success: boolean }>>;
 ```
+
+**Вхідні дані (FormData):**
+
+- `email`: string - обов'язкове, валідний email формат
+- `password`: string - обов'язкове
 
 **Валідація:**
 
+- Використовується `LOGIN_SCHEMA` з `@/constants/authValidationSchemas`
 - `email`: обов'язкове, валідний email формат
 - `password`: обов'язкове
 
 **Повертає:**
 
-- `data.user` - інформація про користувача
-- `error` - помилка автентифікації
+- `data.success` - boolean, успішний вхід
+- `error` - помилка валідації або автентифікації з кодом та повідомленням
 
-**Примітка:** Сесія зберігається автоматично через Supabase cookies
+**Примітки:**
+
+- Використовує `supabase.auth.signInWithPassword()` для автентифікації
+- Сесія зберігається автоматично через Supabase cookies
+- Після успішного входу клієнт перенаправляється на `/dashboard`
 
 ---
 
@@ -2087,16 +2343,19 @@ async function loginUser(data: { email: string; password: string }): Promise<{
 **Сигнатура:**
 
 ```typescript
-async function logoutUser(): Promise<{
-  data: { success: boolean } | null;
-  error: { code: string; message: string } | null;
-}>;
+async function logoutUser(): Promise<AuthResponse<{ success: boolean }>>;
 ```
 
 **Повертає:**
 
-- `data.success` - успішний вихід
-- `error` - помилка (якщо неавторизований)
+- `data.success` - boolean, успішний вихід
+- `error` - помилка з кодом та повідомленням (якщо виникла)
+
+**Примітки:**
+
+- Використовує `supabase.auth.signOut()` для завершення сесії
+- Викликається через `useActionState` з клієнтського компонента
+- Після успішного виходу користувач перенаправляється на сторінку входу
 
 ---
 
@@ -2107,20 +2366,24 @@ async function logoutUser(): Promise<{
 **Сигнатура:**
 
 ```typescript
-async function getCurrentUser(): Promise<{
-  data: { user: PublicUser } | null;
-  error: { code: string; message: string } | null;
-}>;
+async function getCurrentUser(): Promise<AuthResponse<{ user: PublicUser }>>;
 ```
 
 **Повертає:**
 
-- `data.user` - інформація про поточного користувача
-- `error` - помилка (якщо неавторизований)
+- `data.user` - інформація про поточного користувача (PublicUser)
+- `error` - помилка з кодом та повідомленням (якщо неавторизований)
+
+**Примітки:**
+
+- Використовує `supabase.auth.getUser()` для отримання поточного користувача
+- Отримує профіль з таблиці `profiles` через Supabase
+- Використовується на захищених сторінках для перевірки авторизації
+- Якщо користувач не авторизований, повертає помилку з кодом "UNAUTHORIZED"
 
 ### 7.3 Server Actions для тренувань (CRUD)
 
-**Файл:** `src/app/actions/training.ts`
+**Файл:** `src/actions/training.ts`
 
 #### 7.3.1 getTrainings
 
@@ -2249,7 +2512,7 @@ async function deleteTraining(id: string): Promise<{
 
 ### 7.4 Server Actions для вправ
 
-**Файл:** `src/app/actions/exercise.ts`
+**Файл:** `src/actions/exercise.ts`
 
 **Примітка:** Вправи обробляються через окремі Server Actions, але зазвичай створюються/оновлюються разом з тренуванням через `createTraining` та `updateTraining`. Окремі actions для вправ використовуються для додавання/видалення вправ до існуючого тренування.
 
@@ -2504,7 +2767,7 @@ export async function createTraining(data: unknown) {
 **Структура Server Actions:**
 
 ```
-src/app/actions/
+src/actions/
 ├── auth.ts          # registerUser, loginUser, logoutUser, getCurrentUser
 ├── training.ts      # getTrainings, getTraining, createTraining, updateTraining, deleteTraining
 └── exercise.ts      # getExercises, getExercise, createExercise, updateExercise, deleteExercise
@@ -2524,6 +2787,8 @@ src/app/actions/
 
 ### 8.1 Структура компонентів React
 
+**Загальне правило:** Всі папки компонентів мають містити `index.ts` або `index.tsx` для централізованого експорту. Імпорти завжди відбуваються через папку компонентів, а не через прямі шляхи до файлів.
+
 ```
 src/
 ├── components/
@@ -2531,19 +2796,25 @@ src/
 │   │   ├── button.tsx
 │   │   ├── card.tsx
 │   │   ├── dialog.tsx
-│   │   ├── form.tsx
+│   │   ├── field.tsx
+│   │   ├── form-field.tsx         # Reusable form field component with react-hook-form integration
 │   │   ├── input.tsx
 │   │   ├── label.tsx
 │   │   ├── calendar.tsx
 │   │   ├── table.tsx
 │   │   ├── select.tsx
 │   │   ├── badge.tsx
+│   │   ├── separator.tsx          # Separator component
+│   │   ├── sonner.tsx             # Toaster component (Sonner)
+│   │   ├── index.tsx              # Centralized exports for all UI components
 │   │   └── ...
 │   │
 │   ├── auth/                      # Auth components
-│   │   ├── login-form.tsx
-│   │   ├── register-form.tsx
-│   │   └── logout-button.tsx
+│   │   ├── auth-form.tsx          # Unified auth form (login/register)
+│   │   ├── auth-form-container.tsx   # Container wrapper for auth forms
+│   │   ├── logout-button.tsx
+│   │   ├── constants.ts           # Form fields and content constants
+│   │   └── index.ts               # Centralized exports for all auth components
 │   │
 │   ├── training/                  # Training components
 │   │   ├── training-board/        # Calendar/Dashboard
@@ -2579,8 +2850,35 @@ src/
 │   └── layout/                    # Layout components
 │       ├── header.tsx
 │       ├── navbar.tsx
-│       └── footer.tsx
+│       ├── footer.tsx
+│       └── index.ts               # Centralized exports for all layout components
 ```
+
+**Правило централізованих експортів:**
+
+Всі папки компонентів мають містити файл `index.ts` або `index.tsx` для централізованого експорту всіх компонентів з цієї папки. Імпорти завжди відбуваються через папку компонентів, а не через прямі шляхи до файлів.
+
+**Приклади правильних імпортів:**
+
+```typescript
+// ✅ Правильно - через централізований експорт
+import { AuthFormContainer, LogoutButton } from "@/components/auth";
+import { Button, Input, FieldGroup, FormField, Toaster } from "@/components/ui";
+import { TrainingCard, TrainingForm } from "@/components/training";
+import { ExerciseList, ExerciseForm } from "@/components/exercise";
+
+// ❌ Неправильно - прямі шляхи до файлів
+import { AuthFormContainer } from "@/components/auth/auth-form-container";
+import { Button } from "@/components/ui/button";
+import { TrainingCard } from "@/components/training/training-card/training-card";
+```
+
+**Правила:**
+
+- Кожна папка компонентів має містити `index.ts` або `index.tsx`
+- Всі компоненти з папки експортуються через цей файл
+- Імпорти завжди використовують шлях до папки, не до конкретного файлу
+- Це правило застосовується для всіх рівнів вкладеності (навіть для підпапок)
 
 ### 8.2 Використання shadcn/ui компонентів
 
@@ -2611,22 +2909,23 @@ src/
    - Використання: модальні вікна для форм, підтвердження
    - Компоненти: Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter
 
-4. **Form** (`src/components/ui/form.tsx`)
+4. **Field** (`src/components/ui/field.tsx`)
 
    - Використання: всі форми
-   - Інтеграція з react-hook-form та zod
-   - Компоненти: Form, FormItem, FormLabel, FormControl, FormDescription, FormMessage
+   - Інтеграція з react-hook-form через Controller та zod
+   - Компоненти: Field, FieldLabel, FieldError, FieldGroup, FieldDescription, FieldContent, FieldTitle, FieldSet, FieldLegend, FieldSeparator
+   - Примітка: для простих текстових полів рекомендується використовувати `FormField` компонент, який інкапсулює Field, FieldLabel, Input та FieldError
 
 5. **Input** (`src/components/ui/input.tsx`)
 
    - Використання: текстові поля, числові поля
    - Типи: text, number, email, password
-   - Інтеграція з Form компонентом
+   - Інтеграція з Field компонентом через Controller
 
 6. **Label** (`src/components/ui/label.tsx`)
 
    - Використання: мітки для полів форм
-   - Інтеграція з Form компонентом
+   - Інтеграція з Field компонентом через FieldLabel
 
 7. **Calendar** (`src/components/ui/calendar.tsx`)
 
@@ -2649,9 +2948,27 @@ src/
     - Використання: індикація кількості тренувань, статуси
     - Варіанти: default, secondary, destructive, outline
 
-11. **Toast** (`src/components/ui/toast.tsx`) - опціонально
-    - Використання: сповіщення про успіх/помилки
-    - Компоненти: Toast, ToastProvider, ToastViewport, ToastTitle, ToastDescription, ToastAction, ToastClose
+11. **FormField** (`src/components/ui/form-field.tsx`)
+
+    - Використання: переісний компонент для полів форм з інтеграцією react-hook-form
+    - Інтеграція з Controller (react-hook-form) для автоматичної валідації та відображення помилок
+    - Компоненти: FormField (обгортка над Field, FieldLabel, Input, FieldError)
+    - Підтримка TypeScript generics для типобезпеки з будь-якою формою
+    - Підтримка різних типів полів: text, email, password, number тощо
+
+12. **Separator** (`src/components/ui/separator.tsx`)
+
+    - Використання: розділювач контенту
+    - Компоненти: Separator
+    - Орієнтація: horizontal (за замовчуванням) або vertical
+
+13. **Toaster** (`src/components/ui/sonner.tsx`)
+
+    - Використання: система сповіщень (toast notifications)
+    - Бібліотека: Sonner
+    - Компоненти: Toaster (провайдер для toast)
+    - Використання: `toast.success()`, `toast.error()`, `toast.info()` тощо
+    - Інтеграція: додається в `layout.tsx` для глобального доступу
 
 ### 8.3 Основні компоненти
 
@@ -2713,9 +3030,9 @@ interface TrainingBoardProps {
 
 **Залежності:**
 
-- shadcn/ui: `Dialog`, `Form`, `Input`, `Label`, `Calendar`, `Button`
+- shadcn/ui: `Dialog`, `Field`, `FieldGroup`, `FieldLabel`, `FieldError`, `Input`, `Calendar`, `Button`
 - Custom: `ExerciseList`, `ExerciseForm`
-- Hooks: `useForm` (react-hook-form), `useTraining`
+- Hooks: `useForm`, `Controller` (react-hook-form), `useTraining`
 
 **Пропси:**
 
@@ -2744,27 +3061,51 @@ interface TrainingFormProps {
 
 ```typescript
 <TrainingForm>
-  <Form>
-    <FormField name="date">
-      <Calendar />
-    </FormField>
-    <FormField name="name">
-      <Input />
-    </FormField>
-    <FormField name="description">
-      <Input />
-    </FormField>
-    <ExerciseList
-      exercises={exercises}
-      onAdd={handleAddExercise}
-      onEdit={handleEditExercise}
-      onRemove={handleRemoveExercise}
-    />
-    <FormActions>
+  <form onSubmit={form.handleSubmit(onSubmit)}>
+    <FieldGroup>
+      <Controller
+        name="date"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor={field.name}>Date</FieldLabel>
+            <Calendar {...field} />
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
+      <Controller
+        name="name"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor={field.name}>Name</FieldLabel>
+            <Input {...field} aria-invalid={fieldState.invalid} />
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
+      <Controller
+        name="description"
+        control={form.control}
+        render={({ field, fieldState }) => (
+          <Field data-invalid={fieldState.invalid}>
+            <FieldLabel htmlFor={field.name}>Description</FieldLabel>
+            <Input {...field} aria-invalid={fieldState.invalid} />
+            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+          </Field>
+        )}
+      />
+      <ExerciseList
+        exercises={exercises}
+        onAdd={handleAddExercise}
+        onEdit={handleEditExercise}
+        onRemove={handleRemoveExercise}
+      />
       <Button type="cancel">Cancel</Button>
       <Button type="submit">Save</Button>
-    </FormActions>
-  </Form>
+    </FieldGroup>
+  </form>
 </TrainingForm>
 ```
 
@@ -2837,8 +3178,9 @@ interface ExerciseListProps {
 
 **Залежності:**
 
-- shadcn/ui: `Dialog`, `Form`, `Input`, `Label`, `Table`, `Button`
+- shadcn/ui: `Dialog`, `Field`, `FieldGroup`, `FieldLabel`, `FieldError`, `Input`, `Table`, `Button`
 - Custom: `ExerciseSetsTable`
+- Hooks: `useForm`, `Controller` (react-hook-form)
 
 **Пропси:**
 
@@ -2868,24 +3210,46 @@ interface ExerciseFormProps {
 <ExerciseForm>
   <Dialog>
     <DialogContent>
-      <Form>
-        <FormField name="name">
-          <Input />
-        </FormField>
-        <ExerciseSetsTable
-          sets={sets}
-          onAdd={handleAddSet}
-          onRemove={handleRemoveSet}
-          onUpdate={handleUpdateSet}
-        />
-        <FormField name="notes">
-          <Input />
-        </FormField>
-        <DialogFooter>
-          <Button type="cancel">Cancel</Button>
-          <Button type="submit">Add Exercise</Button>
-        </DialogFooter>
-      </Form>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <FieldGroup>
+          <Controller
+            name="name"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Exercise Name</FieldLabel>
+                <Input {...field} aria-invalid={fieldState.invalid} />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+          <ExerciseSetsTable
+            sets={sets}
+            onAdd={handleAddSet}
+            onRemove={handleRemoveSet}
+            onUpdate={handleUpdateSet}
+          />
+          <Controller
+            name="notes"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Notes</FieldLabel>
+                <Input {...field} aria-invalid={fieldState.invalid} />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+          <DialogFooter>
+            <Button type="cancel">Cancel</Button>
+            <Button type="submit">Add Exercise</Button>
+          </DialogFooter>
+        </FieldGroup>
+      </form>
     </DialogContent>
   </Dialog>
 </ExerciseForm>
@@ -2925,27 +3289,73 @@ interface TrainingDetailProps {
 
 ---
 
-#### 8.3.6 LoginForm / RegisterForm
+#### 8.3.6 AuthCard
 
-**Файли:**
+**Файл:**
 
-- `src/components/auth/login-form.tsx`
-- `src/components/auth/register-form.tsx`
+- `src/components/auth/auth-card.tsx`
 
-**Призначення:** Форми автентифікації
+**Призначення:** Переісний компонент-обгортка для форм автентифікації
 
 **Залежності:**
 
-- shadcn/ui: `Card`, `Form`, `Input`, `Label`, `Button`
-- Hooks: `useForm` (react-hook-form), `useAuth`
+- Next.js: `Link`
+
+**Пропси:**
+
+- `title` - заголовок форми
+- `description` - опис форми
+- `children` - вміст форми (LoginForm або RegisterForm)
+- `footerText` - текст перед посиланням у футері
+- `footerLinkText` - текст посилання у футері
+- `footerLinkHref` - URL посилання у футері
 
 **Функціональність:**
 
-- Валідація полів (email формат, пароль мінімум 8 символів)
-- Показ помилок валідації
-- Показ помилок автентифікації
-- Loading стан при відправці
-- Перенаправлення після успішної автентифікації
+- Відображення заголовка та опису форми
+- Обгортка форми зі стилізацією (border, shadow, padding)
+- Футер з посиланням на альтернативну сторінку (login/register)
+
+---
+
+#### 8.3.7 AuthForm
+
+**Файл:** `src/components/auth/auth-form.tsx`
+
+**Призначення:** Уніфікована форма автентифікації (вхід/реєстрація)
+
+**Залежності:**
+
+- shadcn/ui: `Button`, `FieldGroup`, `FormField`
+- Hooks: `useForm` (react-hook-form), `useActionState` (React)
+- Server Actions: `loginUser`, `registerUser` з `@/actions/auth`
+- Sonner: `toast` для відображення помилок
+- Validation: `LOGIN_SCHEMA`, `REGISTER_SCHEMA_WITH_CONFIRM_PASSWORD` з `@/constants/authValidationSchemas`
+- Constants: `LOGIN_FIELDS_DATA`, `REGISTER_FIELDS_DATA` з `./constants`
+- Routes: `DASHBOARD_PATH` з `@/constants/routes`
+
+**Пропси:**
+
+```typescript
+interface AuthFormProps {
+  isLogin: boolean; // Режим: true для входу, false для реєстрації
+  buttonText: string; // Текст кнопки відправки
+}
+```
+
+**Функціональність:**
+
+- Динамічна конфігурація полів залежно від режиму (login/register)
+- Валідація полів через Zod схеми:
+  - Login: email, password
+  - Register: name (optional), email, password, confirmPassword
+- Показ помилок валідації через `FormField` компонент
+- Показ помилок автентифікації через Sonner toast
+- Loading стан (`isPending`) при відправці форми
+- Перенаправлення на `/dashboard` після успішної автентифікації
+- Використання `startTransition` для оптимізації оновлень
+
+**Примітка:** Компонент не містить обгортку, заголовок, опис та футер. Це забезпечує компонент `AuthFormContainer`, який використовується на сторінках `/login` та `/register` для обгортки форми.
 
 ### 8.4 Модулі та сервіси
 
@@ -2965,8 +3375,10 @@ src/
 │   │   └── server.ts             # Server client
 │   │
 │   └── utils/                    # General utilities
+│       ├── cn.ts                 # Class name utility (clsx + tailwind-merge)
 │       ├── date.ts               # Date utilities
-│       └── validation.ts         # Validation helpers (Zod schemas)
+│       ├── validation.ts         # Validation helpers (Zod schemas)
+│       └── index.ts              # Export all utilities (centralized exports)
 │
 ├── hooks/                        # Custom React hooks
 │   ├── useAuth.ts                # Auth hook
@@ -3006,7 +3418,7 @@ src/
 
 #### 8.4.3 Auth Module (Server Actions)
 
-**Файл:** `src/app/actions/auth.ts`
+**Файл:** `src/actions/auth.ts`
 
 **Призначення:** Server Actions для автентифікації
 
@@ -3027,7 +3439,7 @@ src/
 
 #### 8.4.4 Training Module (Server Actions)
 
-**Файл:** `src/app/actions/training.ts`
+**Файл:** `src/actions/training.ts`
 
 **Призначення:** Server Actions для тренувань
 
@@ -3048,7 +3460,175 @@ src/
 
 ---
 
-#### 8.4.5 Custom Hooks
+#### 8.4.5 UI Components Module
+
+**Структура:** `src/components/ui/`
+
+**Принципи організації:**
+
+- Кожен UI компонент - це окремий файл (shadcn/ui компоненти)
+- Дотримується загального правила централізованих експортів (див. розділ 8.1)
+- Навіть компоненти всередині `components/ui/`, які імпортують один одного, мають використовувати `@/components/ui`
+
+**Приклад структури:**
+
+```
+src/components/ui/
+├── button.tsx
+├── card.tsx
+├── field.tsx
+├── input.tsx
+├── label.tsx
+├── calendar.tsx
+├── table.tsx
+├── select.tsx
+├── badge.tsx
+├── form-field.tsx      # Reusable form field component with react-hook-form integration
+└── index.tsx           # Centralized exports for all UI components
+```
+
+**Файл:** `src/components/ui/index.tsx`
+
+**Приклад експортів:**
+
+```typescript
+// src/components/ui/index.tsx
+export { Button, buttonVariants } from "./button";
+export { Input } from "./input";
+export {
+  Field,
+  FieldLabel,
+  FieldError,
+  FieldGroup,
+  FieldDescription,
+} from "./field";
+export { Label } from "./label";
+export { FormField } from "./form-field";
+// ... інші компоненти
+```
+
+---
+
+#### 8.4.6 Auth Components Module
+
+**Структура:** `src/components/auth/`
+
+**Принципи організації:**
+
+- Дотримується загального правила централізованих експортів (див. розділ 8.1)
+
+**Компоненти:**
+
+- `AuthForm` - уніфікована форма автентифікації (вхід/реєстрація)
+- `AuthFormContainer` - компонент-обгортка для форм автентифікації з UI
+- `LogoutButton` - кнопка виходу з системи
+- `constants.ts` - константи для форм (поля, контент)
+
+**Файл:** `src/components/auth/index.ts`
+
+**Приклад експортів:**
+
+```typescript
+// src/components/auth/index.ts
+export { LogoutButton } from "./logout-button";
+export { AuthFormContainer } from "./auth-form-container";
+```
+
+**Деталі компонентів:**
+
+**AuthForm** (`src/components/auth/auth-form.tsx`):
+
+- Уніфікований компонент для входу та реєстрації
+- Приймає пропси для конфігурації форми (поля, дії)
+- Використовує `react-hook-form` з `zodResolver` для валідації
+- Використовує `useActionState` для виклику Server Actions
+- Показує помилки через Sonner toast
+- Перенаправляє на `/dashboard` після успішної автентифікації
+- Використовує `FormField` компонент для полів форми
+
+**AuthFormContainer** (`src/components/auth/auth-form-container.tsx`):
+
+- Обгортка для `AuthForm` з UI елементами
+- Визначає режим (login/register) через пропс `isLogin: boolean`
+- Відображає заголовок, опис та футер з посиланням
+- Використовує константи з `constants.ts` для контенту (LOGIN_FORM_DATA, REGISTER_FORM_DATA)
+- Використовує `useTransition` для оптимізації навігації між сторінками
+
+**LogoutButton** (`src/components/auth/logout-button.tsx`):
+
+- Кнопка виходу з системи
+- Використовує `useActionState` для виклику `logoutUser`
+- Показує loading стан під час виходу
+
+**constants.ts** (`src/components/auth/constants.ts`):
+
+- `CONTENT_DATA` - контент для різних режимів (login/register)
+- `LOGIN_FIELDS_DATA` - конфігурація полів для форми входу
+- `REGISTER_FIELDS_DATA` - конфігурація полів для форми реєстрації
+
+---
+
+#### 8.4.7 Utilities Module
+
+**Структура:** `src/lib/utils/`
+
+**Принципи організації:**
+
+- Кожна утиліта - це окремий файл з назвою утиліти
+- Всі утиліти експортуються через `index.ts` для централізованого доступу
+- Імпорти завжди відбуваються через `@/lib/utils`, а не через прямі шляхи до файлів
+
+**Приклад структури:**
+
+```
+src/lib/utils/
+├── cn.ts              # Утиліта для об'єднання класів (clsx + tailwind-merge)
+├── date.ts            # Утиліти для роботи з датами
+├── validation.ts      # Валідаційні утиліти (Zod schemas)
+└── index.ts           # Централізований експорт всіх утиліт
+```
+
+**Файл:** `src/lib/utils/cn.ts`
+
+**Призначення:** Утиліта для об'єднання та обробки CSS класів
+
+**Функціональність:**
+
+- Об'єднання класів через `clsx`
+- Мердж Tailwind класів через `tailwind-merge`
+- Використовується в усіх shadcn/ui компонентах
+
+**Приклад використання:**
+
+```typescript
+import { cn } from "@/lib/utils";
+
+// В компоненті
+<div className={cn("base-class", condition && "conditional-class")} />;
+```
+
+**Файл:** `src/lib/utils/index.ts`
+
+**Призначення:** Централізований експорт всіх утиліт
+
+**Правила:**
+
+- Всі утиліти мають експортуватися через `index.ts`
+- Імпорти завжди використовують `@/lib/utils`, не прямі шляхи до файлів
+- При додаванні нової утиліти вона має бути додана до `index.ts`
+
+**Приклад:**
+
+```typescript
+// src/lib/utils/index.ts
+export { cn } from "./cn";
+export { formatDate, parseDate } from "./date";
+export { validateTraining } from "./validation";
+```
+
+---
+
+#### 8.4.6 Custom Hooks
 
 **useAuth** (`src/hooks/useAuth.ts`)
 
@@ -3082,13 +3662,14 @@ graph TB
         TrainingDetail["TrainingDetail"]
         ExerciseList["ExerciseList"]
         ExerciseForm["ExerciseForm"]
+        AuthCard["AuthCard"]
         LoginForm["LoginForm"]
     end
 
     subgraph UI["shadcn/ui Components"]
         Calendar["Calendar"]
         Dialog["Dialog"]
-        Form["Form"]
+        Field["Field"]
         Table["Table"]
         Button["Button"]
         Card["Card"]
@@ -3109,7 +3690,9 @@ graph TB
     DashboardPage --> TrainingBoard
     TrainingPage --> TrainingDetail
     TrainingPage --> TrainingForm
-    AuthPage --> LoginForm
+    AuthPage --> AuthCard
+    AuthCard --> LoginForm
+    AuthCard --> RegisterForm
 
     TrainingBoard --> Calendar
     TrainingBoard --> Card
@@ -3117,7 +3700,7 @@ graph TB
     TrainingBoard --> useTraining
 
     TrainingForm --> Dialog
-    TrainingForm --> Form
+    TrainingForm --> Field
     TrainingForm --> ExerciseList
     TrainingForm --> useTraining
 
@@ -3129,10 +3712,10 @@ graph TB
     ExerciseList --> ExerciseForm
 
     ExerciseForm --> Dialog
-    ExerciseForm --> Form
+    ExerciseForm --> Field
     ExerciseForm --> Table
 
-    LoginForm --> Form
+    LoginForm --> FormField
     LoginForm --> useAuth
 
     useAuth --> AuthAPI
@@ -3150,27 +3733,35 @@ graph TB
 // Приклад композиції
 <TrainingForm>
   <Dialog>
-    {" "}
     {/* shadcn/ui */}
     <DialogContent>
-      {" "}
       {/* shadcn/ui */}
-      <Form>
-        {" "}
-        {/* shadcn/ui */}
-        <FormField>
-          <Input /> {/* shadcn/ui */}
-        </FormField>
-        <ExerciseList>
-          {" "}
-          {/* Custom component */}
-          <Table>
-            {" "}
-            {/* shadcn/ui */}
-            ...
-          </Table>
-        </ExerciseList>
-      </Form>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <FieldGroup>
+          {/* shadcn/ui */}
+          <Controller
+            name="name"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor={field.name}>Name</FieldLabel>
+                <Input {...field} aria-invalid={fieldState.invalid} />
+                {/* shadcn/ui */}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+          <ExerciseList>
+            {/* Custom component */}
+            <Table>
+              {/* shadcn/ui */}
+              ...
+            </Table>
+          </ExerciseList>
+        </FieldGroup>
+      </form>
     </DialogContent>
   </Dialog>
 </TrainingForm>
@@ -3188,7 +3779,7 @@ graph TB
 
 **Визначені рішення:**
 
-- **Структура Server Actions:** Модулі в `src/app/actions/` за доменами (auth, training, exercise)
+- **Структура Server Actions:** Модулі в `src/actions/` за доменами (auth, training, exercise)
 - **Інтеграція з БД:** Прямі SQL запити через Supabase клієнт (не потрібен ORM)
 - **Структура Supabase модулів:** Окремі клієнти для браузера та сервера
 - **Custom hooks:** Використання Server Actions через hooks для зручності
@@ -3647,28 +4238,30 @@ console.error("Database connection failed", { error, userId });
 
 **Мета:** Підготовка проекту та налаштування інструментів
 
+**Статус:** ✅ **ЗАВЕРШЕНО**
+
 **Задачі:**
 
-1. ✅ Налаштування проекту (вже зроблено)
+1. ✅ Налаштування проекту
 
-   - Next.js 16 налаштування
-   - TypeScript конфігурація
-   - Tailwind CSS налаштування
-   - Biome налаштування
+   - ✅ Next.js 16 налаштування
+   - ✅ TypeScript конфігурація
+   - ✅ Tailwind CSS налаштування
+   - ✅ Biome налаштування
 
-2. Налаштування shadcn/ui
+2. ✅ Налаштування shadcn/ui
 
-   - Ініціалізація shadcn/ui
-   - Налаштування компонентів
-   - Кастомізація теми
-   - Додавання базових компонентів (Button, Card, Input, тощо)
+   - ✅ Ініціалізація shadcn/ui
+   - ✅ Налаштування компонентів
+   - ✅ Кастомізація теми
+   - ✅ Додавання базових компонентів (Button, Card, Input, тощо)
 
-3. Структура проекту
-   - Створення структури папок
-   - Налаштування TypeScript paths
-   - Створення базових типів (types/)
+3. ✅ Структура проекту
+   - ✅ Створення структури папок
+   - ✅ Налаштування TypeScript paths
+   - ✅ Створення базових типів (types/)
 
-**Мілестоун:** Проект готовий до розробки компонентів
+**Мілестоун:** Проект готовий до розробки компонентів (Фаза 0 завершена)
 
 ---
 
@@ -3676,9 +4269,11 @@ console.error("Database connection failed", { error, userId });
 
 **Мета:** Створення базової інфраструктури та системи автентифікації
 
+**Статус:** ✅ **ЗАВЕРШЕНО**
+
 **Задачі:**
 
-1. Налаштування Supabase ✅
+1. ✅ Налаштування Supabase
 
    - ✅ Створення проекту в Supabase
    - ✅ Отримання API ключів (URL, publishable key, secret key)
@@ -3688,7 +4283,7 @@ console.error("Database connection failed", { error, userId });
      - `SUPABASE_SECRET_KEY` - Secret key (тільки для серверних операцій)
    - ✅ Створення Supabase клієнтів (client.ts, server.ts)
 
-2. Створення схеми БД ✅
+2. ✅ Створення схеми БД
 
    - ✅ Створення таблиць (profiles, trainings, exercises, exercise_sets)
    - ✅ Налаштування foreign keys та constraints
@@ -3696,31 +4291,45 @@ console.error("Database connection failed", { error, userId });
    - ✅ Налаштування Row Level Security (RLS) policies
    - ✅ SQL міграції (001_initial_schema.sql, 002_fix_function_search_path.sql)
 
-3. Налаштування автентифікації
+3. ✅ Налаштування автентифікації
 
-   - Використання Supabase Auth
-   - Створення Server Actions для auth (registerUser, loginUser, logoutUser, getCurrentUser)
-   - Middleware для protected routes
-   - Валідація через Zod
+   - ✅ Використання Supabase Auth
+   - ✅ Створення Server Actions для auth (`src/actions/auth.ts`):
+     - ✅ `registerUser` - реєстрація з FormData та useActionState
+     - ✅ `loginUser` - вхід з FormData та useActionState
+     - ✅ `logoutUser` - вихід з системи
+     - ✅ `getCurrentUser` - отримання поточного користувача
+   - ✅ Валідація через Zod (`src/constants/authValidationSchemas.ts`)
+   - ✅ Константи для полів форм (`src/constants/authFieldNames.ts`)
+   - ✅ Константи для маршрутів (`src/constants/routes.ts`)
 
-4. Auth Components
+4. ✅ Auth Components
 
-   - LoginForm компонент (shadcn/ui Form)
-   - RegisterForm компонент (shadcn/ui Form)
-   - LogoutButton компонент
-   - Auth pages (/login, /register)
+   - ✅ `AuthForm` - уніфікована форма автентифікації (вхід/реєстрація)
+   - ✅ `AuthFormContainer` - компонент-обгортка для форм з UI
+   - ✅ `LogoutButton` - кнопка виходу з системи
+   - ✅ `constants.ts` - константи для форм (поля, контент)
+   - ✅ Сторінки `/login` та `/register` з окремими файлами
+   - ✅ Сторінка `/dashboard` з захистом маршруту
 
-5. Auth Hooks & Utilities
-   - useAuth hook (опціонально, для зручності)
-   - Auth utilities
-   - Session management (автоматично через Supabase)
+5. ✅ UI Components для автентифікації
+
+   - ✅ `FormField` - компонент для полів форм з react-hook-form
+   - ✅ `Separator` - компонент-розділювач
+   - ✅ `Toaster` (Sonner) - система сповіщень для помилок/успіхів
+   - ✅ Інтеграція Sonner в `layout.tsx`
+
+6. ✅ Захист маршрутів
+
+   - ✅ Перевірка авторизації на сторінці `/dashboard` через `getCurrentUser`
+   - ✅ Перенаправлення на `/login` для неавторизованих користувачів
 
 **Залежності:**
 
-- Потребує shadcn/ui налаштування (Фаза 0)
-- Потребує базові типи (Фаза 0)
+- ✅ Потребує shadcn/ui налаштування (Фаза 0) - виконано
+- ✅ Потребує базові типи (Фаза 0) - виконано
 
-**Мілестоун:** Автентифікація працює, користувачі можуть реєструватися та входити
+**Мілестоун:** ✅ **ДОСЯГНУТО** - Автентифікація працює, користувачі можуть реєструватися, входити та виходити з системи. Захищені маршрути працюють коректно.
 
 ---
 
@@ -3796,7 +4405,7 @@ console.error("Database connection failed", { error, userId });
 
 3. Exercise Components
 
-   - ExerciseForm компонент (shadcn/ui Dialog + Form)
+   - ExerciseForm компонент (shadcn/ui Dialog + Field)
    - ExerciseList компонент (shadcn/ui Table)
    - ExerciseCard компонент (shadcn/ui Card)
    - ExerciseSetsTable компонент
@@ -3862,7 +4471,7 @@ console.error("Database connection failed", { error, userId });
 
 1. TrainingForm Component
 
-   - Створення TrainingForm (shadcn/ui Dialog + Form)
+   - Створення TrainingForm (shadcn/ui Dialog + Field)
    - Поля: дата (Calendar), назва, опис
    - Інтеграція ExerciseList
    - Валідація форми (react-hook-form + zod)
@@ -4072,7 +4681,7 @@ graph TB
 2. **Backend:**
 
    - **Вибір:** Next.js Server Actions
-   - **Архітектура:** Server Actions в `src/app/actions/` замість окремих API routes
+   - **Архітектура:** Server Actions в `src/actions/` замість окремих API routes
    - **Переваги:** Типобезпека, менше boilerplate, пряма інтеграція з React
 
 3. **Автентифікація:**
