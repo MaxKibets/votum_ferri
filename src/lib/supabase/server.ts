@@ -26,7 +26,7 @@ export async function createClient() {
             cookiesToSet.forEach(({ name, value, options }) => {
               cookieStore.set(name, value, options);
             });
-          } catch (error) {
+          } catch (_error) {
             // In Server Components, cookie mutations are read-only
             // This is expected behavior and can be ignored
           }

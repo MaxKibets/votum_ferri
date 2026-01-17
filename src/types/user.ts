@@ -12,4 +12,3 @@ export interface PublicUser {
   email: string;
   name?: string;
 }
-

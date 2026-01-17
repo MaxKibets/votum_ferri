@@ -39,4 +39,3 @@ export interface CreateExerciseSetDTO {
   restTime?: number;
   notes?: string;
 }
-

@@ -19,4 +19,3 @@ export interface ExerciseSet {
   completed?: boolean; // Optional completion flag
   notes?: string; // Optional notes for the set
 }
-
