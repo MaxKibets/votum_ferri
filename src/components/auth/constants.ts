@@ -1,7 +1,7 @@
 import { loginUser, registerUser } from "@/actions/auth";
 import { AUTH_FIELD_NAME } from "@/constants/authFieldNames";
 import { LOGIN_SCHEMA, REGISTER_SCHEMA_WITH_CONFIRM_PASSWORD } from "@/constants/authValidationSchemas";
-import { AUTH_MODE, AUTH_ROUTES } from "@/constants/routes";
+import { ROUTE } from "@/constants/routes";
 
 export const LOGIN_FIELDS_DATA = [
   {
@@ -51,32 +51,31 @@ export const REGISTER_FIELDS_DATA = [
   },
 ] as const;
 
-export const FORM_DATA = {
-  [AUTH_MODE.LOGIN]: {
-    title: "Sign in",
-    description: "Enter your credentials to access your account",
-    footerText: "Don't have an account?",
-    footerLinkText: "Sign up",
-    footerLinkHref: AUTH_ROUTES.REGISTER,
-    formData: {
-      fields: LOGIN_FIELDS_DATA,
-      action: loginUser,
-      schema: LOGIN_SCHEMA,
-      buttonText: "Sign in",
-    }
-  },
-  [AUTH_MODE.REGISTER]: {
-    title: "Create an account",
-    description: "Enter your information to create your account",
+export const LOGIN_FORM_DATA = {
+  title: "Sign in",
+  description: "Enter your credentials to access your account",
+  footerText: "Don't have an account?",
+  footerLinkText: "Sign up",
+  footerLinkHref: ROUTE.REGISTER,
+  formData: {
+    fields: LOGIN_FIELDS_DATA,
+    action: loginUser,
+    schema: LOGIN_SCHEMA,
+    buttonText: "Sign in",
+  }
+}
+
+export const REGISTER_FORM_DATA = {
+  title: "Create an account",
+  description: "Enter your information to create your account",
+  buttonText: "Create account",
+  footerText: "Already have an account?",
+  footerLinkText: "Sign in",
+  footerLinkHref: ROUTE.LOGIN,
+  formData: {
+    fields: REGISTER_FIELDS_DATA,
+    action: registerUser,
+    schema: REGISTER_SCHEMA_WITH_CONFIRM_PASSWORD,
     buttonText: "Create account",
-    footerText: "Already have an account?",
-    footerLinkText: "Sign in",
-    footerLinkHref: AUTH_ROUTES.LOGIN,
-    formData: {
-      fields: REGISTER_FIELDS_DATA,
-      action: registerUser,
-      schema: REGISTER_SCHEMA_WITH_CONFIRM_PASSWORD,
-      buttonText: "Create account",
-    }
-  },
-};
+  }
+}
