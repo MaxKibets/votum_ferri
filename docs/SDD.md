@@ -2,16 +2,23 @@
 
 ## Трекер тренувань - votum_ferri
 
-**Версія:** 1.2  
-**Дата:** 2025-01-27  
+**Версія:** 1.3  
+**Дата:** 2025-01-28  
 **Статус:** В розробці
+
+**Оновлення v1.3:**
+
+- Оновлено структуру маршрутів: використання окремих сторінок /login та /register замість /auth?mode=
+- Оновлено компоненти: AuthFormContainer замість AuthFormLayout (використання пропса isLogin замість query параметра)
+- Оновлено константи маршрутів: ROUTE.LOGIN, ROUTE.REGISTER, ROUTE.DASHBOARD
+- Оновлено всі відповідні розділи SDD з фактичною реалізацією структури проєкту
 
 **Оновлення v1.2:**
 
 - Реалізовано систему автентифікації (Phase 1 завершено)
 - Реалізовано Server Actions для автентифікації з використанням FormData та useActionState
-- Реалізовано компоненти автентифікації: AuthForm, AuthFormLayout, LogoutButton
-- Реалізовано сторінки: /auth (з query параметром mode), /dashboard
+- Реалізовано компоненти автентифікації: AuthForm, AuthFormContainer, LogoutButton
+- Реалізовано сторінки: /login, /register, /dashboard
 - Додано UI компоненти: FormField, Separator, Sonner (Toaster)
 - Оновлено всі відповідні розділи SDD з фактичною реалізацією
 
@@ -593,6 +600,10 @@ votum_ferri/
 ├── src/
 │   ├── app/                    # Next.js App Router
 │   │   ├── (auth)/             # Auth routes (login, register)
+│   │   │   ├── login/
+│   │   │   │   └── page.tsx
+│   │   │   └── register/
+│   │   │       └── page.tsx
 │   │   ├── dashboard/          # Dashboard/Calendar page
 │   │   ├── training/           # Training pages
 │   │   └── middleware.ts       # Route protection
@@ -610,6 +621,11 @@ votum_ferri/
 │   │   │   ├── ExerciseList/   # List of exercises
 │   │   │   └── ExerciseForm/   # Exercise form
 │   │   └── auth/               # Auth components
+│   │       ├── auth-form-container.tsx
+│   │       ├── auth-form.tsx
+│   │       ├── logout-button.tsx
+│   │       ├── constants.ts
+│   │       └── index.ts
 │   ├── lib/                    # Utilities & helpers
 │   │   ├── supabase/           # Supabase clients
 │   │   │   ├── client.ts       # Browser client
@@ -1567,26 +1583,19 @@ ALTER TABLE public.exercise_sets ENABLE ROW LEVEL SECURITY;
 **Файл:** `src/constants/routes.ts`
 
 ```typescript
-export const DASHBOARD_PATH = "/dashboard";
-export const AUTH_PATH = "/auth";
-
-export const AUTH_MODE = {
-  LOGIN: "login",
-  REGISTER: "register",
-} as const;
-
-export const AUTH_ROUTES = {
-  LOGIN: `${AUTH_PATH}?mode=${AUTH_MODE.LOGIN}`,
-  REGISTER: `${AUTH_PATH}?mode=${AUTH_MODE.REGISTER}`,
+export const ROUTE = {
+  LOGIN: "/login",
+  REGISTER: "/register",
+  DASHBOARD: "/dashboard",
 } as const;
 ```
 
 **Реалізовані маршрути:**
 
 ```
-/                          # Головна сторінка (redirect до /dashboard або /auth)
-/auth?mode=login           # Сторінка входу (query параметр mode=login)
-/auth?mode=register        # Сторінка реєстрації (query параметр mode=register)
+/                          # Головна сторінка (Next.js default template)
+/login                     # Сторінка входу
+/register                  # Сторінка реєстрації
 /dashboard                 # Дошка тренувань (захищена, перевірка через getCurrentUser)
 ```
 
@@ -1615,15 +1624,15 @@ export const AUTH_ROUTES = {
 
 ### 6.3 Сторінки та інтерфейси
 
-#### 6.3.1 Сторінка автентифікації (/auth)
+#### 6.3.1 Сторінка входу (/login)
 
-**Файл:** `src/app/auth/page.tsx`
+**Файл:** `src/app/(auth)/login/page.tsx`
 
-**Реалізація:** Використовує один компонент `AuthFormLayout`, який визначає режим (login/register) через query параметр `mode`.
+**Реалізація:** Використовує компонент `AuthFormContainer` з пропсом `isLogin={true}`.
 
 **Компоненти:**
 
-- `AuthFormLayout` - обгортка форми з заголовком, описом та футером
+- `AuthFormContainer` - обгортка форми з заголовком, описом та футером
 - `AuthForm` - уніфікована форма автентифікації (вхід/реєстрація)
 - `FormField` (shadcn/ui) - поля форми
 - `Button` (shadcn/ui) - кнопка відправки
@@ -1631,33 +1640,30 @@ export const AUTH_ROUTES = {
 **Структура:**
 
 ```typescript
-// src/app/auth/page.tsx
-import { AuthFormLayout } from "@/components/auth";
+// src/app/(auth)/login/page.tsx
+import { AuthFormContainer } from "@/components/auth";
 
-export default function AuthPage() {
-  return <AuthFormLayout />;
+export default function LoginPage() {
+  return <AuthFormContainer isLogin />;
 }
 ```
 
-**AuthFormLayout** визначає режим через `useSearchParams()`:
+**AuthFormContainer** визначає режим через пропс `isLogin`:
 
 ```typescript
-const mode = searchParams.get("mode") || AUTH_MODE.LOGIN;
 const {
   title,
   description,
-  buttonText,
   footerText,
   footerLinkText,
   footerLinkHref,
-} = CONTENT_DATA[mode];
+  formData,
+} = isLogin ? LOGIN_FORM_DATA : REGISTER_FORM_DATA;
 ```
 
-**Маршрути:**
+**Маршрут:**
 
-- `/auth?mode=login` - сторінка входу
-- `/auth?mode=register` - сторінка реєстрації
-- `/auth` - за замовчуванням показує форму входу
+- `/login` - сторінка входу
 
 **Макет (Login mode):**
 
@@ -1693,7 +1699,7 @@ const {
 │      │  EMAIL: [____]    │          │
 │      │  PASSWORD: [____] │          │
 │      │  Confirm Password:│          │
-│      │  [____]          │          │
+│      │  [____]           │          │
 │      │                   │          │
 │      │ [Create account]  │          │
 │      │                   │          │
@@ -1716,11 +1722,24 @@ const {
 - Автоматичне перенаправлення на `/dashboard` після успішної автентифікації
 - Посилання на реєстрацію (у футері `AuthCard`)
 
-#### 6.3.2 Сторінка реєстрації
+#### 6.3.2 Сторінка реєстрації (/register)
 
-**Реалізація:** Використовує той самий компонент `AuthFormLayout`, що й сторінка входу, але з query параметром `mode=register`.
+**Файл:** `src/app/(auth)/register/page.tsx`
 
-**Маршрут:** `/auth?mode=register`
+**Реалізація:** Використовує компонент `AuthFormContainer` без пропса `isLogin` (за замовчуванням `isLogin={false}`).
+
+**Структура:**
+
+```typescript
+// src/app/(auth)/register/page.tsx
+import { AuthFormContainer } from "@/components/auth";
+
+export default function RegisterPage() {
+  return <AuthFormContainer />;
+}
+```
+
+**Маршрут:** `/register`
 
 **Поля форми (REGISTER_FIELDS_DATA):**
 
@@ -1731,11 +1750,11 @@ const {
 
 **Валідація:**
 
-- Використовується `REGISTER_SCHEMA_WITH_CONFIRM_PASSWORD`
-- Перевірка співпадіння паролів через `.refine()`
+- Використовується `REGISTER_SCHEMA` з перевіркою через Zod
+- Перевірка унікальності email через Supabase Auth
 - Показ помилок через `FormField` та Sonner toast
 
-**Примітка:** Див. розділ 6.3.1 для деталей про структуру та функціональність, оскільки використовується той самий компонент `AuthFormLayout`.
+**Примітка:** Див. розділ 6.3.1 для деталей про структуру та функціональність, оскільки використовується той самий компонент `AuthFormContainer`.
 
 #### 6.3.3 Дошка тренувань / Dashboard (/dashboard)
 
@@ -1756,7 +1775,7 @@ export default async function DashboardPage() {
   const { data, error } = await getCurrentUser();
 
   if (error || !data) {
-    redirect(AUTH_ROUTES.LOGIN);
+    redirect(ROUTE.LOGIN);
   }
 
   return (
@@ -1781,7 +1800,7 @@ export default async function DashboardPage() {
 **Функціональність (Phase 1):**
 
 - ✅ Захист маршруту - перевірка авторизації через `getCurrentUser`
-- ✅ Перенаправлення неавторизованих користувачів на `/auth?mode=login`
+- ✅ Перенаправлення неавторизованих користувачів на `/login`
 - ✅ Відображення привітання з ім'ям/email користувача
 - ✅ Кнопка виходу з системи
 
@@ -2792,7 +2811,7 @@ src/
 │   │
 │   ├── auth/                      # Auth components
 │   │   ├── auth-form.tsx          # Unified auth form (login/register)
-│   │   ├── auth-form-layout.tsx   # Layout wrapper for auth forms
+│   │   ├── auth-form-container.tsx   # Container wrapper for auth forms
 │   │   ├── logout-button.tsx
 │   │   ├── constants.ts           # Form fields and content constants
 │   │   └── index.ts               # Centralized exports for all auth components
@@ -2843,13 +2862,13 @@ src/
 
 ```typescript
 // ✅ Правильно - через централізований експорт
-import { AuthFormLayout, LogoutButton } from "@/components/auth";
+import { AuthFormContainer, LogoutButton } from "@/components/auth";
 import { Button, Input, FieldGroup, FormField, Toaster } from "@/components/ui";
 import { TrainingCard, TrainingForm } from "@/components/training";
 import { ExerciseList, ExerciseForm } from "@/components/exercise";
 
 // ❌ Неправильно - прямі шляхи до файлів
-import { AuthFormLayout } from "@/components/auth/auth-form-layout";
+import { AuthFormContainer } from "@/components/auth/auth-form-container";
 import { Button } from "@/components/ui/button";
 import { TrainingCard } from "@/components/training/training-card/training-card";
 ```
@@ -3336,7 +3355,7 @@ interface AuthFormProps {
 - Перенаправлення на `/dashboard` після успішної автентифікації
 - Використання `startTransition` для оптимізації оновлень
 
-**Примітка:** Компонент не містить обгортку, заголовок, опис та футер. Це забезпечує компонент `AuthFormLayout`, який використовується на сторінці `/auth` для обгортки форми.
+**Примітка:** Компонент не містить обгортку, заголовок, опис та футер. Це забезпечує компонент `AuthFormContainer`, який використовується на сторінках `/login` та `/register` для обгортки форми.
 
 ### 8.4 Модулі та сервіси
 
@@ -3501,7 +3520,7 @@ export { FormField } from "./form-field";
 **Компоненти:**
 
 - `AuthForm` - уніфікована форма автентифікації (вхід/реєстрація)
-- `AuthFormLayout` - компонент-обгортка для форм автентифікації з UI
+- `AuthFormContainer` - компонент-обгортка для форм автентифікації з UI
 - `LogoutButton` - кнопка виходу з системи
 - `constants.ts` - константи для форм (поля, контент)
 
@@ -3512,7 +3531,7 @@ export { FormField } from "./form-field";
 ```typescript
 // src/components/auth/index.ts
 export { LogoutButton } from "./logout-button";
-export { AuthFormLayout } from "./auth-form-layout";
+export { AuthFormContainer } from "./auth-form-container";
 ```
 
 **Деталі компонентів:**
@@ -3520,19 +3539,20 @@ export { AuthFormLayout } from "./auth-form-layout";
 **AuthForm** (`src/components/auth/auth-form.tsx`):
 
 - Уніфікований компонент для входу та реєстрації
-- Приймає пропси: `isLogin: boolean`, `buttonText: string`
+- Приймає пропси для конфігурації форми (поля, дії)
 - Використовує `react-hook-form` з `zodResolver` для валідації
 - Використовує `useActionState` для виклику Server Actions
 - Показує помилки через Sonner toast
 - Перенаправляє на `/dashboard` після успішної автентифікації
 - Використовує `FormField` компонент для полів форми
 
-**AuthFormLayout** (`src/components/auth/auth-form-layout.tsx`):
+**AuthFormContainer** (`src/components/auth/auth-form-container.tsx`):
 
 - Обгортка для `AuthForm` з UI елементами
-- Визначає режим (login/register) через query параметр `mode`
+- Визначає режим (login/register) через пропс `isLogin: boolean`
 - Відображає заголовок, опис та футер з посиланням
-- Використовує константи з `constants.ts` для контенту
+- Використовує константи з `constants.ts` для контенту (LOGIN_FORM_DATA, REGISTER_FORM_DATA)
+- Використовує `useTransition` для оптимізації навігації між сторінками
 
 **LogoutButton** (`src/components/auth/logout-button.tsx`):
 
@@ -4218,6 +4238,8 @@ console.error("Database connection failed", { error, userId });
 
 **Мета:** Підготовка проекту та налаштування інструментів
 
+**Статус:** ✅ **ЗАВЕРШЕНО**
+
 **Задачі:**
 
 1. ✅ Налаштування проекту
@@ -4284,10 +4306,10 @@ console.error("Database connection failed", { error, userId });
 4. ✅ Auth Components
 
    - ✅ `AuthForm` - уніфікована форма автентифікації (вхід/реєстрація)
-   - ✅ `AuthFormLayout` - компонент-обгортка для форм з UI
+   - ✅ `AuthFormContainer` - компонент-обгортка для форм з UI
    - ✅ `LogoutButton` - кнопка виходу з системи
    - ✅ `constants.ts` - константи для форм (поля, контент)
-   - ✅ Сторінка `/auth` з query параметром `mode` (login/register)
+   - ✅ Сторінки `/login` та `/register` з окремими файлами
    - ✅ Сторінка `/dashboard` з захистом маршруту
 
 5. ✅ UI Components для автентифікації
@@ -4300,7 +4322,7 @@ console.error("Database connection failed", { error, userId });
 6. ✅ Захист маршрутів
 
    - ✅ Перевірка авторизації на сторінці `/dashboard` через `getCurrentUser`
-   - ✅ Перенаправлення на `/auth?mode=login` для неавторизованих користувачів
+   - ✅ Перенаправлення на `/login` для неавторизованих користувачів
 
 **Залежності:**
 
