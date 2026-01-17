@@ -20,6 +20,15 @@
       "recommended": true,
       "suspicious": {
         "noUnknownAtRules": "off"
+      },
+      "style": {
+        "noNonNullAssertion": "warn"
+      },
+      "correctness": {
+        "noUnusedVariables": "warn"
+      },
+      "a11y": {
+        "useSemanticElements": "warn"
       }
     },
     "domains": {
