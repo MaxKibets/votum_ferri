@@ -1,12 +1,12 @@
 "use client";
 
-import { Controller, Control, FieldPath, FieldValues } from "react-hook-form";
 import {
-  Field,
-  FieldError,
-  FieldLabel,
-  Input,
-} from "@/components/ui";
+  type Control,
+  Controller,
+  type FieldPath,
+  type FieldValues,
+} from "react-hook-form";
+import { Field, FieldError, FieldLabel, Input } from "@/components/ui";
 
 interface FormFieldProps<T extends FieldValues> {
   name: FieldPath<T>;
@@ -45,9 +45,7 @@ export function FormField<T extends FieldValues>({
             aria-invalid={fieldState.invalid}
           />
 
-          {fieldState.invalid && (
-            <FieldError errors={[fieldState.error]} />
-          )}
+          {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
         </Field>
       )}
     />
