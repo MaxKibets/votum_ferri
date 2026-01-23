@@ -12,13 +12,13 @@ export function LogoutButton() {
   });
 
   useEffect(() => {
-    if (error) toast.error(error.message);
-  }, [error]);
+    if (error?.message) toast.error(error.message);
+  }, [error?.message]);
 
   return (
     <Button
       variant="outline"
-      onClick={() => startTransition(action)}
+      onClick={() => startTransition(() => action())}
       disabled={isPending}
     >
       Logout

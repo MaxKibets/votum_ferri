@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { startTransition, useActionState, useEffect } from "react";
+import { startTransition, useActionState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
@@ -37,9 +37,14 @@ export function AuthForm({
     error: null,
   });
 
+  const defaultValues = useMemo(
+    () => Object.fromEntries(fields.map(({ name }) => [name, ""])),
+    [fields],
+  );
+
   const { handleSubmit, control } = useForm<AuthFormData>({
     resolver: zodResolver(schema),
-    defaultValues: Object.fromEntries(fields.map(({ name }) => [name, ""])),
+    defaultValues: defaultValues,
   });
 
   const handleSubmitForm = handleSubmit((payload: AuthFormData) =>
@@ -57,8 +62,8 @@ export function AuthForm({
   );
 
   useEffect(() => {
-    if (error) toast.error(error.message);
-  }, [error]);
+    if (error?.message) toast.error(error.message);
+  }, [error?.message]);
 
   return (
     <form onSubmit={handleSubmitForm}>

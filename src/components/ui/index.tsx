@@ -2,6 +2,12 @@
 
 export { Badge, badgeVariants } from "./badge";
 export { Button, buttonVariants } from "./button";
+export {
+  ButtonGroup,
+  ButtonGroupSeparator,
+  ButtonGroupText,
+  buttonGroupVariants,
+} from "./button-group";
 export { Calendar } from "./calendar";
 export {
   Card,

@@ -15,6 +15,48 @@ type AuthResponse<T> = {
   error: { code: string; message: string; field?: string } | null;
 };
 
+function getZodFieldPath(issue?: { path?: unknown[] }): string | undefined {
+  const first = issue?.path?.[0];
+  return typeof first === "string" ? first : undefined;
+}
+
+function validationErrorResponse<T>(issue?: {
+  message?: string;
+  path?: unknown[];
+}): AuthResponse<T> {
+  return {
+    data: null,
+    error: {
+      code: "VALIDATION_ERROR",
+      message: issue?.message || "Validation failed",
+      field: getZodFieldPath(issue),
+    },
+  };
+}
+
+function authErrorResponse<T>(
+  fallbackCode: string,
+  error: { name?: string; message: string },
+): AuthResponse<T> {
+  return {
+    data: null,
+    error: {
+      code: error.name || fallbackCode,
+      message: error.message,
+    },
+  };
+}
+
+function genericErrorResponse<T>(
+  code: string,
+  message: string,
+): AuthResponse<T> {
+  return {
+    data: null,
+    error: { code, message },
+  };
+}
+
 /**
  * Register a new user
  */
@@ -31,13 +73,7 @@ export async function registerUser(
   });
 
   if (!success) {
-    return {
-      data: null,
-      error: {
-        code: "VALIDATION_ERROR",
-        message: error.issues[0]?.message || "Validation failed",
-      },
-    };
+    return validationErrorResponse(error.issues[0]);
   }
 
   const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -51,13 +87,7 @@ export async function registerUser(
   });
 
   if (authError) {
-    return {
-      data: null,
-      error: {
-        code: authError.name || "REGISTRATION_ERROR",
-        message: authError.message,
-      },
-    };
+    return authErrorResponse("REGISTRATION_ERROR", authError);
   }
 
   // Check if user already exists (Supabase returns user object but with empty identities or no session)
@@ -76,16 +106,9 @@ export async function registerUser(
   }
 
   if (!authData.user) {
-    return {
-      data: null,
-      error: {
-        code: "REGISTRATION_ERROR",
-        message: "Failed to create user",
-      },
-    };
+    return genericErrorResponse("REGISTRATION_ERROR", "Failed to create user");
   }
 
-  // TODO: Add redirect after successful registration
   redirect(ROUTE.DASHBOARD, RedirectType.replace);
 }
 
@@ -104,13 +127,7 @@ export async function loginUser(
   });
 
   if (!success) {
-    return {
-      data: null,
-      error: {
-        code: "VALIDATION_ERROR",
-        message: error.issues[0]?.message || "Validation failed",
-      },
-    };
+    return validationErrorResponse(error.issues[0]);
   }
 
   const { data: authData, error: authError } =
@@ -120,23 +137,11 @@ export async function loginUser(
     });
 
   if (authError) {
-    return {
-      data: null,
-      error: {
-        code: authError.name || "LOGIN_ERROR",
-        message: authError.message,
-      },
-    };
+    return authErrorResponse("LOGIN_ERROR", authError);
   }
 
   if (!authData.user) {
-    return {
-      data: null,
-      error: {
-        code: "LOGIN_ERROR",
-        message: "Failed to authenticate user",
-      },
-    };
+    return genericErrorResponse("LOGIN_ERROR", "Failed to authenticate user");
   }
 
   redirect(ROUTE.DASHBOARD, RedirectType.replace);
@@ -152,13 +157,7 @@ export async function logoutUser(): Promise<
   const { error } = await supabase.auth.signOut();
 
   if (error) {
-    return {
-      data: null,
-      error: {
-        code: error.name || "LOGOUT_ERROR",
-        message: error.message,
-      },
-    };
+    return authErrorResponse("LOGOUT_ERROR", error);
   }
 
   redirect("/", RedirectType.replace);
@@ -179,13 +178,7 @@ export async function getCurrentUser(): Promise<
     } = await supabase.auth.getUser();
 
     if (authError || !authUser) {
-      return {
-        data: null,
-        error: {
-          code: "UNAUTHORIZED",
-          message: "User is not authenticated",
-        },
-      };
+      return genericErrorResponse("UNAUTHORIZED", "User is not authenticated");
     }
 
     // Get user profile
@@ -196,13 +189,10 @@ export async function getCurrentUser(): Promise<
       .single();
 
     if (profileError || !profile) {
-      return {
-        data: null,
-        error: {
-          code: "PROFILE_ERROR",
-          message: "Failed to retrieve user profile",
-        },
-      };
+      return genericErrorResponse(
+        "PROFILE_ERROR",
+        "Failed to retrieve user profile",
+      );
     }
 
     const publicUser: PublicUser = {

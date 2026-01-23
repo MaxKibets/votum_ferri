@@ -64,7 +64,6 @@
   - [4.5 Інструменти розробки](#45-інструменти-розробки)
   - [4.6 Залежності проекту](#46-залежності-проекту)
   - [4.7 Середовища розробки](#47-середовища-розробки)
-  - [4.8 Резюме технічного стеку](#48-резюме-технічного-стеку)
 - [5. Модель даних](#5-модель-даних)
   - [5.1 Структура даних користувача](#51-структура-даних-користувача)
   - [5.2 Структура даних тренування](#52-структура-даних-тренування)
@@ -73,7 +72,7 @@
   - [5.5 Індекси бази даних](#55-індекси-бази-даних)
   - [5.6 Типи для API responses](#56-типи-для-api-responses)
   - [5.7 Валідація даних](#57-валідація-даних)
-  - [5.8 TODO: Схема бази даних](#58-todo-схема-бази-даних)
+  - [5.8 Схема бази даних (SQL)](#58-схема-бази-даних-sql)
 - [6. UI/UX специфікації](#6-uiux-специфікації)
   - [6.1 Загальні принципи дизайну](#61-загальні-принципи-дизайну)
   - [6.2 Схема навігації](#62-схема-навігації)
@@ -89,8 +88,7 @@
   - [7.3 Server Actions для тренувань (CRUD)](#73-server-actions-для-тренувань-crud)
   - [7.4 Server Actions для вправ](#74-server-actions-для-вправ)
   - [7.5 Авторизація та безпека](#75-авторизація-та-безпека)
-  - [7.6 Error Handling](#76-error-handling)
-  - [7.7 Деталізація Server Actions](#77-деталізація-server-actions)
+  - [7.7 Структура та паттерни Server Actions](#77-структура-та-паттерни-server-actions)
 - [8. Компоненти та модулі](#8-компоненти-та-модулі)
   - [8.1 Структура компонентів React](#81-структура-компонентів-react)
   - [8.2 Використання shadcn/ui компонентів](#82-використання-shadcnui-компонентів)
@@ -98,7 +96,7 @@
   - [8.4 Модулі та сервіси](#84-модулі-та-сервіси)
   - [8.5 Діаграма залежностей компонентів](#85-діаграма-залежностей-компонентів)
   - [8.6 Інтеграція компонентів](#86-інтеграція-компонентів)
-  - [8.7 Деталізація модулів](#87-деталізація-модулів)
+  - [8.7 Структура модулів](#87-структура-модулів)
 - [9. Безпека та автентифікація](#9-безпека-та-автентифікація)
   - [9.1 Стратегія автентифікації](#91-стратегія-автентифікації)
   - [9.2 Управління сесіями](#92-управління-сесіями)
@@ -108,7 +106,7 @@
   - [9.6 Error Handling та Logging](#96-error-handling-та-logging)
   - [9.7 Rate Limiting](#97-rate-limiting)
   - [9.8 Data Privacy](#98-data-privacy)
-  - [9.9 Деталізація безпеки](#99-деталізація-безпеки)
+  - [9.9 Резюме безпеки](#99-резюме-безпеки)
 - [10. План реалізації](#10-план-реалізації)
   - [10.1 Послідовність реалізації](#101-послідовність-реалізації)
   - [10.2 Залежності між компонентами](#102-залежності-між-компонентами)
@@ -1005,22 +1003,6 @@ src/actions/
 - Netlify
 - Self-hosted (якщо потрібно)
 
-### 4.8 Резюме технічного стеку
-
-| Категорія      | Технологія             | Статус     |
-| -------------- | ---------------------- | ---------- |
-| Framework      | Next.js 16             | ✅ Вибрано |
-| UI Library     | React 19               | ✅ Вибрано |
-| Мова           | TypeScript 5           | ✅ Вибрано |
-| Стилі          | Tailwind CSS 4         | ✅ Вибрано |
-| UI Components  | shadcn/ui              | ✅ Вибрано |
-| Linting        | Biome 2.2.0            | ✅ Вибрано |
-| Backend        | Next.js Server Actions | ✅ Вибрано |
-| База даних     | Supabase (PostgreSQL)  | ✅ Вибрано |
-| Автентифікація | Supabase Auth          | ✅ Вибрано |
-| Валідація      | Zod                    | ✅ Вибрано |
-| Форми          | react-hook-form        | ✅ Вибрано |
-
 ---
 
 ## 5. Модель даних
@@ -1385,7 +1367,7 @@ export const AUTH_FIELD_NAME = {
 
 #### 5.8.1 Таблиця profiles
 
-**Призначення:** Додаткові дані профілю користувача (основні дані в `auth.users`)
+**Призначення:** Додаткові дані профілю користувача (основні дані в `auth.users`). Детальніше про структуру даних див. розділ [5.1](#51-структура-даних-користувача).
 
 ```sql
 CREATE TABLE public.profiles (
@@ -1397,15 +1379,9 @@ CREATE TABLE public.profiles (
 );
 ```
 
-**Типи даних:**
-
-- `id`: UUID (PRIMARY KEY, FK на auth.users)
-- `email`: TEXT (унікальний)
-- `name`: TEXT (опціонально)
-- `created_at`: TIMESTAMP WITH TIME ZONE
-- `updated_at`: TIMESTAMP WITH TIME ZONE
-
 #### 5.8.2 Таблиця trainings
+
+Детальніше про структуру даних див. розділ [5.2](#52-структура-даних-тренування).
 
 ```sql
 CREATE TABLE public.trainings (
@@ -1419,17 +1395,9 @@ CREATE TABLE public.trainings (
 );
 ```
 
-**Типи даних:**
-
-- `id`: UUID (PRIMARY KEY)
-- `user_id`: UUID (FOREIGN KEY на auth.users, CASCADE DELETE)
-- `date`: DATE (обов'язкове)
-- `name`: TEXT (опціонально, максимум 255 символів)
-- `description`: TEXT (опціонально, максимум 1000 символів)
-- `created_at`: TIMESTAMP WITH TIME ZONE
-- `updated_at`: TIMESTAMP WITH TIME ZONE
-
 #### 5.8.3 Таблиця exercises
+
+Детальніше про структуру даних див. розділ [5.3](#53-структура-даних-вправи).
 
 ```sql
 CREATE TABLE public.exercises (
@@ -1443,17 +1411,9 @@ CREATE TABLE public.exercises (
 );
 ```
 
-**Типи даних:**
-
-- `id`: UUID (PRIMARY KEY)
-- `training_id`: UUID (FOREIGN KEY на trainings, CASCADE DELETE)
-- `name`: TEXT (обов'язкове, максимум 255 символів)
-- `order_number`: INTEGER (обов'язкове, для сортування)
-- `notes`: TEXT (опціонально, максимум 500 символів)
-- `created_at`: TIMESTAMP WITH TIME ZONE
-- `updated_at`: TIMESTAMP WITH TIME ZONE
-
 #### 5.8.4 Таблиця exercise_sets
+
+Детальніше про структуру даних див. розділ [5.3.2](#532-exerciseset-підхід-вправи).
 
 ```sql
 CREATE TABLE public.exercise_sets (
@@ -1469,19 +1429,6 @@ CREATE TABLE public.exercise_sets (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 ```
-
-**Типи даних:**
-
-- `id`: UUID (PRIMARY KEY)
-- `exercise_id`: UUID (FOREIGN KEY на exercises, CASCADE DELETE)
-- `set_number`: INTEGER (обов'язкове, унікальне в межах вправи)
-- `reps`: INTEGER (обов'язкове, >= 1)
-- `weight`: DECIMAL(10, 2) (обов'язкове, >= 0)
-- `rest_time`: INTEGER (опціонально, секунди)
-- `completed`: BOOLEAN (опціонально, за замовчуванням false)
-- `notes`: TEXT (опціонально, максимум 500 символів)
-- `created_at`: TIMESTAMP WITH TIME ZONE
-- `updated_at`: TIMESTAMP WITH TIME ZONE
 
 #### 5.8.5 Індекси
 
@@ -2691,78 +2638,26 @@ export async function getTrainings() {
 
 #### 7.5.3 Валідація даних
 
-**Реалізація:**
+Детальніше про валідацію даних див. розділ [9.4.3](#943-валідація-даних).
 
-- Валідація через Zod схеми в Server Actions
-- Перевірка обов'язкових полів
-- Перевірка типів даних
-- Перевірка обмежень (мінімум/максимум значень, формати)
+**Реалізація в Server Actions:**
 
-**Приклад:**
-
-```typescript
-import { z } from 'zod'
-
-const createTrainingSchema = z.object({
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  name: z.string().max(255).optional(),
-  exercises: z.array(z.object({...})).min(1)
-})
-
-export async function createTraining(data: unknown) {
-  const validated = createTrainingSchema.safeParse(data)
-  if (!validated.success) {
-    return { data: null, error: { code: 'VALIDATION_ERROR', message: 'Invalid data', details: validated.error } }
-  }
-  // ... логіка створення
-}
-```
+- Валідація через Zod схеми перед обробкою даних
+- Всі вхідні дані перевіряються на відповідність схемам (див. розділ [5.7](#57-валідація-даних))
+- При помилці валідації повертається `{ data: null, error: { code: 'VALIDATION_ERROR', ... } }`
 
 #### 7.5.4 Rate Limiting
 
+Детальніше про rate limiting див. розділ [9.7](#97-rate-limiting).
+
 **Реалізація:**
 
-- Supabase має вбудований rate limiting
-- Додатковий rate limiting можна додати через middleware (за потреби)
-- Обмеження на автентифікаційні actions (login, register)
+- Supabase має вбудований rate limiting для всіх запитів
+- Додатковий rate limiting можна додати через Next.js middleware (за потреби)
 
-### 7.6 Error Handling
+**Примітка:** Формат помилок та коди помилок детально описані в розділі [9.6](#96-error-handling-та-logging).
 
-#### 7.6.1 Формат помилок
-
-```typescript
-{
-  "success": false,
-  "error": {
-    "code": string,           // Код помилки (наприклад, "VALIDATION_ERROR")
-    "message": string,        // Людсько-читабельне повідомлення
-    "details"?: {             // Додаткові деталі
-      "field"?: string,       // Поле з помилкою (для валідації)
-      "errors"?: string[]     // Список помилок валідації
-    }
-  }
-}
-```
-
-#### 7.6.2 Коди помилок
-
-- `VALIDATION_ERROR` - помилка валідації
-- `AUTHENTICATION_ERROR` - помилка автентифікації
-- `AUTHORIZATION_ERROR` - помилка авторизації
-- `NOT_FOUND` - ресурс не знайдено
-- `DUPLICATE_ENTRY` - дублікат (наприклад, email вже існує)
-- `SERVER_ERROR` - серверна помилка
-
-### 7.7 Деталізація Server Actions
-
-**Визначені рішення:**
-
-- **Автентифікація:** Supabase Auth (JWT токени в cookies)
-- **Middleware:** Next.js middleware з Supabase для захисту маршрутів
-- **Валідація:** Zod для валідації даних в Server Actions
-- **База даних:** Supabase PostgreSQL з прямими SQL запитами через Supabase клієнт
-- **Міграції:** SQL міграції через Supabase Dashboard або CLI
-- **Тестування:** Unit тести для Server Actions, інтеграційні тести для повного flow
+### 7.7 Структура та паттерни Server Actions
 
 **Структура Server Actions:**
 
@@ -2776,10 +2671,12 @@ src/actions/
 **Паттерни використання:**
 
 - Всі actions мають уніфікований формат відповіді `{ data, error }`
-- Автоматична перевірка автентифікації в кожній action
-- Валідація через Zod перед обробкою
+- Автоматична перевірка автентифікації в кожній action (див. розділ [7.5.1](#751-авторизація-server-actions))
+- Валідація через Zod перед обробкою (див. розділ [5.7](#57-валідація-даних))
 - `revalidatePath` для оновлення кешу після змін
-- Обробка помилок з детальними повідомленнями
+- Обробка помилок з детальними повідомленнями (див. розділ [9.6](#96-error-handling-та-logging))
+
+**Примітка:** Детальна інформація про безпеку та автентифікацію див. розділ [9. Безпека та автентифікація](#9-безпека-та-автентифікація).
 
 ---
 
@@ -2882,8 +2779,6 @@ import { TrainingCard } from "@/components/training/training-card/training-card"
 
 ### 8.2 Використання shadcn/ui компонентів
 
-#### 8.2.1 Базові UI компоненти (shadcn/ui)
-
 **Структура:**
 
 - Компоненти копіюються в `src/components/ui/`
@@ -2891,84 +2786,11 @@ import { TrainingCard } from "@/components/training/training-card/training-card"
 - Використання TypeScript для типізації
 - Інтеграція з Tailwind CSS
 
-**Компоненти, що плануються до використання:**
+**Компоненти, що використовуються:**
 
-1. **Button** (`src/components/ui/button.tsx`)
+Button, Card, Dialog, Field, FormField, Input, Label, Calendar, Table, Select, Badge, Separator, Toaster (Sonner).
 
-   - Використання: всі кнопки
-   - Варіанти: default, destructive, outline, secondary, ghost, link
-   - Розміри: sm, md, lg
-
-2. **Card** (`src/components/ui/card.tsx`)
-
-   - Використання: контейнери для форм, відображення тренувань
-   - Компоненти: Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter
-
-3. **Dialog** (`src/components/ui/dialog.tsx`)
-
-   - Використання: модальні вікна для форм, підтвердження
-   - Компоненти: Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter
-
-4. **Field** (`src/components/ui/field.tsx`)
-
-   - Використання: всі форми
-   - Інтеграція з react-hook-form через Controller та zod
-   - Компоненти: Field, FieldLabel, FieldError, FieldGroup, FieldDescription, FieldContent, FieldTitle, FieldSet, FieldLegend, FieldSeparator
-   - Примітка: для простих текстових полів рекомендується використовувати `FormField` компонент, який інкапсулює Field, FieldLabel, Input та FieldError
-
-5. **Input** (`src/components/ui/input.tsx`)
-
-   - Використання: текстові поля, числові поля
-   - Типи: text, number, email, password
-   - Інтеграція з Field компонентом через Controller
-
-6. **Label** (`src/components/ui/label.tsx`)
-
-   - Використання: мітки для полів форм
-   - Інтеграція з Field компонентом через FieldLabel
-
-7. **Calendar** (`src/components/ui/calendar.tsx`)
-
-   - Використання: календар для дошки тренувань, вибір дати
-   - Інтеграція з date-fns або dayjs
-   - Кастомізація для відображення тренувань
-
-8. **Table** (`src/components/ui/table.tsx`)
-
-   - Використання: список вправ, список підходів
-   - Компоненти: Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell
-
-9. **Select** (`src/components/ui/select.tsx`)
-
-   - Використання: випадаючі списки
-   - Компоненти: Select, SelectTrigger, SelectContent, SelectItem, SelectValue
-
-10. **Badge** (`src/components/ui/badge.tsx`)
-
-    - Використання: індикація кількості тренувань, статуси
-    - Варіанти: default, secondary, destructive, outline
-
-11. **FormField** (`src/components/ui/form-field.tsx`)
-
-    - Використання: переісний компонент для полів форм з інтеграцією react-hook-form
-    - Інтеграція з Controller (react-hook-form) для автоматичної валідації та відображення помилок
-    - Компоненти: FormField (обгортка над Field, FieldLabel, Input, FieldError)
-    - Підтримка TypeScript generics для типобезпеки з будь-якою формою
-    - Підтримка різних типів полів: text, email, password, number тощо
-
-12. **Separator** (`src/components/ui/separator.tsx`)
-
-    - Використання: розділювач контенту
-    - Компоненти: Separator
-    - Орієнтація: horizontal (за замовчуванням) або vertical
-
-13. **Toaster** (`src/components/ui/sonner.tsx`)
-
-    - Використання: система сповіщень (toast notifications)
-    - Бібліотека: Sonner
-    - Компоненти: Toaster (провайдер для toast)
-    - Використання: `toast.success()`, `toast.error()`, `toast.info()` тощо
-    - Інтеграція: додається в `layout.tsx` для глобального доступу
+Детальний опис кожного компонента, його використання та кастомізації див. розділ [6.4 shadcn/ui компоненти - детальний опис використання](#64-shadcnui-компоненти---детальний-опис-використання).
 
 ### 8.3 Основні компоненти
 
@@ -3775,22 +3597,12 @@ graph TB
 - Context для глобального стану (auth, theme)
 - Custom hooks для спільної логіки
 
-### 8.7 Деталізація модулів
+### 8.7 Структура модулів
 
-**Визначені рішення:**
-
-- **Структура Server Actions:** Модулі в `src/actions/` за доменами (auth, training, exercise)
-- **Інтеграція з БД:** Прямі SQL запити через Supabase клієнт (не потрібен ORM)
-- **Структура Supabase модулів:** Окремі клієнти для браузера та сервера
-- **Custom hooks:** Використання Server Actions через hooks для зручності
-- **State management:** React state + Server Actions (не потрібен глобальний state manager для MVP)
-
-**Паттерни використання:**
-
-- Server Actions викликаються напряму з Client Components
-- Hooks обгортають Server Actions для зручності та додаткової логіки
-- Валідація через Zod перед викликом Server Actions
-- Error handling через уніфікований формат `{ data, error }`
+Детальна інформація про модулі та їх структуру описана в розділах:
+- [7. API специфікації](#7-api-специфікації) - Server Actions та їх структура
+- [8.4 Модулі та сервіси](#84-модулі-та-сервіси) - детальний опис модулів
+- [3.5 Модульна структура](#35-модульна-структура) - високорівнева структура системи
 
 ---
 
@@ -4186,45 +3998,17 @@ console.error("Database connection failed", { error, userId });
 - Видалення всіх даних користувача (каскадне видалення)
 - Підтвердження видалення
 
-### 9.9 Деталізація безпеки
+### 9.9 Резюме безпеки
 
-**Визначені рішення:**
-
-1. **Стратегія автентифікації:**
-
-   - **Тип:** Supabase Auth (JWT токени)
-   - **Реалізація:** Server Actions для auth операцій
-   - **Зберігання:** HTTP-only cookies через `@supabase/ssr`
-
-2. **Управління сесіями:**
-
-   - **Зберігання:** Cookies (access token + refresh token)
-   - **Термін дії:** Access token - 1 година, Refresh token - налаштовується
-   - **Оновлення:** Автоматичне через Supabase
-   - **Завершення:** Через `logoutUser` action або при застарілому refresh token
-
-3. **Хешування паролів:**
-
-   - **Алгоритм:** bcrypt (автоматично в Supabase)
-   - **Управління:** Повністю автоматичне через Supabase Auth
-
-4. **Захист від атак:**
-
-   - **SQL Injection:** Автоматичний захист через Supabase клієнт + RLS
-   - **CSRF:** SameSite=Strict cookies
-   - **Rate Limiting:** Вбудований в Supabase, додатковий через middleware (за потреби)
-   - **XSS:** React автоматичне екранування + валідація через Zod
-
-5. **HTTPS та Cookies:**
-
-   - **HTTPS:** Обов'язковий в production (Vercel автоматично)
-   - **Cookies:** Secure, HttpOnly, SameSite=Strict
-
-6. **Logging та Monitoring:**
-
-   - **Logging:** Console logs для розробки, структуровані логи для production
-   - **Monitoring:** Supabase Dashboard для БД метрик
-   - **Error Tracking:** Рекомендовано додати Sentry або аналогічний сервіс
+Детальна інформація про всі аспекти безпеки описана в розділах:
+- [9.1 Стратегія автентифікації](#91-стратегія-автентифікації) - автентифікація через Supabase Auth
+- [9.2 Управління сесіями](#92-управління-сесіями) - зберігання та оновлення сесій
+- [9.3 Захист маршрутів](#93-захист-маршрутів) - захист сторінок та Server Actions
+- [9.4 Захист даних](#94-захист-даних) - ізоляція даних, хешування паролів, валідація, захист від атак
+- [9.5 HTTPS та Secure Cookies](#95-https-та-secure-cookies) - безпечне з'єднання та cookies
+- [9.6 Error Handling та Logging](#96-error-handling-та-logging) - безпечна обробка помилок
+- [9.7 Rate Limiting](#97-rate-limiting) - обмеження кількості запитів
+- [9.8 Data Privacy](#98-data-privacy) - захист персональних даних
 
 ---
 
@@ -4670,31 +4454,11 @@ graph TB
 
 ### 10.5 Визначені рішення
 
-**✅ Всі критичні рішення прийняті:**
+**✅ Всі критичні рішення прийняті та детально описані в відповідних розділах SDD:**
 
-1. **База даних:**
-
-   - **Вибір:** Supabase (PostgreSQL)
-   - **Схема БД:** Реляційна структура з таблицями profiles, trainings, exercises, exercise_sets
-   - **ORM/ODM:** Прямі SQL запити через Supabase клієнт (не потрібен ORM)
-
-2. **Backend:**
-
-   - **Вибір:** Next.js Server Actions
-   - **Архітектура:** Server Actions в `src/actions/` замість окремих API routes
-   - **Переваги:** Типобезпека, менше boilerplate, пряма інтеграція з React
-
-3. **Автентифікація:**
-
-   - **Стратегія:** Supabase Auth (JWT токени)
-   - **Реалізація:** Server Actions для auth операцій
-   - **Управління сесіями:** Автоматичне через Supabase cookies
-
-**Наступні кроки:**
-
-- ✅ Оновлено відповідні розділи SDD
-- ⏳ Деталізувати план реалізації
-- ⏳ Почати реалізацію з Фази 0
+- **База даних:** Див. розділ [4.3 База даних](#43-база-даних) та [5. Модель даних](#5-модель-даних)
+- **Backend:** Див. розділ [4.2 Backend технології](#42-backend-технології) та [7. API специфікації](#7-api-специфікації)
+- **Автентифікація:** Див. розділ [4.4 Автентифікація](#44-автентифікація) та [9. Безпека та автентифікація](#9-безпека-та-автентифікація)
 
 ### 10.6 Наступні кроки
 
