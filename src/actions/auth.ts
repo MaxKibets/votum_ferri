@@ -1,6 +1,7 @@
 "use server";
 
 import { RedirectType, redirect } from "next/navigation";
+import { AUTH_FIELD_NAME } from "@/constants/authFieldNames";
 import {
   LOGIN_SCHEMA,
   REGISTER_SCHEMA,
@@ -8,54 +9,9 @@ import {
 import { ROUTE } from "@/constants/routes";
 import { createClient } from "@/lib/supabase/server";
 import type { PublicUser } from "@/types/user";
-
-// Response types
-type AuthResponse<T> = {
-  data: T | null;
-  error: { code: string; message: string; field?: string } | null;
-};
-
-function getZodFieldPath(issue?: { path?: unknown[] }): string | undefined {
-  const first = issue?.path?.[0];
-  return typeof first === "string" ? first : undefined;
-}
-
-function validationErrorResponse<T>(issue?: {
-  message?: string;
-  path?: unknown[];
-}): AuthResponse<T> {
-  return {
-    data: null,
-    error: {
-      code: "VALIDATION_ERROR",
-      message: issue?.message || "Validation failed",
-      field: getZodFieldPath(issue),
-    },
-  };
-}
-
-function authErrorResponse<T>(
-  fallbackCode: string,
-  error: { name?: string; message: string },
-): AuthResponse<T> {
-  return {
-    data: null,
-    error: {
-      code: error.name || fallbackCode,
-      message: error.message,
-    },
-  };
-}
-
-function genericErrorResponse<T>(
-  code: string,
-  message: string,
-): AuthResponse<T> {
-  return {
-    data: null,
-    error: { code, message },
-  };
-}
+import { ACTION_ERROR_CODES } from "./constants";
+import type { AuthResponse } from "./types";
+import { actionErrorResponse } from "./utils";
 
 /**
  * Register a new user
@@ -73,7 +29,9 @@ export async function registerUser(
   });
 
   if (!success) {
-    return validationErrorResponse(error.issues[0]);
+    return actionErrorResponse(ACTION_ERROR_CODES.VALIDATION, {
+      issue: error.issues[0],
+    });
   }
 
   const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -87,7 +45,9 @@ export async function registerUser(
   });
 
   if (authError) {
-    return authErrorResponse("REGISTRATION_ERROR", authError);
+    return actionErrorResponse(ACTION_ERROR_CODES.REGISTRATION, {
+      error: authError,
+    });
   }
 
   // Check if user already exists (Supabase returns user object but with empty identities or no session)
@@ -95,18 +55,13 @@ export async function registerUser(
     authData.user &&
     (!authData.user.identities || authData.user.identities.length === 0)
   ) {
-    return {
-      data: null,
-      error: {
-        code: "EMAIL_ALREADY_EXISTS",
-        message: "This email is already registered",
-        field: "email",
-      },
-    };
+    return actionErrorResponse(ACTION_ERROR_CODES.EMAIL_ALREADY_EXISTS, {
+      field: AUTH_FIELD_NAME.EMAIL,
+    });
   }
 
   if (!authData.user) {
-    return genericErrorResponse("REGISTRATION_ERROR", "Failed to create user");
+    return actionErrorResponse(ACTION_ERROR_CODES.REGISTRATION);
   }
 
   redirect(ROUTE.DASHBOARD, RedirectType.replace);
@@ -122,26 +77,28 @@ export async function loginUser(
   const supabase = await createClient();
 
   const { success, error, data } = LOGIN_SCHEMA.safeParse({
-    email: formData.get("email"),
-    password: formData.get("password"),
+    email: formData.get(AUTH_FIELD_NAME.EMAIL),
+    password: formData.get(AUTH_FIELD_NAME.PASSWORD),
   });
 
   if (!success) {
-    return validationErrorResponse(error.issues[0]);
+    return actionErrorResponse(ACTION_ERROR_CODES.VALIDATION, {
+      issue: error.issues[0],
+    });
   }
 
   const { data: authData, error: authError } =
     await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
+      email: data[AUTH_FIELD_NAME.EMAIL],
+      password: data[AUTH_FIELD_NAME.PASSWORD],
     });
 
   if (authError) {
-    return authErrorResponse("LOGIN_ERROR", authError);
+    return actionErrorResponse(ACTION_ERROR_CODES.LOGIN, { error: authError });
   }
 
   if (!authData.user) {
-    return genericErrorResponse("LOGIN_ERROR", "Failed to authenticate user");
+    return actionErrorResponse(ACTION_ERROR_CODES.LOGIN);
   }
 
   redirect(ROUTE.DASHBOARD, RedirectType.replace);
@@ -157,7 +114,7 @@ export async function logoutUser(): Promise<
   const { error } = await supabase.auth.signOut();
 
   if (error) {
-    return authErrorResponse("LOGOUT_ERROR", error);
+    return actionErrorResponse(ACTION_ERROR_CODES.LOGOUT, { error });
   }
 
   redirect("/", RedirectType.replace);
@@ -178,7 +135,7 @@ export async function getCurrentUser(): Promise<
     } = await supabase.auth.getUser();
 
     if (authError || !authUser) {
-      return genericErrorResponse("UNAUTHORIZED", "User is not authenticated");
+      return actionErrorResponse(ACTION_ERROR_CODES.UNAUTHORIZED);
     }
 
     // Get user profile
@@ -189,10 +146,7 @@ export async function getCurrentUser(): Promise<
       .single();
 
     if (profileError || !profile) {
-      return genericErrorResponse(
-        "PROFILE_ERROR",
-        "Failed to retrieve user profile",
-      );
+      return actionErrorResponse(ACTION_ERROR_CODES.PROFILE);
     }
 
     const publicUser: PublicUser = {
@@ -206,13 +160,8 @@ export async function getCurrentUser(): Promise<
       error: null,
     };
   } catch (error) {
-    return {
-      data: null,
-      error: {
-        code: "UNKNOWN_ERROR",
-        message:
-          error instanceof Error ? error.message : "An unknown error occurred",
-      },
-    };
+    return actionErrorResponse(ACTION_ERROR_CODES.UNKNOWN, {
+      message: error instanceof Error ? error.message : undefined,
+    });
   }
 }

@@ -608,7 +608,10 @@ votum_ferri/
 │   ├── actions/                # Server Actions (one level above app/)
 │   │   ├── auth.ts             # Auth actions
 │   │   ├── training.ts         # Training actions
-│   │   └── exercise.ts         # Exercise actions
+│   │   ├── exercise.ts         # Exercise actions
+│   │   ├── types.ts            # Shared actions types
+│   │   ├── constants.ts        # Shared actions constants
+│   │   └── utils.ts            # Shared actions utilities
 │   ├── components/             # React components
 │   │   ├── ui/                 # shadcn/ui components
 │   │   ├── training/           # Training-specific components
@@ -804,7 +807,10 @@ votum_ferri/
 src/actions/
 ├── auth.ts          # Auth actions (login, register, logout)
 ├── training.ts      # Training CRUD actions
-└── exercise.ts      # Exercise actions
+├── exercise.ts      # Exercise actions
+├── types.ts         # Shared actions types
+├── constants.ts     # Shared actions constants
+└── utils.ts         # Shared actions utilities
 ```
 
 **Переваги:**
@@ -2156,7 +2162,9 @@ export default async function DashboardPage() {
 
 **Формат відповіді:**
 
-Всі Server Actions повертають уніфікований формат `AuthResponse<T>`:
+Всі Server Actions повертають уніфікований формат `AuthResponse<T>` з `src/actions/types.ts`.
+Коди помилок зібрані в `ACTION_ERROR_CODES`, а повідомлення — в `ACTION_ERROR_MESSAGES` у `src/actions/constants.ts`.
+Стандартизований response будується через `actionErrorResponse` у `src/actions/utils.ts`.
 
 ```typescript
 type AuthResponse<T> = {

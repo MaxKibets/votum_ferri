@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { startTransition, useActionState, useEffect, useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { type FieldPath, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import type { z } from "zod";
 import type { loginUser, registerUser } from "@/actions/auth";
@@ -42,7 +42,7 @@ export function AuthForm({
     [fields],
   );
 
-  const { handleSubmit, control } = useForm<AuthFormData>({
+  const { handleSubmit, control, setError } = useForm<AuthFormData>({
     resolver: zodResolver(schema),
     defaultValues: defaultValues,
   });
@@ -62,8 +62,16 @@ export function AuthForm({
   );
 
   useEffect(() => {
+    if (error?.field) {
+      setError(error.field as FieldPath<AuthFormData>, {
+        message: error.message,
+      });
+
+      return;
+    }
+
     if (error?.message) toast.error(error.message);
-  }, [error?.message]);
+  }, [error, setError]);
 
   return (
     <form onSubmit={handleSubmitForm}>
