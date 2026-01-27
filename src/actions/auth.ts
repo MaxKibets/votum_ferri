@@ -16,7 +16,7 @@ import { actionErrorResponse, withActionError } from "./utils";
 /**
  * Register a new user
  */
-export function registerUser(
+export async function registerUser(
   _prevState: AuthResponse<null> | null,
   formData: FormData,
 ): Promise<AuthResponse<null>> {
@@ -72,7 +72,7 @@ export function registerUser(
 /**
  * Login user
  */
-export function loginUser(
+export async function loginUser(
   _prevState: AuthResponse<null> | null,
   formData: FormData,
 ): Promise<AuthResponse<null>> {
@@ -113,7 +113,7 @@ export function loginUser(
 /**
  * Logout user
  */
-export function logoutUser(): Promise<AuthResponse<null>> {
+export async function logoutUser(): Promise<AuthResponse<null>> {
   return withActionError(async () => {
     const supabase = await createClient();
     const { error } = await supabase.auth.signOut();
@@ -129,7 +129,7 @@ export function logoutUser(): Promise<AuthResponse<null>> {
 /**
  * Get current user
  */
-export function getCurrentUser(): Promise<AuthResponse<{ user: PublicUser }>> {
+export async function getCurrentUser(): Promise<AuthResponse<{ user: PublicUser }>> {
   return withActionError(async () => {
     const supabase = await createClient();
 

@@ -856,7 +856,7 @@ src/actions/
 
 - `NEXT_PUBLIC_SUPABASE_URL` - URL проекту Supabase
 - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` - Publishable API key (використовується для клієнтського коду)
-- `SUPABASE_SECRET_KEY` - Secret API key (використовується тільки для серверних операцій з повними правами)
+- `SUPABASE_SECRET_KEY` - Secret API key (не використовується в поточній реалізації; потрібен лише для сервісних операцій з повними правами)
 
 **Примітка:** Supabase переходить на нову систему API ключів (publishable/secret замість legacy anon/service_role). Використовуються нові ключі для кращої безпеки та сумісності з майбутніми версіями.
 
@@ -4072,7 +4072,7 @@ console.error("Database connection failed", { error, userId });
    - ✅ Налаштування змінних середовища (.env.local)
      - `NEXT_PUBLIC_SUPABASE_URL` - URL проекту
      - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` - Publishable key (для клієнтського коду)
-     - `SUPABASE_SECRET_KEY` - Secret key (тільки для серверних операцій)
+     - `SUPABASE_SECRET_KEY` - Secret key (не використовується в поточній реалізації; тільки для серверних операцій з повними правами)
    - ✅ Створення Supabase клієнтів (client.ts, server.ts)
 
 2. ✅ Створення схеми БД
