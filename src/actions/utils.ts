@@ -1,4 +1,4 @@
-import { ACTION_ERROR_MESSAGES } from "./constants";
+import { ACTION_ERROR_CODES, ACTION_ERROR_MESSAGES } from "./constants";
 import type { ActionErrorCode, AuthResponse } from "./types";
 
 function getZodFieldPath(issue?: { path?: unknown[] }): string | undefined {
@@ -12,6 +12,15 @@ type ActionErrorOptions = {
   message?: string;
   field?: string;
 };
+
+function isNextRedirectError(error: unknown): boolean {
+  if (!error || typeof error !== "object") {
+    return false;
+  }
+
+  const digest = (error as { digest?: unknown }).digest;
+  return typeof digest === "string" && digest.startsWith("NEXT_REDIRECT");
+}
 
 export function actionErrorResponse<T>(
   code: ActionErrorCode,
@@ -33,4 +42,24 @@ export function actionErrorResponse<T>(
       field: resolvedField,
     },
   };
+}
+
+export function actionUnknownErrorResponse<T>(error: unknown): AuthResponse<T> {
+  return actionErrorResponse(ACTION_ERROR_CODES.UNKNOWN, {
+    message: error instanceof Error ? error.message : undefined,
+  });
+}
+
+export async function withActionError<T>(
+  action: () => Promise<AuthResponse<T>>,
+): Promise<AuthResponse<T>> {
+  try {
+    return await action();
+  } catch (error) {
+    if (isNextRedirectError(error)) {
+      throw error;
+    }
+
+    return actionUnknownErrorResponse(error);
+  }
 }

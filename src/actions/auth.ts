@@ -11,122 +11,126 @@ import { createClient } from "@/lib/supabase/server";
 import type { PublicUser } from "@/types/user";
 import { ACTION_ERROR_CODES } from "./constants";
 import type { AuthResponse } from "./types";
-import { actionErrorResponse } from "./utils";
+import { actionErrorResponse, withActionError } from "./utils";
 
 /**
  * Register a new user
  */
-export async function registerUser(
-  _prevState: AuthResponse<{ success: boolean }> | null,
+export function registerUser(
+  _prevState: AuthResponse<null> | null,
   formData: FormData,
-): Promise<AuthResponse<{ success: boolean }>> {
-  const supabase = await createClient();
+): Promise<AuthResponse<null>> {
+  return withActionError(async () => {
+    const supabase = await createClient();
 
-  const { success, error, data } = REGISTER_SCHEMA.safeParse({
-    email: formData.get("email"),
-    password: formData.get("password"),
-    name: formData.get("name") || undefined,
-  });
-
-  if (!success) {
-    return actionErrorResponse(ACTION_ERROR_CODES.VALIDATION, {
-      issue: error.issues[0],
+    const { success, error, data } = REGISTER_SCHEMA.safeParse({
+      email: formData.get("email"),
+      password: formData.get("password"),
+      name: formData.get("name") || undefined,
     });
-  }
 
-  const { data: authData, error: authError } = await supabase.auth.signUp({
-    email: data.email,
-    password: data.password,
-    options: {
-      data: {
-        name: data.name || null,
+    if (!success) {
+      return actionErrorResponse(ACTION_ERROR_CODES.VALIDATION, {
+        issue: error.issues[0],
+      });
+    }
+
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email: data.email,
+      password: data.password,
+      options: {
+        data: {
+          name: data.name || null,
+        },
       },
-    },
+    });
+
+    if (authError) {
+      return actionErrorResponse(ACTION_ERROR_CODES.REGISTRATION, {
+        error: authError,
+      });
+    }
+
+    // Check if user already exists (Supabase returns user object but with empty identities or no session)
+    if (
+      authData.user &&
+      (!authData.user.identities || authData.user.identities.length === 0)
+    ) {
+      return actionErrorResponse(ACTION_ERROR_CODES.EMAIL_ALREADY_EXISTS, {
+        field: AUTH_FIELD_NAME.EMAIL,
+      });
+    }
+
+    if (!authData.user) {
+      return actionErrorResponse(ACTION_ERROR_CODES.REGISTRATION);
+    }
+
+    redirect(ROUTE.DASHBOARD, RedirectType.replace);
   });
-
-  if (authError) {
-    return actionErrorResponse(ACTION_ERROR_CODES.REGISTRATION, {
-      error: authError,
-    });
-  }
-
-  // Check if user already exists (Supabase returns user object but with empty identities or no session)
-  if (
-    authData.user &&
-    (!authData.user.identities || authData.user.identities.length === 0)
-  ) {
-    return actionErrorResponse(ACTION_ERROR_CODES.EMAIL_ALREADY_EXISTS, {
-      field: AUTH_FIELD_NAME.EMAIL,
-    });
-  }
-
-  if (!authData.user) {
-    return actionErrorResponse(ACTION_ERROR_CODES.REGISTRATION);
-  }
-
-  redirect(ROUTE.DASHBOARD, RedirectType.replace);
 }
 
 /**
  * Login user
  */
-export async function loginUser(
-  _prevState: AuthResponse<{ success: boolean }> | null,
+export function loginUser(
+  _prevState: AuthResponse<null> | null,
   formData: FormData,
-): Promise<AuthResponse<{ success: boolean }>> {
-  const supabase = await createClient();
+): Promise<AuthResponse<null>> {
+  return withActionError(async () => {
+    const supabase = await createClient();
 
-  const { success, error, data } = LOGIN_SCHEMA.safeParse({
-    email: formData.get(AUTH_FIELD_NAME.EMAIL),
-    password: formData.get(AUTH_FIELD_NAME.PASSWORD),
+    const { success, error, data } = LOGIN_SCHEMA.safeParse({
+      email: formData.get(AUTH_FIELD_NAME.EMAIL),
+      password: formData.get(AUTH_FIELD_NAME.PASSWORD),
+    });
+
+    if (!success) {
+      return actionErrorResponse(ACTION_ERROR_CODES.VALIDATION, {
+        issue: error.issues[0],
+      });
+    }
+
+    const { data: authData, error: authError } =
+      await supabase.auth.signInWithPassword({
+        email: data[AUTH_FIELD_NAME.EMAIL],
+        password: data[AUTH_FIELD_NAME.PASSWORD],
+      });
+
+    if (authError) {
+      return actionErrorResponse(ACTION_ERROR_CODES.LOGIN, {
+        error: authError,
+      });
+    }
+
+    if (!authData.user) {
+      return actionErrorResponse(ACTION_ERROR_CODES.LOGIN);
+    }
+
+    redirect(ROUTE.DASHBOARD, RedirectType.replace);
   });
-
-  if (!success) {
-    return actionErrorResponse(ACTION_ERROR_CODES.VALIDATION, {
-      issue: error.issues[0],
-    });
-  }
-
-  const { data: authData, error: authError } =
-    await supabase.auth.signInWithPassword({
-      email: data[AUTH_FIELD_NAME.EMAIL],
-      password: data[AUTH_FIELD_NAME.PASSWORD],
-    });
-
-  if (authError) {
-    return actionErrorResponse(ACTION_ERROR_CODES.LOGIN, { error: authError });
-  }
-
-  if (!authData.user) {
-    return actionErrorResponse(ACTION_ERROR_CODES.LOGIN);
-  }
-
-  redirect(ROUTE.DASHBOARD, RedirectType.replace);
 }
 
 /**
  * Logout user
  */
-export async function logoutUser(): Promise<
-  AuthResponse<{ success: boolean }>
-> {
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signOut();
+export function logoutUser(): Promise<AuthResponse<null>> {
+  return withActionError(async () => {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.signOut();
 
-  if (error) {
-    return actionErrorResponse(ACTION_ERROR_CODES.LOGOUT, { error });
-  }
+    if (error) {
+      return actionErrorResponse(ACTION_ERROR_CODES.LOGOUT, { error });
+    }
 
-  redirect("/", RedirectType.replace);
+    redirect("/", RedirectType.replace);
+  });
 }
 
 /**
  * Get current user
  */
-export async function getCurrentUser(): Promise<
-  AuthResponse<{ user: PublicUser }>
-> {
-  try {
+export function getCurrentUser(): Promise<AuthResponse<{ user: PublicUser }>> {
+  return withActionError(async () => {
     const supabase = await createClient();
 
     const {
@@ -149,7 +153,7 @@ export async function getCurrentUser(): Promise<
       return actionErrorResponse(ACTION_ERROR_CODES.PROFILE);
     }
 
-    const publicUser: PublicUser = {
+    const publicUser = {
       id: profile.id,
       email: profile.email,
       name: profile.name || undefined,
@@ -159,9 +163,5 @@ export async function getCurrentUser(): Promise<
       data: { user: publicUser },
       error: null,
     };
-  } catch (error) {
-    return actionErrorResponse(ACTION_ERROR_CODES.UNKNOWN, {
-      message: error instanceof Error ? error.message : undefined,
-    });
-  }
+  });
 }
