@@ -5,8 +5,8 @@ export interface Exercise {
   sets: ExerciseSet[]; // List of sets
   order: number; // Exercise order within training
   notes?: string; // Optional exercise notes
-  createdAt: Date; // Creation timestamp
-  updatedAt: Date; // Last update timestamp
+  createdAt: string; // Creation timestamp
+  updatedAt: string; // Last update timestamp
 }
 
 export interface ExerciseSet {
@@ -18,4 +18,6 @@ export interface ExerciseSet {
   restTime?: number; // Optional rest time after set (seconds)
   completed?: boolean; // Optional completion flag
   notes?: string; // Optional notes for the set
+  createdAt: string; // Creation timestamp
+  updatedAt: string; // Last update timestamp
 }

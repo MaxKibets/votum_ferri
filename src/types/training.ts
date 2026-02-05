@@ -3,16 +3,16 @@ import type { Exercise } from "./exercise";
 export interface Training {
   id: string; // Unique identifier
   userId: string; // User ID (foreign key)
-  date: Date; // Training date
+  date: string; // ISO date string (YYYY-MM-DD)
   name?: string; // Optional training name
   description?: string; // Optional training description
   exercises: Exercise[]; // List of exercises
-  createdAt: Date; // Creation timestamp
-  updatedAt: Date; // Last update timestamp
+  createdAt: string; // Creation timestamp
+  updatedAt: string; // Last update timestamp
 }
 
 export interface CreateTrainingDTO {
-  date: string; // ISO date string
+  date: string; // ISO date string (YYYY-MM-DD)
   name?: string;
   description?: string;
   exercises: CreateExerciseDTO[];
@@ -38,4 +38,11 @@ export interface CreateExerciseSetDTO {
   weight: number;
   restTime?: number;
   notes?: string;
+}
+
+export interface UpdateExerciseDTO {
+  name?: string;
+  order?: number;
+  notes?: string;
+  sets?: CreateExerciseSetDTO[];
 }

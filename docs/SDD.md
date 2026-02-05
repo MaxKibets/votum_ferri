@@ -606,12 +606,41 @@ votum_ferri/
 │   │   ├── training/           # Training pages
 │   │   └── middleware.ts       # Route protection
 │   ├── actions/                # Server Actions (one level above app/)
-│   │   ├── auth.ts             # Auth actions
-│   │   ├── training.ts         # Training actions
-│   │   ├── exercise.ts         # Exercise actions
+│   │   ├── auth/               # Auth actions directory
+│   │   │   ├── get-current-user.ts
+│   │   │   ├── login-user.ts
+│   │   │   ├── logout-user.ts
+│   │   │   ├── register-user.ts
+│   │   │   └── index.ts        # Exports all auth actions
+│   │   ├── training/           # Training actions directory
+│   │   │   ├── constants.ts    # Training-specific constants
+│   │   │   ├── utils.ts        # Training-specific utilities
+│   │   │   ├── create-training.ts
+│   │   │   ├── delete-training.ts
+│   │   │   ├── get-training.ts
+│   │   │   ├── get-trainings.ts
+│   │   │   ├── update-training.ts
+│   │   │   └── index.ts        # Exports all training actions
+│   │   ├── exercise/           # Exercise actions directory
+│   │   │   ├── constants.ts    # Exercise-specific constants
+│   │   │   ├── utils.ts        # Exercise-specific utilities
+│   │   │   ├── create-exercise.ts
+│   │   │   ├── delete-exercise.ts
+│   │   │   ├── get-exercise.ts
+│   │   │   ├── get-exercises.ts
+│   │   │   ├── update-exercise.ts
+│   │   │   └── index.ts        # Exports all exercise actions
 │   │   ├── types.ts            # Shared actions types
 │   │   ├── constants.ts        # Shared actions constants
-│   │   └── utils.ts            # Shared actions utilities
+│   │   └── utils/              # Shared actions utilities directory
+│   │       ├── action-error-response.ts
+│   │       ├── action-unknown-error-response.ts
+│   │       ├── get-authenticated-user-id.ts
+│   │       ├── map-training.ts
+│   │       ├── map-exercise.ts
+│   │       ├── map-exercise-set.ts
+│   │       ├── with-action-error.ts
+│   │       └── index.ts         # Exports all utilities
 │   ├── components/             # React components
 │   │   ├── ui/                 # shadcn/ui components
 │   │   ├── training/           # Training-specific components
@@ -805,12 +834,41 @@ votum_ferri/
 
 ```
 src/actions/
-├── auth.ts          # Auth actions (login, register, logout)
-├── training.ts      # Training CRUD actions
-├── exercise.ts      # Exercise actions
+├── auth/            # Auth actions directory
+│   ├── get-current-user.ts
+│   ├── login-user.ts
+│   ├── logout-user.ts
+│   ├── register-user.ts
+│   └── index.ts
+├── training/        # Training actions directory
+│   ├── constants.ts
+│   ├── utils.ts
+│   ├── create-training.ts
+│   ├── delete-training.ts
+│   ├── get-training.ts
+│   ├── get-trainings.ts
+│   ├── update-training.ts
+│   └── index.ts
+├── exercise/        # Exercise actions directory
+│   ├── constants.ts
+│   ├── utils.ts
+│   ├── create-exercise.ts
+│   ├── delete-exercise.ts
+│   ├── get-exercise.ts
+│   ├── get-exercises.ts
+│   ├── update-exercise.ts
+│   └── index.ts
 ├── types.ts         # Shared actions types
 ├── constants.ts     # Shared actions constants
-└── utils.ts         # Shared actions utilities
+└── utils/           # Shared actions utilities directory
+    ├── action-error-response.ts
+    ├── action-unknown-error-response.ts
+    ├── get-authenticated-user-id.ts
+    ├── map-training.ts
+    ├── map-exercise.ts
+    ├── map-exercise-set.ts
+    ├── with-action-error.ts
+    └── index.ts
 ```
 
 **Переваги:**
@@ -1046,12 +1104,12 @@ interface PublicUser {
 interface Training {
   id: string; // Унікальний ідентифікатор
   userId: string; // ID користувача (foreign key)
-  date: Date; // Дата тренування
+  date: string; // ISO date string (YYYY-MM-DD)
   name?: string; // Назва тренування (опціонально)
   description?: string; // Опис тренування (опціонально)
   exercises: Exercise[]; // Список вправ
-  createdAt: Date; // Дата створення
-  updatedAt: Date; // Дата останнього оновлення
+  createdAt: string; // ISO datetime string
+  updatedAt: string; // ISO datetime string
 }
 ```
 
@@ -1060,7 +1118,7 @@ interface Training {
 ```typescript
 // Для створення нового тренування
 interface CreateTrainingDTO {
-  date: string; // ISO date string
+  date: string; // ISO date string (YYYY-MM-DD)
   name?: string;
   description?: string;
   exercises: CreateExerciseDTO[];
@@ -1087,8 +1145,8 @@ interface Exercise {
   sets: ExerciseSet[]; // Список підходів
   order: number; // Порядок вправи в тренуванні
   notes?: string; // Нотатки до вправи (опціонально)
-  createdAt: Date; // Дата створення
-  updatedAt: Date; // Дата останнього оновлення
+  createdAt: string; // ISO datetime string
+  updatedAt: string; // ISO datetime string
 }
 ```
 
@@ -1104,6 +1162,8 @@ interface ExerciseSet {
   restTime?: number; // Час відпочинку після підходу (секунди, опціонально)
   completed?: boolean; // Чи виконано підхід (опціонально)
   notes?: string; // Нотатки до підходу (опціонально)
+  createdAt: string; // ISO datetime string
+  updatedAt: string; // ISO datetime string
 }
 ```
 
@@ -2162,12 +2222,12 @@ export default async function DashboardPage() {
 
 **Формат відповіді:**
 
-Всі Server Actions повертають уніфікований формат `AuthResponse<T>` з `src/actions/types.ts`.
+Всі Server Actions повертають уніфікований формат `ActionResponse<T>` з `src/actions/types.ts`.
 Коди помилок зібрані в `ACTION_ERROR_CODES`, а повідомлення — в `ACTION_ERROR_MESSAGES` у `src/actions/constants.ts`.
-Стандартизований response будується через `actionErrorResponse` у `src/actions/utils.ts`.
+Стандартизований response будується через `actionErrorResponse` у `src/actions/utils/action-error-response.ts` (експортується через `src/actions/utils/index.ts`).
 
 ```typescript
-type AuthResponse<T> = {
+type ActionResponse<T> = {
   data: T | null;
   error: { code: string; message: string; field?: string } | null;
 };
@@ -2211,7 +2271,7 @@ const [{ data, error }, formAction, isPending] = useActionState(serverAction, {
 
 ### 7.2 Server Actions для автентифікації
 
-**Файл:** `src/actions/auth.ts`
+**Файл:** `src/actions/auth/`
 
 #### 7.2.1 registerUser
 
@@ -2221,9 +2281,9 @@ const [{ data, error }, formAction, isPending] = useActionState(serverAction, {
 
 ```typescript
 async function registerUser(
-  prevState: AuthResponse<{ success: boolean }> | null,
+  prevState: ActionResponse<null> | null,
   formData: FormData
-): Promise<AuthResponse<{ success: boolean }>>;
+): Promise<ActionResponse<null>>;
 ```
 
 **Вхідні дані (FormData):**
@@ -2242,7 +2302,7 @@ async function registerUser(
 
 **Повертає:**
 
-- `data.success` - boolean, успішна реєстрація
+- `data` - завжди `null` (успіх завершується redirect)
 - `error` - помилка валідації або реєстрації з кодом та повідомленням
 
 **Примітки:**
@@ -2250,7 +2310,7 @@ async function registerUser(
 - Перевіряє унікальність email через таблицю `profiles`
 - Використовує `supabase.auth.signUp()` для створення користувача
 - Автоматично створює профіль користувача через Supabase trigger
-- Викликає `revalidatePath('/')` після успішної реєстрації
+- Після успішної реєстрації перенаправляє на `/dashboard`
 
 ---
 
@@ -2262,9 +2322,9 @@ async function registerUser(
 
 ```typescript
 async function loginUser(
-  prevState: AuthResponse<{ success: boolean }> | null,
+  prevState: ActionResponse<null> | null,
   formData: FormData
-): Promise<AuthResponse<{ success: boolean }>>;
+): Promise<ActionResponse<null>>;
 ```
 
 **Вхідні дані (FormData):**
@@ -2280,7 +2340,7 @@ async function loginUser(
 
 **Повертає:**
 
-- `data.success` - boolean, успішний вхід
+- `data` - завжди `null` (успіх завершується redirect)
 - `error` - помилка валідації або автентифікації з кодом та повідомленням
 
 **Примітки:**
@@ -2298,12 +2358,12 @@ async function loginUser(
 **Сигнатура:**
 
 ```typescript
-async function logoutUser(): Promise<AuthResponse<{ success: boolean }>>;
+async function logoutUser(): Promise<ActionResponse<null>>;
 ```
 
 **Повертає:**
 
-- `data.success` - boolean, успішний вихід
+- `data` - завжди `null` (успіх завершується redirect)
 - `error` - помилка з кодом та повідомленням (якщо виникла)
 
 **Примітки:**
@@ -2321,7 +2381,7 @@ async function logoutUser(): Promise<AuthResponse<{ success: boolean }>>;
 **Сигнатура:**
 
 ```typescript
-async function getCurrentUser(): Promise<AuthResponse<{ user: PublicUser }>>;
+async function getCurrentUser(): Promise<ActionResponse<{ user: PublicUser }>>;
 ```
 
 **Повертає:**
@@ -2338,7 +2398,7 @@ async function getCurrentUser(): Promise<AuthResponse<{ user: PublicUser }>>;
 
 ### 7.3 Server Actions для тренувань (CRUD)
 
-**Файл:** `src/actions/training.ts`
+**Файл:** `src/actions/training/`
 
 #### 7.3.1 getTrainings
 
@@ -2347,21 +2407,15 @@ async function getCurrentUser(): Promise<AuthResponse<{ user: PublicUser }>>;
 **Сигнатура:**
 
 ```typescript
-async function getTrainings(params?: {
-  month?: string; // Фільтр по місяцю (YYYY-MM)
-  date?: string; // Фільтр по конкретній даті (YYYY-MM-DD)
-  limit?: number; // Ліміт результатів
-  offset?: number; // Зміщення для пагінації
-}): Promise<{
-  data: { trainings: TrainingResponse[]; total?: number } | null;
-  error: { code: string; message: string } | null;
-}>;
+async function getTrainings(
+  startDate?: string,
+  endDate?: string
+): Promise<ActionResponse<{ trainings: TrainingResponse[] }>>;
 ```
 
 **Повертає:**
 
 - `data.trainings` - масив тренувань з вправами та підходами
-- `data.total` - загальна кількість (для пагінації)
 - `error` - помилка авторизації або запиту
 
 ---
@@ -2452,22 +2506,21 @@ async function updateTraining(
 **Сигнатура:**
 
 ```typescript
-async function deleteTraining(id: string): Promise<{
-  data: { success: boolean } | null;
-  error: { code: string; message: string } | null;
-}>;
+async function deleteTraining(
+  id: string
+): Promise<ActionResponse<{ trainingId: string }>>;
 ```
 
 **Повертає:**
 
-- `data.success` - успішне видалення
+- `data.trainingId` - id видаленого тренування
 - `error` - помилка (неавторизований, не знайдено, доступ заборонено)
 
 **Примітка:** Каскадне видалення вправ та підходів через foreign keys. Автоматично викликає `revalidatePath('/dashboard')`
 
 ### 7.4 Server Actions для вправ
 
-**Файл:** `src/actions/exercise.ts`
+**Файл:** `src/actions/exercise/`
 
 **Примітка:** Вправи обробляються через окремі Server Actions, але зазвичай створюються/оновлюються разом з тренуванням через `createTraining` та `updateTraining`. Окремі actions для вправ використовуються для додавання/видалення вправ до існуючого тренування.
 
@@ -2499,12 +2552,8 @@ async function getExercises(trainingId: string): Promise<{
 
 ```typescript
 async function getExercise(
-  trainingId: string,
   exerciseId: string
-): Promise<{
-  data: { exercise: ExerciseResponse } | null;
-  error: { code: string; message: string } | null;
-}>;
+): Promise<ActionResponse<{ exercise: ExerciseResponse }>>;
 ```
 
 **Повертає:**
@@ -2551,13 +2600,9 @@ async function createExercise(
 
 ```typescript
 async function updateExercise(
-  trainingId: string,
   exerciseId: string,
-  data: Partial<CreateExerciseDTO>
-): Promise<{
-  data: { exercise: ExerciseResponse } | null;
-  error: { code: string; message: string; details?: any } | null;
-}>;
+  data: UpdateExerciseDTO
+): Promise<ActionResponse<{ exercise: ExerciseResponse }>>;
 ```
 
 **Валідація:**
@@ -2580,17 +2625,13 @@ async function updateExercise(
 
 ```typescript
 async function deleteExercise(
-  trainingId: string,
   exerciseId: string
-): Promise<{
-  data: { success: boolean } | null;
-  error: { code: string; message: string } | null;
-}>;
+): Promise<ActionResponse<{ exerciseId: string }>>;
 ```
 
 **Повертає:**
 
-- `data.success` - успішне видалення
+- `data.exerciseId` - id видаленої вправи
 - `error` - помилка (неавторизований, не знайдено, доступ заборонено)
 
 **Примітка:** Каскадне видалення підходів через foreign keys
@@ -2671,9 +2712,41 @@ export async function getTrainings() {
 
 ```
 src/actions/
-├── auth.ts          # registerUser, loginUser, logoutUser, getCurrentUser
-├── training.ts      # getTrainings, getTraining, createTraining, updateTraining, deleteTraining
-└── exercise.ts      # getExercises, getExercise, createExercise, updateExercise, deleteExercise
+├── auth/            # Auth actions directory
+│   ├── get-current-user.ts
+│   ├── login-user.ts
+│   ├── logout-user.ts
+│   ├── register-user.ts
+│   └── index.ts
+├── training/        # Training actions directory
+│   ├── constants.ts # TRAINING_SELECT_WITH_EXERCISES
+│   ├── utils.ts     # fetchTrainingById
+│   ├── create-training.ts
+│   ├── delete-training.ts
+│   ├── get-training.ts
+│   ├── get-trainings.ts
+│   ├── update-training.ts
+│   └── index.ts
+├── exercise/        # Exercise actions directory
+│   ├── constants.ts # EXERCISE_SELECT_WITH_SETS
+│   ├── utils.ts     # fetchExerciseById
+│   ├── create-exercise.ts
+│   ├── delete-exercise.ts
+│   ├── get-exercise.ts
+│   ├── get-exercises.ts
+│   ├── update-exercise.ts
+│   └── index.ts
+├── types.ts         # Shared types (ActionResponse, TrainingRow, ExerciseRow, ExerciseSetRow)
+├── constants.ts     # Shared constants (ACTION_ERROR_CODES, ACTION_ERROR_MESSAGES)
+└── utils/           # Shared utilities directory
+    ├── action-error-response.ts
+    ├── action-unknown-error-response.ts
+    ├── get-authenticated-user-id.ts
+    ├── map-training.ts        # Maps TrainingRow → Training
+    ├── map-exercise.ts         # Maps ExerciseRow → Exercise
+    ├── map-exercise-set.ts    # Maps ExerciseSetRow → ExerciseSet
+    ├── with-action-error.ts
+    └── index.ts
 ```
 
 **Паттерни використання:**
@@ -2685,6 +2758,59 @@ src/actions/
 - Обробка помилок з детальними повідомленнями (див. розділ [9.6](#96-error-handling-та-logging))
 
 **Примітка:** Детальна інформація про безпеку та автентифікацію див. розділ [9. Безпека та автентифікація](#9-безпека-та-автентифікація).
+
+---
+
+### 7.8 Data Mapping Utilities
+
+**Призначення:** Утиліти для перетворення даних з бази даних (snake_case) в TypeScript типи (camelCase).
+
+**Розташування:** `src/actions/utils/`
+
+**Функції:**
+
+- `mapTraining(row: TrainingRow): Training` - перетворює TrainingRow з БД в Training тип
+- `mapExercise(row: ExerciseRow): Exercise` - перетворює ExerciseRow з БД в Exercise тип
+- `mapExerciseSet(row: ExerciseSetRow): ExerciseSet` - перетворює ExerciseSetRow з БД в ExerciseSet тип
+
+**Використання:**
+
+```typescript
+import { mapTraining } from "@/actions/utils";
+import type { TrainingRow } from "@/actions/types";
+
+const { data } = await supabase.from("trainings").select(...).single();
+return mapTraining(data as TrainingRow);
+```
+
+### 7.9 Domain-Specific Constants and Utilities
+
+**Призначення:** Константи та утиліти специфічні для кожного домену (training, exercise).
+
+**Структура:**
+
+Кожен домен (training, exercise) має власні файли:
+
+- `constants.ts` - SQL select рядки для Supabase запитів
+- `utils.ts` - допоміжні функції для роботи з даними домену
+
+**Training Domain:**
+
+- `src/actions/training/constants.ts`:
+
+  - `TRAINING_SELECT_WITH_EXERCISES` - SQL select для отримання тренування з вправами та підходами
+
+- `src/actions/training/utils.ts`:
+  - `fetchTrainingById(trainingId, userId)` - отримує тренування з БД та конвертує в Training тип
+
+**Exercise Domain:**
+
+- `src/actions/exercise/constants.ts`:
+
+  - `EXERCISE_SELECT_WITH_SETS` - SQL select для отримання вправи з підходами
+
+- `src/actions/exercise/utils.ts`:
+  - `fetchExerciseById(exerciseId)` - отримує вправу з БД та конвертує в Exercise тип
 
 ---
 
@@ -3193,11 +3319,13 @@ interface AuthFormProps {
 
 ```
 src/
-├── app/
-│   └── actions/                 # Server Actions
-│       ├── auth.ts               # Auth actions
-│       ├── training.ts           # Training actions
-│       └── exercise.ts           # Exercise actions
+├── actions/                      # Server Actions
+│   ├── auth/                     # Auth actions directory
+│   ├── training/                 # Training actions directory
+│   ├── exercise/                 # Exercise actions directory
+│   ├── types.ts                  # Shared actions types
+│   ├── constants.ts              # Shared actions constants
+│   └── utils/                    # Shared actions utilities directory
 │
 ├── lib/
 │   ├── supabase/                 # Supabase clients
@@ -3248,7 +3376,7 @@ src/
 
 #### 8.4.3 Auth Module (Server Actions)
 
-**Файл:** `src/actions/auth.ts`
+**Файл:** `src/actions/auth/`
 
 **Призначення:** Server Actions для автентифікації
 
@@ -3269,7 +3397,7 @@ src/
 
 #### 8.4.4 Training Module (Server Actions)
 
-**Файл:** `src/actions/training.ts`
+**Файл:** `src/actions/training/`
 
 **Призначення:** Server Actions для тренувань
 
@@ -3608,6 +3736,7 @@ graph TB
 ### 8.7 Структура модулів
 
 Детальна інформація про модулі та їх структуру описана в розділах:
+
 - [7. API специфікації](#7-api-специфікації) - Server Actions та їх структура
 - [8.4 Модулі та сервіси](#84-модулі-та-сервіси) - детальний опис модулів
 - [3.5 Модульна структура](#35-модульна-структура) - високорівнева структура системи
@@ -4009,6 +4138,7 @@ console.error("Database connection failed", { error, userId });
 ### 9.9 Резюме безпеки
 
 Детальна інформація про всі аспекти безпеки описана в розділах:
+
 - [9.1 Стратегія автентифікації](#91-стратегія-автентифікації) - автентифікація через Supabase Auth
 - [9.2 Управління сесіями](#92-управління-сесіями) - зберігання та оновлення сесій
 - [9.3 Захист маршрутів](#93-захист-маршрутів) - захист сторінок та Server Actions
@@ -4086,7 +4216,7 @@ console.error("Database connection failed", { error, userId });
 3. ✅ Налаштування автентифікації
 
    - ✅ Використання Supabase Auth
-   - ✅ Створення Server Actions для auth (`src/actions/auth.ts`):
+   - ✅ Створення Server Actions для auth (`src/actions/auth/`):
      - ✅ `registerUser` - реєстрація з FormData та useActionState
      - ✅ `loginUser` - вхід з FormData та useActionState
      - ✅ `logoutUser` - вихід з системи
@@ -4131,49 +4261,49 @@ console.error("Database connection failed", { error, userId });
 
 **Задачі:**
 
-1. Database Schema (якщо не зроблено в Фазі 1)
+1. ✅ Database Schema (якщо не зроблено в Фазі 1)
 
-   - Перевірка та доповнення таблиць
-   - Додаткові індекси (якщо потрібно)
-   - Оптимізація RLS policies
+   - ✅ Перевірка та доповнення таблиць
+   - ✅ Додаткові індекси (якщо потрібно)
+   - ✅ Оптимізація RLS policies
 
-2. TypeScript Types
+2. ✅ TypeScript Types
 
-   - User types
-   - Training types
-   - Exercise types
-   - ExerciseSet types
-   - Server Action response types
-   - DTO types для валідації (Zod schemas)
+   - ✅ User types
+   - ✅ Training types
+   - ✅ Exercise types
+   - ✅ ExerciseSet types
+   - ✅ Server Action response types
+   - ✅ DTO types для валідації (Zod schemas)
 
-3. Server Actions - Training
+3. ✅ Server Actions - Training
 
-   - `getTrainings` - список тренувань (з фільтрами)
-   - `getTraining` - деталі тренування
-   - `createTraining` - створення тренування
-   - `updateTraining` - оновлення тренування
-   - `deleteTraining` - видалення тренування
+   - ✅ `getTrainings` - список тренувань (з фільтрами)
+   - ✅ `getTraining` - деталі тренування
+   - ✅ `createTraining` - створення тренування
+   - ✅ `updateTraining` - оновлення тренування
+   - ✅ `deleteTraining` - видалення тренування
 
-4. Server Actions - Exercise
+4. ✅ Server Actions - Exercise
 
-   - `getExercises` - список вправ для тренування
-   - `getExercise` - деталі вправи
-   - `createExercise` - додавання вправи
-   - `updateExercise` - оновлення вправи
-   - `deleteExercise` - видалення вправи
+   - ✅ `getExercises` - список вправ для тренування
+   - ✅ `getExercise` - деталі вправи
+   - ✅ `createExercise` - додавання вправи
+   - ✅ `updateExercise` - оновлення вправи
+   - ✅ `deleteExercise` - видалення вправи
 
-5. Валідація та обробка помилок
-   - Zod схеми для всіх DTO
-   - Уніфікований формат відповіді `{ data, error }`
-   - Error handling в Server Actions
-   - Revalidation через `revalidatePath`
+5. ✅ Валідація та обробка помилок
+   - ✅ Zod схеми для всіх DTO
+   - ✅ Уніфікований формат відповіді `{ data, error }`
+   - ✅ Error handling в Server Actions
+   - ✅ Revalidation через `revalidatePath`
 
 **Залежності:**
 
 - Потребує Фази 1 (автентифікація та БД)
 - Потребує базові типи (Фаза 0)
 
-**Мілестоун:** Server Actions працюють, дані зберігаються та отримуються
+**Мілестоун:** ✅ **ДОСЯГНУТО** - Server Actions працюють, дані зберігаються та отримуються
 
 ---
 
