@@ -1,7 +1,7 @@
 import { loginUser, registerUser } from "@/actions/auth";
 import { AUTH_FIELD_NAME } from "@/constants/authFieldNames";
-import { LOGIN_SCHEMA, REGISTER_SCHEMA_WITH_CONFIRM_PASSWORD } from "@/constants/authValidationSchemas";
 import { ROUTE } from "@/constants/routes";
+import { LOGIN_SCHEMA, REGISTER_SCHEMA_WITH_CONFIRM_PASSWORD } from "@/schemas";
 
 export const LOGIN_FIELDS_DATA = [
   {
@@ -62,8 +62,8 @@ export const LOGIN_FORM_DATA = {
     action: loginUser,
     schema: LOGIN_SCHEMA,
     buttonText: "Sign in",
-  }
-}
+  },
+};
 
 export const REGISTER_FORM_DATA = {
   title: "Create an account",
@@ -77,5 +77,5 @@ export const REGISTER_FORM_DATA = {
     action: registerUser,
     schema: REGISTER_SCHEMA_WITH_CONFIRM_PASSWORD,
     buttonText: "Create account",
-  }
-}
+  },
+};

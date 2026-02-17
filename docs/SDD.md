@@ -2,9 +2,16 @@
 
 ## Трекер тренувань - votum_ferri
 
-**Версія:** 1.3  
-**Дата:** 2025-01-28  
+**Версія:** 1.4  
+**Дата:** 2026-02-17  
 **Статус:** В розробці
+
+**Оновлення v1.4:**
+
+- Auth flow розділено на шари `actions` і `services`
+- Auth Server Actions винесені у `src/actions/auth/*` (замість одного `src/actions/auth.ts`)
+- Утиліти відповідей розділено за призначенням: `src/services/utils.ts` (tuple response) та `src/actions/utils.ts` (UI error state)
+- Оновлено розділи API та модульної структури відповідно до фактичної реалізації
 
 **Оновлення v1.3:**
 
@@ -517,11 +524,14 @@ graph TB
 - Типобезпека між клієнтом та сервером
 - Автоматична серіалізація/десеріалізація
 
-**Action Layer Pattern**
+**Action + Service Layer Pattern**
 
-- Відокремлення бізнес-логіки в Server Actions
+- Action layer відповідає за orchestration (redirect, повернення state для UI)
+- Business logic винесена в service layer (`src/services/*`)
 - Actions в окремих файлах за доменами (auth, training, exercise)
-- Уніфікований формат відповіді `{ data, error }`
+- Для auth використовується дворівневий контракт відповіді:
+  - service: tuple `[error, data]`
+  - action: `{ message?: string; detailes?: TDetails }`
 - Валідація через Zod перед обробкою
 
 ### 3.4 Потік даних між компонентами
@@ -607,10 +617,23 @@ votum_ferri/
 │   │   ├── dashboard/          # Dashboard/Calendar page
 │   │   ├── training/           # Training pages
 │   │   └── middleware.ts       # Route protection
-│   ├── actions/                # Server Actions (one level above app/)
-│   │   ├── auth.ts             # Auth actions
-│   │   ├── training.ts         # Training actions
-│   │   └── exercise.ts         # Exercise actions
+│   ├── actions/                # Server Actions
+│   │   ├── auth/
+│   │   │   ├── register-user.ts
+│   │   │   ├── login-user.ts
+│   │   │   ├── logout-user.ts
+│   │   │   ├── get-current-user.ts
+│   │   │   └── index.ts
+│   │   └── utils.ts            # Action error response helper
+│   ├── services/               # Business logic layer
+│   │   ├── auth/
+│   │   │   ├── register-user.ts
+│   │   │   ├── login-user.ts
+│   │   │   ├── logout-user.ts
+│   │   │   ├── get-current-user.ts
+│   │   │   └── index.ts
+│   │   ├── utils.ts            # Service tuple response helpers
+│   │   └── index.ts
 │   ├── components/             # React components
 │   │   ├── ui/                 # shadcn/ui components
 │   │   ├── training/           # Training-specific components
@@ -629,19 +652,58 @@ votum_ferri/
 │   ├── lib/                    # Utilities & helpers
 │   │   ├── supabase/           # Supabase clients
 │   │   │   ├── client.ts       # Browser client
-│   │   │   └── server.ts       # Server client
-│   │   └── utils/              # General utilities
-│   │       ├── cn.ts            # Class name utility
-│   │       └── index.ts         # Export all utilities
+│   │   │   ├── server.ts       # Server client
+│   │   │   └── index.ts        # Export all Supabase clients (interface)
+│   │   └── utils/              # General UI utilities
+│   │       ├── cn.ts           # Class name utility
+│   │       └── index.ts        # Export all utilities (interface)
+│   ├── schemas/                # Zod validation schemas
+│   │   ├── login.ts
+│   │   ├── register.ts
+│   │   ├── register-with-confirm-password.ts
+│   │   └── index.ts            # Export all schemas (interface)
 │   ├── types/                  # TypeScript types
 │   │   ├── training.ts
 │   │   ├── exercise.ts
-│   │   └── user.ts
+│   │   ├── user.ts
+│   │   └── index.ts            # Export all types (interface)
 │   └── hooks/                 # Custom React hooks
 │       ├── useTraining.ts
 │       └── useAuth.ts
 ├── docs/                      # Documentation
 └── public/                    # Static assets
+```
+
+**Конвенція експортів через index.ts (Barrel exports):**
+
+Усі експорти з модулів проєкту мають відбуватися через файл `index.ts`, який слугує публічним інтерфейсом (interface) директорії. Це правило застосовується до таких категорій:
+
+- `lib/utils` — загальні UI-утиліти (наприклад, `cn`)
+- `actions` — Server Actions (barrel для доменів, наприклад `actions/auth/index.ts`)
+- `services` — бізнес-логіка та допоміжні утиліти сервісного шару
+- `lib/supabase` — Supabase клієнти (client, server)
+- `schemas` — Zod валідаційні схеми
+- `types` — TypeScript типи та інтерфейси
+- `components/*` — React-компоненти (ui, auth, training, exercise, layout)
+- Інші директорії з множинними експортованими сутностями
+
+**Правила:**
+
+- Імпорти виконуються через публічний інтерфейс модуля (barrel або root-файл), а не через випадкові внутрішні шляхи
+- Файл `index.ts` реекспортує потрібні сутності з внутрішніх модулів
+- Такий підхід забезпечує єдину точку входу та спрощує рефакторинг
+
+```typescript
+// ✅ Правильно — через index.ts
+import { cn } from "@/lib/utils";
+import { createBrowserClient, createServerClient } from "@/lib/supabase";
+import type { User, Training, Exercise } from "@/types";
+import { AuthFormContainer } from "@/components/auth";
+
+// ❌ Неправильно — прямі шляхи до файлів
+import { cn } from "@/lib/utils/cn";
+import { createBrowserClient } from "@/lib/supabase/client";
+import type { User } from "@/types/user";
 ```
 
 ### 3.6 Залежності та інтеграції
@@ -804,9 +866,13 @@ votum_ferri/
 
 ```
 src/actions/
-├── auth.ts          # Auth actions (login, register, logout)
-├── training.ts      # Training CRUD actions
-└── exercise.ts      # Exercise actions
+├── auth/
+│   ├── register-user.ts
+│   ├── login-user.ts
+│   ├── logout-user.ts
+│   ├── get-current-user.ts
+│   └── index.ts
+└── utils.ts
 ```
 
 **Переваги:**
@@ -1294,7 +1360,7 @@ interface ExerciseSetResponse {
 
 #### 5.7.1 Валідаційні схеми (Zod)
 
-**Файл:** `src/constants/authValidationSchemas.ts`
+**Директорія:** `src/schemas/`
 
 Валідація даних виконується через Zod схеми, які використовуються як на клієнті (через react-hook-form), так і на сервері (в Server Actions).
 
@@ -1332,6 +1398,13 @@ z.object({
   path: ["confirmPassword"],
 });
 ```
+
+**Файли схем:**
+
+- `src/schemas/login.ts` → `LOGIN_SCHEMA`
+- `src/schemas/register.ts` → `REGISTER_SCHEMA`
+- `src/schemas/register-with-confirm-password.ts` → `REGISTER_SCHEMA_WITH_CONFIRM_PASSWORD`
+- `src/schemas/index.ts` → централізований експорт схем
 
 **Константи полів:**
 
@@ -1772,11 +1845,7 @@ export default function RegisterPage() {
 
 ```typescript
 export default async function DashboardPage() {
-  const { data, error } = await getCurrentUser();
-
-  if (error || !data) {
-    redirect(ROUTE.LOGIN);
-  }
+  const user = await getCurrentUser();
 
   return (
     <div className="container mx-auto py-8">
@@ -1786,7 +1855,7 @@ export default async function DashboardPage() {
       </div>
       <div className="rounded-lg border bg-white p-6 shadow-sm dark:bg-zinc-900 dark:border-zinc-800">
         <p className="text-muted-foreground">
-          Welcome, {data.user.name || data.user.email}! This is your dashboard.
+          Welcome, {user.name || user.email}! This is your dashboard.
         </p>
         <p className="text-sm text-muted-foreground mt-2">
           Training calendar and features will be available in Phase 4.
@@ -2209,29 +2278,17 @@ export default async function DashboardPage() {
 
 **Формат відповіді:**
 
-Всі Server Actions повертають уніфікований формат `AuthResponse<T>`:
+Auth модуль використовує два формати відповіді:
 
 ```typescript
-type AuthResponse<T> = {
-  data: T | null;
-  error: { code: string; message: string; field?: string } | null;
+// Service layer (`src/services/utils.ts`)
+type ServiceResponse<E extends { reason: string }, R> = [E, null] | [null, R];
+
+// Action layer (`src/actions/utils.ts`)
+type ActionErrorResponse<TDetails> = {
+  message?: string;
+  detailes?: TDetails;
 };
-
-// Успішна відповідь
-{
-  data: { ... },
-  error: null
-}
-
-// Помилка
-{
-  data: null,
-  error: {
-    code: string,
-    message: string,
-    field?: string  // Опціонально, для валідації полів
-  }
-}
 ```
 
 **Використання на клієнті:**
@@ -2239,10 +2296,7 @@ type AuthResponse<T> = {
 Server Actions викликаються через React `useActionState` hook:
 
 ```typescript
-const [{ data, error }, formAction, isPending] = useActionState(serverAction, {
-  data: null,
-  error: null,
-});
+const [{ message }, formAction, isPending] = useActionState(serverAction, {});
 ```
 
 **Переваги Server Actions:**
@@ -2256,7 +2310,7 @@ const [{ data, error }, formAction, isPending] = useActionState(serverAction, {
 
 ### 7.2 Server Actions для автентифікації
 
-**Файл:** `src/actions/auth.ts`
+**Файли:** `src/actions/auth/*.ts`
 
 #### 7.2.1 registerUser
 
@@ -2265,10 +2319,10 @@ const [{ data, error }, formAction, isPending] = useActionState(serverAction, {
 **Сигнатура:**
 
 ```typescript
-async function registerUser(
-  prevState: AuthResponse<{ success: boolean }> | null,
-  formData: FormData
-): Promise<AuthResponse<{ success: boolean }>>;
+async function registerUser(_: unknown, formData: FormData): Promise<{
+  message?: string;
+  detailes?: unknown;
+} | void>;
 ```
 
 **Вхідні дані (FormData):**
@@ -2280,22 +2334,20 @@ async function registerUser(
 
 **Валідація:**
 
-- Використовується `REGISTER_SCHEMA` з `@/constants/authValidationSchemas`
+- Використовується `REGISTER_SCHEMA` з `@/schemas`
 - `email`: обов'язкове, валідний email формат
 - `password`: обов'язкове, мінімум 8 символів
 - `name`: опціональне, максимум 255 символів
 
 **Повертає:**
 
-- `data.success` - boolean, успішна реєстрація
-- `error` - помилка валідації або реєстрації з кодом та повідомленням
+- При успіху виконує redirect на `/dashboard`
+- При помилці повертає `{ message, detailes }` через `err()` з `src/actions/utils.ts`
 
 **Примітки:**
 
-- Перевіряє унікальність email через таблицю `profiles`
-- Використовує `supabase.auth.signUp()` для створення користувача
-- Автоматично створює профіль користувача через Supabase trigger
-- Викликає `revalidatePath('/')` після успішної реєстрації
+- Викликає `registerUserService(formData)`
+- Мапить service error reasons (`VALIDATION_ERROR`, `EMAIL_ALREADY_EXISTS`, тощо) у user-friendly повідомлення
 
 ---
 
@@ -2306,10 +2358,10 @@ async function registerUser(
 **Сигнатура:**
 
 ```typescript
-async function loginUser(
-  prevState: AuthResponse<{ success: boolean }> | null,
-  formData: FormData
-): Promise<AuthResponse<{ success: boolean }>>;
+async function loginUser(_: unknown, formData: FormData): Promise<{
+  message?: string;
+  detailes?: unknown;
+} | void>;
 ```
 
 **Вхідні дані (FormData):**
@@ -2319,20 +2371,19 @@ async function loginUser(
 
 **Валідація:**
 
-- Використовується `LOGIN_SCHEMA` з `@/constants/authValidationSchemas`
+- Використовується `LOGIN_SCHEMA` з `@/schemas`
 - `email`: обов'язкове, валідний email формат
 - `password`: обов'язкове
 
 **Повертає:**
 
-- `data.success` - boolean, успішний вхід
-- `error` - помилка валідації або автентифікації з кодом та повідомленням
+- При успіху виконує redirect на `/dashboard`
+- При помилці повертає `{ message, detailes }` через `err()`
 
 **Примітки:**
 
-- Використовує `supabase.auth.signInWithPassword()` для автентифікації
-- Сесія зберігається автоматично через Supabase cookies
-- Після успішного входу клієнт перенаправляється на `/dashboard`
+- Викликає `loginUserService(formData)`
+- Мапить service error reasons (`VALIDATION_ERROR`, `AUTH_ERROR`, `USER_NOT_FOUND`, `UNKNOWN_ERROR`)
 
 ---
 
@@ -2343,19 +2394,18 @@ async function loginUser(
 **Сигнатура:**
 
 ```typescript
-async function logoutUser(): Promise<AuthResponse<{ success: boolean }>>;
+async function logoutUser(): Promise<{ message?: string; detailes?: unknown } | void>;
 ```
 
 **Повертає:**
 
-- `data.success` - boolean, успішний вихід
-- `error` - помилка з кодом та повідомленням (якщо виникла)
+- При успіху виконує redirect на `/`
+- При помилці повертає `{ message, detailes }` через `err()`
 
 **Примітки:**
 
-- Використовує `supabase.auth.signOut()` для завершення сесії
+- Викликає `logoutUserService()`
 - Викликається через `useActionState` з клієнтського компонента
-- Після успішного виходу користувач перенаправляється на сторінку входу
 
 ---
 
@@ -2366,20 +2416,18 @@ async function logoutUser(): Promise<AuthResponse<{ success: boolean }>>;
 **Сигнатура:**
 
 ```typescript
-async function getCurrentUser(): Promise<AuthResponse<{ user: PublicUser }>>;
+async function getCurrentUser(): Promise<PublicUser | never>;
 ```
 
 **Повертає:**
 
-- `data.user` - інформація про поточного користувача (PublicUser)
-- `error` - помилка з кодом та повідомленням (якщо неавторизований)
+- Повертає `PublicUser`, якщо користувач авторизований
+- Інакше виконує redirect на `/login`
 
 **Примітки:**
 
-- Використовує `supabase.auth.getUser()` для отримання поточного користувача
-- Отримує профіль з таблиці `profiles` через Supabase
-- Використовується на захищених сторінках для перевірки авторизації
-- Якщо користувач не авторизований, повертає помилку з кодом "UNAUTHORIZED"
+- Викликає `getCurrentUserService()`
+- На помилки `AUTH_ERROR | UNAUTHORIZED | PROFILE_ERROR | UNKNOWN_ERROR` виконує redirect на `/login`
 
 ### 7.3 Server Actions для тренувань (CRUD)
 
@@ -2768,14 +2816,18 @@ export async function createTraining(data: unknown) {
 
 ```
 src/actions/
-├── auth.ts          # registerUser, loginUser, logoutUser, getCurrentUser
-├── training.ts      # getTrainings, getTraining, createTraining, updateTraining, deleteTraining
-└── exercise.ts      # getExercises, getExercise, createExercise, updateExercise, deleteExercise
+├── auth/
+│   ├── register-user.ts
+│   ├── login-user.ts
+│   ├── logout-user.ts
+│   ├── get-current-user.ts
+│   └── index.ts
+└── utils.ts
 ```
 
 **Паттерни використання:**
 
-- Всі actions мають уніфікований формат відповіді `{ data, error }`
+- Auth actions повертають error state у форматі `{ message?, detailes? }` або виконують redirect
 - Автоматична перевірка автентифікації в кожній action
 - Валідація через Zod перед обробкою
 - `revalidatePath` для оновлення кешу після змін
@@ -2856,7 +2908,7 @@ src/
 
 **Правило централізованих експортів:**
 
-Всі папки компонентів мають містити файл `index.ts` або `index.tsx` для централізованого експорту всіх компонентів з цієї папки. Імпорти завжди відбуваються через папку компонентів, а не через прямі шляхи до файлів.
+Відповідно до загальної конвенції проєкту (див. розділ 3.5), усі папки компонентів мають містити файл `index.ts` або `index.tsx` для централізованого експорту. Файл `index` слугує інтерфейсом модуля. Імпорти завжди відбуваються через папку компонентів, а не через прямі шляхи до файлів.
 
 **Приклади правильних імпортів:**
 
@@ -3330,7 +3382,7 @@ interface TrainingDetailProps {
 - Hooks: `useForm` (react-hook-form), `useActionState` (React)
 - Server Actions: `loginUser`, `registerUser` з `@/actions/auth`
 - Sonner: `toast` для відображення помилок
-- Validation: `LOGIN_SCHEMA`, `REGISTER_SCHEMA_WITH_CONFIRM_PASSWORD` з `@/constants/authValidationSchemas`
+- Validation: `LOGIN_SCHEMA`, `REGISTER_SCHEMA_WITH_CONFIRM_PASSWORD` з `@/schemas`
 - Constants: `LOGIN_FIELDS_DATA`, `REGISTER_FIELDS_DATA` з `./constants`
 - Routes: `DASHBOARD_PATH` з `@/constants/routes`
 
@@ -3363,21 +3415,32 @@ interface AuthFormProps {
 
 ```
 src/
-├── app/
-│   └── actions/                 # Server Actions
-│       ├── auth.ts               # Auth actions
-│       ├── training.ts           # Training actions
-│       └── exercise.ts           # Exercise actions
+├── actions/
+│   ├── auth/
+│   │   ├── register-user.ts
+│   │   ├── login-user.ts
+│   │   ├── logout-user.ts
+│   │   ├── get-current-user.ts
+│   │   └── index.ts
+│   └── utils.ts
+│
+├── services/
+│   ├── auth/
+│   │   ├── register-user.ts
+│   │   ├── login-user.ts
+│   │   ├── logout-user.ts
+│   │   ├── get-current-user.ts
+│   │   └── index.ts
+│   ├── utils.ts
+│   └── index.ts
 │
 ├── lib/
 │   ├── supabase/                 # Supabase clients
 │   │   ├── client.ts             # Browser client
 │   │   └── server.ts             # Server client
 │   │
-│   └── utils/                    # General utilities
+│   └── utils/                    # General UI utilities
 │       ├── cn.ts                 # Class name utility (clsx + tailwind-merge)
-│       ├── date.ts               # Date utilities
-│       ├── validation.ts         # Validation helpers (Zod schemas)
 │       └── index.ts              # Export all utilities (centralized exports)
 │
 ├── hooks/                        # Custom React hooks
@@ -3416,9 +3479,9 @@ src/
 
 ---
 
-#### 8.4.3 Auth Module (Server Actions)
+#### 8.4.3 Auth Module (Actions + Services)
 
-**Файл:** `src/actions/auth.ts`
+**Файли:** `src/actions/auth/*.ts`, `src/services/auth/*.ts`
 
 **Призначення:** Server Actions для автентифікації
 
@@ -3431,9 +3494,12 @@ src/
 
 **Реалізація:**
 
-- Використання Supabase Auth API
-- Валідація через Zod
-- Уніфікований формат відповіді `{ data, error }`
+- Action layer (`src/actions/auth/*`) керує redirect та формує state для UI
+- Service layer (`src/services/auth/*`) містить бізнес-логіку та інтеграцію з `src/data/auth/*`
+- Валідація через Zod у service layer
+- Формат відповідей:
+  - services: tuple `[error, data]` через `src/services/utils.ts`
+  - actions: `{ message?, detailes? }` через `src/actions/utils.ts`
 
 ---
 
@@ -3570,22 +3636,23 @@ export { AuthFormContainer } from "./auth-form-container";
 
 #### 8.4.7 Utilities Module
 
-**Структура:** `src/lib/utils/`
+**Структура:** `src/lib/utils/`, `src/services/utils.ts`, `src/actions/utils.ts`
 
 **Принципи організації:**
 
-- Кожна утиліта - це окремий файл з назвою утиліти
-- Всі утиліти експортуються через `index.ts` для централізованого доступу
-- Імпорти завжди відбуваються через `@/lib/utils`, а не через прямі шляхи до файлів
+- `src/lib/utils/` містить загальні UI-утиліти (наприклад, `cn`)
+- `src/services/utils.ts` містить helper-и `ok/err` для tuple response сервісів
+- `src/actions/utils.ts` містить helper `err` для state-відповіді action (`{ message, detailes }`)
 
 **Приклад структури:**
 
 ```
 src/lib/utils/
-├── cn.ts              # Утиліта для об'єднання класів (clsx + tailwind-merge)
-├── date.ts            # Утиліти для роботи з датами
-├── validation.ts      # Валідаційні утиліти (Zod schemas)
-└── index.ts           # Централізований експорт всіх утиліт
+├── cn.ts
+└── index.ts
+
+src/services/utils.ts
+src/actions/utils.ts
 ```
 
 **Файл:** `src/lib/utils/cn.ts`
@@ -3609,21 +3676,18 @@ import { cn } from "@/lib/utils";
 
 **Файл:** `src/lib/utils/index.ts`
 
-**Призначення:** Централізований експорт всіх утиліт
+**Призначення:** Централізований експорт загальних UI-утиліт
 
 **Правила:**
 
-- Всі утиліти мають експортуватися через `index.ts`
-- Імпорти завжди використовують `@/lib/utils`, не прямі шляхи до файлів
-- При додаванні нової утиліти вона має бути додана до `index.ts`
+- Всі загальні UI-утиліти мають експортуватися через `index.ts`
+- Імпорти для className helpers використовують `@/lib/utils`
 
 **Приклад:**
 
 ```typescript
 // src/lib/utils/index.ts
 export { cn } from "./cn";
-export { formatDate, parseDate } from "./date";
-export { validateTraining } from "./validation";
 ```
 
 ---
@@ -3790,7 +3854,7 @@ graph TB
 - Server Actions викликаються напряму з Client Components
 - Hooks обгортають Server Actions для зручності та додаткової логіки
 - Валідація через Zod перед викликом Server Actions
-- Error handling через уніфікований формат `{ data, error }`
+- Error handling в auth через `{ message, detailes }` state та redirect
 
 ---
 
@@ -4294,12 +4358,12 @@ console.error("Database connection failed", { error, userId });
 3. ✅ Налаштування автентифікації
 
    - ✅ Використання Supabase Auth
-   - ✅ Створення Server Actions для auth (`src/actions/auth.ts`):
+   - ✅ Створення Server Actions для auth (`src/actions/auth/*`):
      - ✅ `registerUser` - реєстрація з FormData та useActionState
      - ✅ `loginUser` - вхід з FormData та useActionState
      - ✅ `logoutUser` - вихід з системи
      - ✅ `getCurrentUser` - отримання поточного користувача
-   - ✅ Валідація через Zod (`src/constants/authValidationSchemas.ts`)
+  - ✅ Валідація через Zod (`src/schemas/`)
    - ✅ Константи для полів форм (`src/constants/authFieldNames.ts`)
    - ✅ Константи для маршрутів (`src/constants/routes.ts`)
 
@@ -4372,7 +4436,7 @@ console.error("Database connection failed", { error, userId });
 
 5. Валідація та обробка помилок
    - Zod схеми для всіх DTO
-   - Уніфікований формат відповіді `{ data, error }`
+   - Для auth: state-формат помилок `{ message, detailes }`, для services: tuple `[error, data]`
    - Error handling в Server Actions
    - Revalidation через `revalidatePath`
 
