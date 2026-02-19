@@ -2,15 +2,24 @@
 
 ## Трекер тренувань - votum_ferri
 
-**Версія:** 1.4  
-**Дата:** 2026-02-17  
+**Версія:** 1.5  
+**Дата:** 2026-02-19  
 **Статус:** В розробці
+
+**Оновлення v1.5:**
+
+- Реалізовано Phase 2 для доменів `training` та `exercise` у шарах `data -> services -> actions`
+- Server Actions для `training` та `exercise` винесені в окремі директорії `src/actions/training/*` і `src/actions/exercise/*`
+- Обробка помилок виконується локально в кожному action (без `error-response.ts`)
+- Єдиний формат відповіді action через `src/actions/utils.ts`: `ok(...)` / `err(...)` або `redirect(...)`
+- Додано Zod схеми для Phase 2: `src/schemas/training.ts`, `src/schemas/exercise.ts`
+- Додано спільні API типи: `src/types/training-api.ts`
 
 **Оновлення v1.4:**
 
 - Auth flow розділено на шари `actions` і `services`
 - Auth Server Actions винесені у `src/actions/auth/*` (замість одного `src/actions/auth.ts`)
-- Утиліти відповідей розділено за призначенням: `src/services/utils.ts` (tuple response) та `src/actions/utils.ts` (UI error state)
+- Утиліти відповідей розділено за призначенням: `src/services/utils.ts` (tuple response) та `src/actions/utils.ts` (action success/error response)
 - Оновлено розділи API та модульної структури відповідно до фактичної реалізації
 
 **Оновлення v1.3:**
@@ -437,7 +446,6 @@ SDD охоплює:
 **Основні компоненти:**
 
 1. **Frontend (Next.js 16)**
-
    - Клієнтська частина на React 19
    - Server-Side Rendering (SSR) та Static Site Generation (SSG)
    - Server Actions для backend логіки (замість API Routes)
@@ -528,10 +536,10 @@ graph TB
 
 - Action layer відповідає за orchestration (redirect, повернення state для UI)
 - Business logic винесена в service layer (`src/services/*`)
-- Actions в окремих файлах за доменами (auth, training, exercise)
-- Для auth використовується дворівневий контракт відповіді:
+- Actions в окремих файлах за доменами (auth, training, exercise), `1 method = 1 file`
+- Для всіх доменів використовується дворівневий контракт відповіді:
   - service: tuple `[error, data]`
-  - action: `{ message?: string; detailes?: TDetails }`
+  - action: `ok(data)` або `err(message, detailes)` через `src/actions/utils.ts`
 - Валідація через Zod перед обробкою
 
 ### 3.4 Потік даних між компонентами
@@ -624,13 +632,33 @@ votum_ferri/
 │   │   │   ├── logout-user.ts
 │   │   │   ├── get-current-user.ts
 │   │   │   └── index.ts
-│   │   └── utils.ts            # Action error response helper
+│   │   ├── training/
+│   │   │   ├── get-trainings.ts
+│   │   │   ├── get-training.ts
+│   │   │   ├── create-training.ts
+│   │   │   ├── update-training.ts
+│   │   │   ├── delete-training.ts
+│   │   │   └── index.ts
+│   │   ├── exercise/
+│   │   │   ├── get-exercises.ts
+│   │   │   ├── get-exercise.ts
+│   │   │   ├── create-exercise.ts
+│   │   │   ├── update-exercise.ts
+│   │   │   ├── delete-exercise.ts
+│   │   │   └── index.ts
+│   │   └── utils.ts            # Action response helpers (ok/err)
 │   ├── services/               # Business logic layer
 │   │   ├── auth/
 │   │   │   ├── register-user.ts
 │   │   │   ├── login-user.ts
 │   │   │   ├── logout-user.ts
 │   │   │   ├── get-current-user.ts
+│   │   │   └── index.ts
+│   │   ├── training/
+│   │   │   ├── *.ts            # one method per file
+│   │   │   └── index.ts
+│   │   ├── exercise/
+│   │   │   ├── *.ts            # one method per file
 │   │   │   └── index.ts
 │   │   ├── utils.ts            # Service tuple response helpers
 │   │   └── index.ts
@@ -660,11 +688,13 @@ votum_ferri/
 │   ├── schemas/                # Zod validation schemas
 │   │   ├── login.ts
 │   │   ├── register.ts
-│   │   ├── register-with-confirm-password.ts
+│   │   ├── training.ts
+│   │   ├── exercise.ts
 │   │   └── index.ts            # Export all schemas (interface)
 │   ├── types/                  # TypeScript types
 │   │   ├── training.ts
 │   │   ├── exercise.ts
+│   │   ├── training-api.ts
 │   │   ├── user.ts
 │   │   └── index.ts            # Export all types (interface)
 │   └── hooks/                 # Custom React hooks
@@ -871,6 +901,20 @@ src/actions/
 │   ├── login-user.ts
 │   ├── logout-user.ts
 │   ├── get-current-user.ts
+│   └── index.ts
+├── training/
+│   ├── get-trainings.ts
+│   ├── get-training.ts
+│   ├── create-training.ts
+│   ├── update-training.ts
+│   ├── delete-training.ts
+│   └── index.ts
+├── exercise/
+│   ├── get-exercises.ts
+│   ├── get-exercise.ts
+│   ├── create-exercise.ts
+│   ├── update-exercise.ts
+│   ├── delete-exercise.ts
 │   └── index.ts
 └── utils.ts
 ```
@@ -1277,19 +1321,16 @@ erDiagram
 **Реалізовані індекси для Supabase PostgreSQL:**
 
 1. **profiles таблиця:**
-
    - PRIMARY KEY: `id` (UUID)
    - UNIQUE INDEX: `email` (якщо потрібно)
    - Автоматичні індекси через foreign key на `auth.users`
 
 2. **trainings таблиця:**
-
    - PRIMARY KEY: `id` (UUID)
    - FOREIGN KEY INDEX: `user_id` (автоматично)
    - COMPOSITE INDEX: `trainings_user_id_date_idx` на `(user_id, date)` - для швидкого пошуку тренувань користувача за датою
 
 3. **exercises таблиця:**
-
    - PRIMARY KEY: `id` (UUID)
    - FOREIGN KEY INDEX: `training_id` (автоматично)
    - COMPOSITE INDEX: `exercises_training_id_order_idx` на `(training_id, order_number)` - для сортування вправ в тренуванні
@@ -2278,16 +2319,24 @@ export default async function DashboardPage() {
 
 **Формат відповіді:**
 
-Auth модуль використовує два формати відповіді:
+Actions і services використовують два формати відповіді:
 
 ```typescript
 // Service layer (`src/services/utils.ts`)
 type ServiceResponse<E extends { reason: string }, R> = [E, null] | [null, R];
 
 // Action layer (`src/actions/utils.ts`)
+type ActionSuccessResponse<TData> = {
+  data: TData;
+  error: null;
+};
+
 type ActionErrorResponse<TDetails> = {
-  message?: string;
-  detailes?: TDetails;
+  data: null;
+  error: {
+    message?: string;
+    detailes?: TDetails;
+  };
 };
 ```
 
@@ -2296,7 +2345,10 @@ type ActionErrorResponse<TDetails> = {
 Server Actions викликаються через React `useActionState` hook:
 
 ```typescript
-const [{ message }, formAction, isPending] = useActionState(serverAction, {});
+const [{ error }, formAction, isPending] = useActionState(serverAction, {
+  data: null,
+  error: { message: "", detailes: null },
+});
 ```
 
 **Переваги Server Actions:**
@@ -2319,9 +2371,15 @@ const [{ message }, formAction, isPending] = useActionState(serverAction, {});
 **Сигнатура:**
 
 ```typescript
-async function registerUser(_: unknown, formData: FormData): Promise<{
-  message?: string;
-  detailes?: unknown;
+async function registerUser(
+  _: unknown,
+  formData: FormData,
+): Promise<{
+  data: null;
+  error: {
+    message?: string;
+    detailes?: unknown;
+  };
 } | void>;
 ```
 
@@ -2342,7 +2400,7 @@ async function registerUser(_: unknown, formData: FormData): Promise<{
 **Повертає:**
 
 - При успіху виконує redirect на `/dashboard`
-- При помилці повертає `{ message, detailes }` через `err()` з `src/actions/utils.ts`
+- При помилці повертає `ActionErrorResponse` у форматі `{ data: null, error: { message, detailes } }` через `err()` з `src/actions/utils.ts`
 
 **Примітки:**
 
@@ -2358,9 +2416,15 @@ async function registerUser(_: unknown, formData: FormData): Promise<{
 **Сигнатура:**
 
 ```typescript
-async function loginUser(_: unknown, formData: FormData): Promise<{
-  message?: string;
-  detailes?: unknown;
+async function loginUser(
+  _: unknown,
+  formData: FormData,
+): Promise<{
+  data: null;
+  error: {
+    message?: string;
+    detailes?: unknown;
+  };
 } | void>;
 ```
 
@@ -2378,7 +2442,7 @@ async function loginUser(_: unknown, formData: FormData): Promise<{
 **Повертає:**
 
 - При успіху виконує redirect на `/dashboard`
-- При помилці повертає `{ message, detailes }` через `err()`
+- При помилці повертає `ActionErrorResponse` у форматі `{ data: null, error: { message, detailes } }` через `err()`
 
 **Примітки:**
 
@@ -2394,13 +2458,19 @@ async function loginUser(_: unknown, formData: FormData): Promise<{
 **Сигнатура:**
 
 ```typescript
-async function logoutUser(): Promise<{ message?: string; detailes?: unknown } | void>;
+async function logoutUser(): Promise<{
+  data: null;
+  error: {
+    message?: string;
+    detailes?: unknown;
+  };
+} | void>;
 ```
 
 **Повертає:**
 
 - При успіху виконує redirect на `/`
-- При помилці повертає `{ message, detailes }` через `err()`
+- При помилці повертає `ActionErrorResponse` у форматі `{ data: null, error: { message, detailes } }` через `err()`
 
 **Примітки:**
 
@@ -2416,22 +2486,27 @@ async function logoutUser(): Promise<{ message?: string; detailes?: unknown } | 
 **Сигнатура:**
 
 ```typescript
-async function getCurrentUser(): Promise<PublicUser | never>;
+async function getCurrentUser(): Promise<
+  | { data: PublicUser; error: null }
+  | { data: null; error: { message?: string; detailes?: unknown } }
+  | never
+>;
 ```
 
 **Повертає:**
 
-- Повертає `PublicUser`, якщо користувач авторизований
-- Інакше виконує redirect на `/login`
+- Повертає `ok(PublicUser)`, якщо користувач авторизований
+- На помилки `AUTH_ERROR | UNAUTHORIZED | PROFILE_ERROR` виконує redirect на `/login`
+- На `UNKNOWN_ERROR` повертає `err("An unknown error occurred...")`
 
 **Примітки:**
 
 - Викликає `getCurrentUserService()`
-- На помилки `AUTH_ERROR | UNAUTHORIZED | PROFILE_ERROR | UNKNOWN_ERROR` виконує redirect на `/login`
+- Викликає `getCurrentUserService()` і локально мапить `reason` через `switch`
 
 ### 7.3 Server Actions для тренувань (CRUD)
 
-**Файл:** `src/actions/training.ts`
+**Файли:** `src/actions/training/*.ts`
 
 #### 7.3.1 getTrainings
 
@@ -2447,7 +2522,7 @@ async function getTrainings(params?: {
   offset?: number; // Зміщення для пагінації
 }): Promise<{
   data: { trainings: TrainingResponse[]; total?: number } | null;
-  error: { code: string; message: string } | null;
+  error: { message?: string; detailes?: unknown } | null;
 }>;
 ```
 
@@ -2468,7 +2543,7 @@ async function getTrainings(params?: {
 ```typescript
 async function getTraining(id: string): Promise<{
   data: { training: TrainingResponse } | null;
-  error: { code: string; message: string } | null;
+  error: { message?: string; detailes?: unknown } | null;
 }>;
 ```
 
@@ -2488,7 +2563,7 @@ async function getTraining(id: string): Promise<{
 ```typescript
 async function createTraining(data: CreateTrainingDTO): Promise<{
   data: { training: TrainingResponse } | null;
-  error: { code: string; message: string; details?: any } | null;
+  error: { message?: string; detailes?: unknown } | null;
 }>;
 ```
 
@@ -2517,10 +2592,10 @@ async function createTraining(data: CreateTrainingDTO): Promise<{
 ```typescript
 async function updateTraining(
   id: string,
-  data: UpdateTrainingDTO
+  data: UpdateTrainingDTO,
 ): Promise<{
   data: { training: TrainingResponse } | null;
-  error: { code: string; message: string; details?: any } | null;
+  error: { message?: string; detailes?: unknown } | null;
 }>;
 ```
 
@@ -2547,7 +2622,7 @@ async function updateTraining(
 ```typescript
 async function deleteTraining(id: string): Promise<{
   data: { success: boolean } | null;
-  error: { code: string; message: string } | null;
+  error: { message?: string; detailes?: unknown } | null;
 }>;
 ```
 
@@ -2560,7 +2635,7 @@ async function deleteTraining(id: string): Promise<{
 
 ### 7.4 Server Actions для вправ
 
-**Файл:** `src/actions/exercise.ts`
+**Файли:** `src/actions/exercise/*.ts`
 
 **Примітка:** Вправи обробляються через окремі Server Actions, але зазвичай створюються/оновлюються разом з тренуванням через `createTraining` та `updateTraining`. Окремі actions для вправ використовуються для додавання/видалення вправ до існуючого тренування.
 
@@ -2573,7 +2648,7 @@ async function deleteTraining(id: string): Promise<{
 ```typescript
 async function getExercises(trainingId: string): Promise<{
   data: { exercises: ExerciseResponse[] } | null;
-  error: { code: string; message: string } | null;
+  error: { message?: string; detailes?: unknown } | null;
 }>;
 ```
 
@@ -2593,10 +2668,10 @@ async function getExercises(trainingId: string): Promise<{
 ```typescript
 async function getExercise(
   trainingId: string,
-  exerciseId: string
+  exerciseId: string,
 ): Promise<{
   data: { exercise: ExerciseResponse } | null;
-  error: { code: string; message: string } | null;
+  error: { message?: string; detailes?: unknown } | null;
 }>;
 ```
 
@@ -2616,10 +2691,10 @@ async function getExercise(
 ```typescript
 async function createExercise(
   trainingId: string,
-  data: CreateExerciseDTO
+  data: CreateExerciseDTO,
 ): Promise<{
   data: { exercise: ExerciseResponse } | null;
-  error: { code: string; message: string; details?: any } | null;
+  error: { message?: string; detailes?: unknown } | null;
 }>;
 ```
 
@@ -2646,10 +2721,10 @@ async function createExercise(
 async function updateExercise(
   trainingId: string,
   exerciseId: string,
-  data: Partial<CreateExerciseDTO>
+  data: Partial<CreateExerciseDTO>,
 ): Promise<{
   data: { exercise: ExerciseResponse } | null;
-  error: { code: string; message: string; details?: any } | null;
+  error: { message?: string; detailes?: unknown } | null;
 }>;
 ```
 
@@ -2674,10 +2749,10 @@ async function updateExercise(
 ```typescript
 async function deleteExercise(
   trainingId: string,
-  exerciseId: string
+  exerciseId: string,
 ): Promise<{
   data: { success: boolean } | null;
-  error: { code: string; message: string } | null;
+  error: { message?: string; detailes?: unknown } | null;
 }>;
 ```
 
@@ -2822,12 +2897,27 @@ src/actions/
 │   ├── logout-user.ts
 │   ├── get-current-user.ts
 │   └── index.ts
+├── training/
+│   ├── get-trainings.ts
+│   ├── get-training.ts
+│   ├── create-training.ts
+│   ├── update-training.ts
+│   ├── delete-training.ts
+│   └── index.ts
+├── exercise/
+│   ├── get-exercises.ts
+│   ├── get-exercise.ts
+│   ├── create-exercise.ts
+│   ├── update-exercise.ts
+│   ├── delete-exercise.ts
+│   └── index.ts
 └── utils.ts
 ```
 
 **Паттерни використання:**
 
-- Auth actions повертають error state у форматі `{ message?, detailes? }` або виконують redirect
+- Кожен action самостійно обробляє помилки через `switch(reason)` (без окремого `error-response.ts`)
+- Actions повертають уніфікований формат через `ok(...)` / `err(...)` або виконують `redirect(...)` якщо відповідь не потрібна
 - Автоматична перевірка автентифікації в кожній action
 - Валідація через Zod перед обробкою
 - `revalidatePath` для оновлення кешу після змін
@@ -2946,62 +3036,51 @@ import { TrainingCard } from "@/components/training/training-card/training-card"
 **Компоненти, що плануються до використання:**
 
 1. **Button** (`src/components/ui/button.tsx`)
-
    - Використання: всі кнопки
    - Варіанти: default, destructive, outline, secondary, ghost, link
    - Розміри: sm, md, lg
 
 2. **Card** (`src/components/ui/card.tsx`)
-
    - Використання: контейнери для форм, відображення тренувань
    - Компоненти: Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter
 
 3. **Dialog** (`src/components/ui/dialog.tsx`)
-
    - Використання: модальні вікна для форм, підтвердження
    - Компоненти: Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter
 
 4. **Field** (`src/components/ui/field.tsx`)
-
    - Використання: всі форми
    - Інтеграція з react-hook-form через Controller та zod
    - Компоненти: Field, FieldLabel, FieldError, FieldGroup, FieldDescription, FieldContent, FieldTitle, FieldSet, FieldLegend, FieldSeparator
    - Примітка: для простих текстових полів рекомендується використовувати `FormField` компонент, який інкапсулює Field, FieldLabel, Input та FieldError
 
 5. **Input** (`src/components/ui/input.tsx`)
-
    - Використання: текстові поля, числові поля
    - Типи: text, number, email, password
    - Інтеграція з Field компонентом через Controller
 
 6. **Label** (`src/components/ui/label.tsx`)
-
    - Використання: мітки для полів форм
    - Інтеграція з Field компонентом через FieldLabel
 
 7. **Calendar** (`src/components/ui/calendar.tsx`)
-
    - Використання: календар для дошки тренувань, вибір дати
    - Інтеграція з date-fns або dayjs
    - Кастомізація для відображення тренувань
 
 8. **Table** (`src/components/ui/table.tsx`)
-
    - Використання: список вправ, список підходів
    - Компоненти: Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell
 
 9. **Select** (`src/components/ui/select.tsx`)
-
    - Використання: випадаючі списки
    - Компоненти: Select, SelectTrigger, SelectContent, SelectItem, SelectValue
 
 10. **Badge** (`src/components/ui/badge.tsx`)
-
     - Використання: індикація кількості тренувань, статуси
     - Варіанти: default, secondary, destructive, outline
 
 11. **FormField** (`src/components/ui/form-field.tsx`)
-
     - Використання: переісний компонент для полів форм з інтеграцією react-hook-form
     - Інтеграція з Controller (react-hook-form) для автоматичної валідації та відображення помилок
     - Компоненти: FormField (обгортка над Field, FieldLabel, Input, FieldError)
@@ -3009,13 +3088,11 @@ import { TrainingCard } from "@/components/training/training-card/training-card"
     - Підтримка різних типів полів: text, email, password, number тощо
 
 12. **Separator** (`src/components/ui/separator.tsx`)
-
     - Використання: розділювач контенту
     - Компоненти: Separator
     - Орієнтація: horizontal (за замовчуванням) або vertical
 
 13. **Toaster** (`src/components/ui/sonner.tsx`)
-
     - Використання: система сповіщень (toast notifications)
     - Бібліотека: Sonner
     - Компоненти: Toaster (провайдер для toast)
@@ -3451,6 +3528,7 @@ src/
 └── types/                        # TypeScript types
     ├── training.ts
     ├── exercise.ts
+    ├── training-api.ts
     ├── user.ts
     └── supabase.ts               # Supabase generated types
 ```
@@ -3499,13 +3577,13 @@ src/
 - Валідація через Zod у service layer
 - Формат відповідей:
   - services: tuple `[error, data]` через `src/services/utils.ts`
-  - actions: `{ message?, detailes? }` через `src/actions/utils.ts`
+  - actions: `{ data, error }` через `ok(...)` / `err(...)` (`src/actions/utils.ts`)
 
 ---
 
 #### 8.4.4 Training Module (Server Actions)
 
-**Файл:** `src/actions/training.ts`
+**Файли:** `src/actions/training/*.ts`
 
 **Призначення:** Server Actions для тренувань
 
@@ -3519,9 +3597,9 @@ src/
 
 **Реалізація:**
 
-- Прямі SQL запити через Supabase клієнт
-- Валідація через Zod
-- Автоматичне revalidation через `revalidatePath`
+- Data layer (`src/data/training/*`, `src/data/exercise/*`) виконує доступ до БД
+- Service layer (`src/services/training/*`) містить бізнес-логіку і валідацію
+- Action layer (`src/actions/training/*`) виконує orchestration (`ok/err/redirect`, `revalidatePath`)
 - Перевірка прав доступу через RLS та додаткова перевірка в коді
 
 ---
@@ -3642,7 +3720,7 @@ export { AuthFormContainer } from "./auth-form-container";
 
 - `src/lib/utils/` містить загальні UI-утиліти (наприклад, `cn`)
 - `src/services/utils.ts` містить helper-и `ok/err` для tuple response сервісів
-- `src/actions/utils.ts` містить helper `err` для state-відповіді action (`{ message, detailes }`)
+- `src/actions/utils.ts` містить helper-и `ok/err` для уніфікованої відповіді action (`{ data, error }`)
 
 **Приклад структури:**
 
@@ -3747,8 +3825,8 @@ graph TB
 
     subgraph API["API Modules"]
         AuthAPI["auth.ts"]
-        TrainingAPI["training.ts"]
-        ExerciseAPI["exercise.ts"]
+        TrainingAPI["actions/training/*"]
+        ExerciseAPI["actions/exercise/*"]
     end
 
     DashboardPage --> TrainingBoard
@@ -3854,7 +3932,7 @@ graph TB
 - Server Actions викликаються напряму з Client Components
 - Hooks обгортають Server Actions для зручності та додаткової логіки
 - Валідація через Zod перед викликом Server Actions
-- Error handling в auth через `{ message, detailes }` state та redirect
+- Error handling в actions через `ok(...)` / `err(...)` та redirect для сценаріїв без payload
 
 ---
 
@@ -3967,17 +4045,17 @@ export async function middleware(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) =>
-            request.cookies.set(name, value)
+            request.cookies.set(name, value),
           );
           response = NextResponse.next({
             request,
           });
           cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options)
+            response.cookies.set(name, value, options),
           );
         },
       },
-    }
+    },
   );
 
   const {
@@ -4255,37 +4333,31 @@ console.error("Database connection failed", { error, userId });
 **Визначені рішення:**
 
 1. **Стратегія автентифікації:**
-
    - **Тип:** Supabase Auth (JWT токени)
    - **Реалізація:** Server Actions для auth операцій
    - **Зберігання:** HTTP-only cookies через `@supabase/ssr`
 
 2. **Управління сесіями:**
-
    - **Зберігання:** Cookies (access token + refresh token)
    - **Термін дії:** Access token - 1 година, Refresh token - налаштовується
    - **Оновлення:** Автоматичне через Supabase
    - **Завершення:** Через `logoutUser` action або при застарілому refresh token
 
 3. **Хешування паролів:**
-
    - **Алгоритм:** bcrypt (автоматично в Supabase)
    - **Управління:** Повністю автоматичне через Supabase Auth
 
 4. **Захист від атак:**
-
    - **SQL Injection:** Автоматичний захист через Supabase клієнт + RLS
    - **CSRF:** SameSite=Strict cookies
    - **Rate Limiting:** Вбудований в Supabase, додатковий через middleware (за потреби)
    - **XSS:** React автоматичне екранування + валідація через Zod
 
 5. **HTTPS та Cookies:**
-
    - **HTTPS:** Обов'язковий в production (Vercel автоматично)
    - **Cookies:** Secure, HttpOnly, SameSite=Strict
 
 6. **Logging та Monitoring:**
-
    - **Logging:** Console logs для розробки, структуровані логи для production
    - **Monitoring:** Supabase Dashboard для БД метрик
    - **Error Tracking:** Рекомендовано додати Sentry або аналогічний сервіс
@@ -4307,14 +4379,12 @@ console.error("Database connection failed", { error, userId });
 **Задачі:**
 
 1. ✅ Налаштування проекту
-
    - ✅ Next.js 16 налаштування
    - ✅ TypeScript конфігурація
    - ✅ Tailwind CSS налаштування
    - ✅ Biome налаштування
 
 2. ✅ Налаштування shadcn/ui
-
    - ✅ Ініціалізація shadcn/ui
    - ✅ Налаштування компонентів
    - ✅ Кастомізація теми
@@ -4338,7 +4408,6 @@ console.error("Database connection failed", { error, userId });
 **Задачі:**
 
 1. ✅ Налаштування Supabase
-
    - ✅ Створення проекту в Supabase
    - ✅ Отримання API ключів (URL, publishable key, secret key)
    - ✅ Налаштування змінних середовища (.env.local)
@@ -4348,7 +4417,6 @@ console.error("Database connection failed", { error, userId });
    - ✅ Створення Supabase клієнтів (client.ts, server.ts)
 
 2. ✅ Створення схеми БД
-
    - ✅ Створення таблиць (profiles, trainings, exercises, exercise_sets)
    - ✅ Налаштування foreign keys та constraints
    - ✅ Створення індексів
@@ -4356,19 +4424,18 @@ console.error("Database connection failed", { error, userId });
    - ✅ SQL міграції (001_initial_schema.sql, 002_fix_function_search_path.sql)
 
 3. ✅ Налаштування автентифікації
-
    - ✅ Використання Supabase Auth
    - ✅ Створення Server Actions для auth (`src/actions/auth/*`):
      - ✅ `registerUser` - реєстрація з FormData та useActionState
      - ✅ `loginUser` - вхід з FormData та useActionState
      - ✅ `logoutUser` - вихід з системи
      - ✅ `getCurrentUser` - отримання поточного користувача
-  - ✅ Валідація через Zod (`src/schemas/`)
-   - ✅ Константи для полів форм (`src/constants/authFieldNames.ts`)
-   - ✅ Константи для маршрутів (`src/constants/routes.ts`)
+
+- ✅ Валідація через Zod (`src/schemas/`)
+- ✅ Константи для полів форм (`src/constants/authFieldNames.ts`)
+- ✅ Константи для маршрутів (`src/constants/routes.ts`)
 
 4. ✅ Auth Components
-
    - ✅ `AuthForm` - уніфікована форма автентифікації (вхід/реєстрація)
    - ✅ `AuthFormContainer` - компонент-обгортка для форм з UI
    - ✅ `LogoutButton` - кнопка виходу з системи
@@ -4377,14 +4444,12 @@ console.error("Database connection failed", { error, userId });
    - ✅ Сторінка `/dashboard` з захистом маршруту
 
 5. ✅ UI Components для автентифікації
-
    - ✅ `FormField` - компонент для полів форм з react-hook-form
    - ✅ `Separator` - компонент-розділювач
    - ✅ `Toaster` (Sonner) - система сповіщень для помилок/успіхів
    - ✅ Інтеграція Sonner в `layout.tsx`
 
 6. ✅ Захист маршрутів
-
    - ✅ Перевірка авторизації на сторінці `/dashboard` через `getCurrentUser`
    - ✅ Перенаправлення на `/login` для неавторизованих користувачів
 
@@ -4404,13 +4469,11 @@ console.error("Database connection failed", { error, userId });
 **Задачі:**
 
 1. Database Schema (якщо не зроблено в Фазі 1)
-
    - Перевірка та доповнення таблиць
    - Додаткові індекси (якщо потрібно)
    - Оптимізація RLS policies
 
 2. TypeScript Types
-
    - User types
    - Training types
    - Exercise types
@@ -4419,7 +4482,6 @@ console.error("Database connection failed", { error, userId });
    - DTO types для валідації (Zod schemas)
 
 3. Server Actions - Training
-
    - `getTrainings` - список тренувань (з фільтрами)
    - `getTraining` - деталі тренування
    - `createTraining` - створення тренування
@@ -4427,7 +4489,6 @@ console.error("Database connection failed", { error, userId });
    - `deleteTraining` - видалення тренування
 
 4. Server Actions - Exercise
-
    - `getExercises` - список вправ для тренування
    - `getExercise` - деталі вправи
    - `createExercise` - додавання вправи
@@ -4436,7 +4497,7 @@ console.error("Database connection failed", { error, userId });
 
 5. Валідація та обробка помилок
    - Zod схеми для всіх DTO
-   - Для auth: state-формат помилок `{ message, detailes }`, для services: tuple `[error, data]`
+  - Для actions: уніфікований формат `{ data, error }` через `ok/err`, для services: tuple `[error, data]`
    - Error handling в Server Actions
    - Revalidation через `revalidatePath`
 
@@ -4456,19 +4517,16 @@ console.error("Database connection failed", { error, userId });
 **Задачі:**
 
 1. Layout Components
-
    - Header/Navbar компонент
    - Footer компонент (якщо потрібно)
    - Layout wrapper
 
 2. shadcn/ui Components Setup
-
    - Додавання потрібних компонентів
    - Кастомізація компонентів
    - Тестування компонентів
 
 3. Exercise Components
-
    - ExerciseForm компонент (shadcn/ui Dialog + Field)
    - ExerciseList компонент (shadcn/ui Table)
    - ExerciseCard компонент (shadcn/ui Card)
@@ -4494,21 +4552,18 @@ console.error("Database connection failed", { error, userId });
 **Задачі:**
 
 1. Calendar Component
-
    - Інтеграція shadcn/ui Calendar
    - Кастомізація Calendar для відображення тренувань
    - Індикація днів з тренуваннями (Badge)
    - Навігація між місяцями
 
 2. TrainingBoard Component
-
    - Створення TrainingBoard компонента
    - Інтеграція Calendar
    - Відображення тренувань на днях
    - Клік на день з тренуваннями
 
 3. Training Hooks
-
    - useTraining hook
    - Завантаження тренувань за місяцем
    - Кешування даних
@@ -4534,7 +4589,6 @@ console.error("Database connection failed", { error, userId });
 **Задачі:**
 
 1. TrainingForm Component
-
    - Створення TrainingForm (shadcn/ui Dialog + Field)
    - Поля: дата (Calendar), назва, опис
    - Інтеграція ExerciseList
@@ -4542,13 +4596,11 @@ console.error("Database connection failed", { error, userId });
    - Loading стани
 
 2. Training Pages
-
    - /training/new сторінка (створення)
    - /training/[id]/edit сторінка (редагування)
    - Інтеграція TrainingForm
 
 3. Training CRUD Integration
-
    - Створення тренування через API
    - Оновлення тренування через API
    - Валідація даних
@@ -4577,20 +4629,17 @@ console.error("Database connection failed", { error, userId });
 **Задачі:**
 
 1. TrainingDetail Component
-
    - Детальний перегляд тренування
    - Відображення всіх вправ
    - Дата, назва, опис
 
 2. Training Detail Page
-
    - /training/[id] сторінка
    - Інтеграція TrainingDetail
    - Кнопка редагування
    - Кнопка видалення
 
 3. Delete Functionality
-
    - Діалог підтвердження (shadcn/ui Dialog)
    - Видалення через API
    - Redirect після видалення
@@ -4617,40 +4666,34 @@ console.error("Database connection failed", { error, userId });
 **Задачі:**
 
 1. Loading States
-
    - Skeleton loaders
    - Spinners
    - Disabled стани
 
 2. Error Handling & Feedback
-
    - Toast notifications (shadcn/ui Toast, опціонально)
    - Error messages
    - Success messages
    - Error boundaries
 
 3. Responsive Design
-
    - Mobile оптимізація
    - Tablet оптимізація
    - Desktop оптимізація
    - Тестування на різних пристроях
 
 4. Темна тема
-
    - Перевірка підтримки темної теми
    - Кастомізація компонентів
    - Перемикач теми (опціонально)
 
 5. Accessibility
-
    - Перевірка keyboard navigation
    - ARIA атрибути
    - Screen reader support
    - Color contrast
 
 6. Performance Optimization
-
    - Code splitting
    - Image optimization
    - Lazy loading
@@ -4737,19 +4780,16 @@ graph TB
 **✅ Всі критичні рішення прийняті:**
 
 1. **База даних:**
-
    - **Вибір:** Supabase (PostgreSQL)
    - **Схема БД:** Реляційна структура з таблицями profiles, trainings, exercises, exercise_sets
    - **ORM/ODM:** Прямі SQL запити через Supabase клієнт (не потрібен ORM)
 
 2. **Backend:**
-
    - **Вибір:** Next.js Server Actions
    - **Архітектура:** Server Actions в `src/actions/` замість окремих API routes
    - **Переваги:** Типобезпека, менше boilerplate, пряма інтеграція з React
 
 3. **Автентифікація:**
-
    - **Стратегія:** Supabase Auth (JWT токени)
    - **Реалізація:** Server Actions для auth операцій
    - **Управління сесіями:** Автоматичне через Supabase cookies
@@ -4763,7 +4803,6 @@ graph TB
 ### 10.6 Наступні кроки
 
 1. **Налаштувати інфраструктуру** ✅
-
    - ✅ Створено проект у Supabase
    - ✅ Налаштовано підключення до Supabase (URL, publishable key, secret key)
    - ✅ Створено схему бази даних (таблиці, індекси, RLS policies, тригери)
@@ -4772,13 +4811,11 @@ graph TB
    - ⏳ Налаштувати Supabase Auth (Email provider вже увімкнений за замовчуванням)
 
 2. **Почати з Фази 0: Підготовка**
-
    - Налаштування shadcn/ui
    - Структура проекту
    - Налаштування Supabase клієнтів (browser та server)
 
 3. **Послідовно реалізувати фази**
-
    - Дотримуватися залежностей між фазами
    - Тестувати кожну фазу
    - Ітеративно покращувати

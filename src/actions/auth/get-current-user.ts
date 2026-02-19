@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { err, ok } from "@/actions/utils";
 import { ROUTE } from "@/constants";
 import { getCurrentUserService } from "@/services";
 
@@ -11,7 +12,7 @@ export async function getCurrentUser() {
   const [error, data] = await getCurrentUserService();
 
   if (!error) {
-    return data.user;
+    return ok(data.user);
   }
 
   const { reason } = error;
@@ -25,7 +26,7 @@ export async function getCurrentUser() {
     case "PROFILE_ERROR":
       return redirect(ROUTE.LOGIN);
     case "UNKNOWN_ERROR":
-      return redirect(ROUTE.LOGIN);
+      return err("An unknown error occurred. Please try again later");
     default:
       throw new Error(`Unhandled error: ${reason satisfies never}`);
   }

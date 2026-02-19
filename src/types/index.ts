@@ -5,13 +5,17 @@
 
 export type { Exercise, ExerciseSet } from "./exercise";
 export type { SupabaseProfile } from "./supabase";
+export type { Training } from "./training";
 export type {
   CreateExerciseDTO,
   CreateExerciseSetDTO,
   CreateTrainingDTO,
-  Training,
+  ExerciseResponse,
+  ExerciseSetResponse,
+  GetTrainingsParams,
+  TrainingResponse,
   UpdateTrainingDTO,
-} from "./training";
+} from "./training-api";
 export type {
   PublicUser,
   User,
