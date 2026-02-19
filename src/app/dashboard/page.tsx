@@ -2,7 +2,12 @@ import { getCurrentUser } from "@/actions/auth";
 import { LogoutButton } from "@/components/auth";
 
 export default async function DashboardPage() {
-  const data = await getCurrentUser();
+  const result = await getCurrentUser();
+  const user = result.data;
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="container mx-auto py-8">
@@ -12,7 +17,7 @@ export default async function DashboardPage() {
       </div>
       <div className="rounded-lg border bg-white p-6 shadow-sm dark:bg-zinc-900 dark:border-zinc-800">
         <p className="text-muted-foreground">
-          Welcome, {data.name || data.email}! This is your dashboard.
+          Welcome, {user.name || user.email}! This is your dashboard.
         </p>
         <p className="text-sm text-muted-foreground mt-2">
           Training calendar and features will be available in Phase 4.

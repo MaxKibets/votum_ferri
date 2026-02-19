@@ -32,7 +32,7 @@ export function AuthForm({
   schema,
   disabled,
 }: AuthFormProps) {
-  const [{ message }, formAction, isPending] = useActionState(action, {});
+  const [{ error }, formAction, isPending] = useActionState(action, { data: null });
 
   const { handleSubmit, control } = useForm<AuthFormData>({
     resolver: zodResolver(schema),
@@ -48,8 +48,8 @@ export function AuthForm({
   );
 
   useEffect(() => {
-    if (message) toast.error(message);
-  }, [message]);
+    if (error?.message) toast.error(error.message);
+  }, [error]);
 
   return (
     <form onSubmit={handleSubmitForm}>

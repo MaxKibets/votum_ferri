@@ -5,7 +5,7 @@ import { logoutUser } from "@/actions/auth";
 import { Button } from "@/components/ui";
 
 export function LogoutButton() {
-  const [, action, isPending] = useActionState(logoutUser, { message: "", detailes: null });
+  const [, action, isPending] = useActionState(logoutUser, { data: null });
 
   return (
     <Button
