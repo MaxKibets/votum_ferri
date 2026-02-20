@@ -2,9 +2,17 @@
 
 ## Трекер тренувань - votum_ferri
 
-**Версія:** 1.5  
+**Версія:** 1.6  
 **Дата:** 2026-02-19  
 **Статус:** В розробці
+
+**Оновлення v1.6:**
+
+- Фаза 3 (базові UI компоненти) реалізована: `layout`, `exercise`, `training`
+- Базовий layout інтегровано напряму в `src/app/layout.tsx` (без окремого `LayoutWrapper`)
+- Header оновлено: для неавторизованого користувача показуються `Login/Register`, для авторизованого — `Navbar` + `Logout`
+- `Navbar` винесено в підмодуль `src/components/layout/navbar/*` з popover-based mobile navigation
+- Для всіх компонентів поза `src/components/ui` використовується `default export`; реекспорт через `index.ts`
 
 **Оновлення v1.5:**
 
@@ -1727,9 +1735,9 @@ export const ROUTE = {
 **Header/Navbar:**
 
 - Логотип/назва (ліворуч)
-- Навігаційні посилання (Dashboard, Profile)
-- Кнопка виходу (праворуч)
-- Мобільна версія: hamburger меню
+- Для неавторизованого користувача: кнопки `Login/Register` (з блокуванням переходу на поточний роут)
+- Для авторизованого користувача: `Navbar` (Dashboard, Profile) + `LogoutButton`
+- Мобільна версія навігації: popover menu через hamburger кнопку
 
 **Breadcrumbs (де потрібно):**
 
@@ -1874,45 +1882,49 @@ export default function RegisterPage() {
 
 **Файл:** `src/app/dashboard/page.tsx`
 
-**Статус:** ✅ **РЕАЛІЗОВАНО** (базова версія, Phase 1)
+**Статус:** ✅ **РЕАЛІЗОВАНО** (оновлено під Phase 3 базові UI компоненти)
 
 **Компоненти:**
 
 - `getCurrentUser` (Server Action) - перевірка авторизації
-- `LogoutButton` - кнопка виходу з системи
-- `Card` (shadcn/ui) - контейнер для контенту
+- `getTrainings` (Server Action) - завантаження списку тренувань
+- `TrainingCard` - відображення тренування карткою
 
 **Реалізація:**
 
 ```typescript
 export default async function DashboardPage() {
-  const user = await getCurrentUser();
+  const result = await getCurrentUser();
+  const user = result.data;
+  const trainingsResult = await getTrainings({ limit: 6 });
+  const trainings = trainingsResult.data?.trainings ?? [];
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="flex items-center justify-between mb-8">
+    <section className="space-y-8">
+      <div className="space-y-2">
         <h1 className="text-3xl font-semibold">Dashboard</h1>
-        <LogoutButton />
-      </div>
-      <div className="rounded-lg border bg-white p-6 shadow-sm dark:bg-zinc-900 dark:border-zinc-800">
         <p className="text-muted-foreground">
-          Welcome, {user.name || user.email}! This is your dashboard.
-        </p>
-        <p className="text-sm text-muted-foreground mt-2">
-          Training calendar and features will be available in Phase 4.
+          Welcome, {user.name || user.email}!
         </p>
       </div>
-    </div>
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {trainings.map((training) => (
+          <TrainingCard key={training.id} training={training} />
+        ))}
+      </div>
+    </section>
   );
 }
 ```
 
-**Функціональність (Phase 1):**
+**Функціональність (поточна реалізація):**
 
 - ✅ Захист маршруту - перевірка авторизації через `getCurrentUser`
 - ✅ Перенаправлення неавторизованих користувачів на `/login`
 - ✅ Відображення привітання з ім'ям/email користувача
-- ✅ Кнопка виходу з системи
+- ✅ Відображення останніх тренувань картками (`TrainingCard`)
+- ✅ Header містить auth-aware navigation і logout-кнопку
 
 **Планові функції (Phase 4):**
 
@@ -1923,20 +1935,15 @@ export default async function DashboardPage() {
 - Вибір дати відкриває форму створення тренування
 - Кнопка "Створити тренування" для швидкого створення
 
-**Макет (Phase 1 - поточна реалізація):**
+**Макет (поточна реалізація):**
 
 ```
 ┌──────────────────────────────────────────────────┐
-│  Dashboard                    [Logout Button]    │
+│  Header (Logo + Auth-aware controls)             │
 ├──────────────────────────────────────────────────┤
 │                                                  │
-│  ┌──────────────────────────────────────────┐    │
-│  │  Welcome, [User Name/Email]!            │    │
-│  │  This is your dashboard.                │    │
-│  │                                          │    │
-│  │  Training calendar and features         │    │
-│  │  will be available in Phase 4.          │    │
-│  └──────────────────────────────────────────┘    │
+│  Dashboard title + welcome                        │
+│  Grid of TrainingCard components                  │
 │                                                  │
 └──────────────────────────────────────────────────┘
 ```
@@ -2929,7 +2936,7 @@ src/actions/
 
 ### 8.1 Структура компонентів React
 
-**Загальне правило:** Всі папки компонентів мають містити `index.ts` або `index.tsx` для централізованого експорту. Імпорти завжди відбуваються через папку компонентів, а не через прямі шляхи до файлів.
+**Загальне правило:** Всі папки компонентів мають містити `index.ts` або `index.tsx` для централізованого експорту. Імпорти завжди відбуваються через папку компонентів, а не через прямі шляхи до файлів. Для всіх компонентів, крім `src/components/ui`, використовується `default export`.
 
 ```
 src/
@@ -2991,14 +2998,26 @@ src/
 │   │
 │   └── layout/                    # Layout components
 │       ├── header.tsx
-│       ├── navbar.tsx
 │       ├── footer.tsx
+│       ├── auth-links.tsx
+│       ├── navbar/
+│       │   ├── navbar.tsx
+│       │   ├── navbar-button.tsx
+│       │   ├── constants.ts
+│       │   └── index.ts
 │       └── index.ts               # Centralized exports for all layout components
 ```
 
 **Правило централізованих експортів:**
 
 Відповідно до загальної конвенції проєкту (див. розділ 3.5), усі папки компонентів мають містити файл `index.ts` або `index.tsx` для централізованого експорту. Файл `index` слугує інтерфейсом модуля. Імпорти завжди відбуваються через папку компонентів, а не через прямі шляхи до файлів.
+
+Для non-`ui` компонентів реекспорти в `index.ts` виконуються з `default export`:
+
+```typescript
+export { default as AuthFormContainer } from "./auth-form-container";
+export { default as LogoutButton } from "./logout-button";
+```
 
 **Приклади правильних імпортів:**
 
@@ -3674,8 +3693,8 @@ export { FormField } from "./form-field";
 
 ```typescript
 // src/components/auth/index.ts
-export { LogoutButton } from "./logout-button";
-export { AuthFormContainer } from "./auth-form-container";
+export { default as AuthFormContainer } from "./auth-form-container";
+export { default as LogoutButton } from "./logout-button";
 ```
 
 **Деталі компонентів:**
@@ -4468,45 +4487,45 @@ console.error("Database connection failed", { error, userId });
 
 **Задачі:**
 
-1. Database Schema (якщо не зроблено в Фазі 1)
-   - Перевірка та доповнення таблиць
-   - Додаткові індекси (якщо потрібно)
-   - Оптимізація RLS policies
+1. ✅ Database Schema (якщо не зроблено в Фазі 1)
+   - ✅ Перевірка та доповнення таблиць
+   - ✅ Додаткові індекси (якщо потрібно)
+   - ✅ Оптимізація RLS policies
 
-2. TypeScript Types
-   - User types
-   - Training types
-   - Exercise types
-   - ExerciseSet types
-   - Server Action response types
-   - DTO types для валідації (Zod schemas)
+2. ✅ TypeScript Types
+   - ✅ User types
+   - ✅ Training types
+   - ✅ Exercise types
+   - ✅ ExerciseSet types
+   - ✅ Server Action response types
+   - ✅ DTO types для валідації (Zod schemas)
 
-3. Server Actions - Training
-   - `getTrainings` - список тренувань (з фільтрами)
-   - `getTraining` - деталі тренування
-   - `createTraining` - створення тренування
-   - `updateTraining` - оновлення тренування
-   - `deleteTraining` - видалення тренування
+3. ✅ Server Actions - Training
+   - ✅ `getTrainings` - список тренувань (з фільтрами)
+   - ✅ `getTraining` - деталі тренування
+   - ✅ `createTraining` - створення тренування
+   - ✅ `updateTraining` - оновлення тренування
+   - ✅ `deleteTraining` - видалення тренування
 
-4. Server Actions - Exercise
-   - `getExercises` - список вправ для тренування
-   - `getExercise` - деталі вправи
-   - `createExercise` - додавання вправи
-   - `updateExercise` - оновлення вправи
-   - `deleteExercise` - видалення вправи
+4. ✅ Server Actions - Exercise
+   - ✅ `getExercises` - список вправ для тренування
+   - ✅ `getExercise` - деталі вправи
+   - ✅ `createExercise` - додавання вправи
+   - ✅ `updateExercise` - оновлення вправи
+   - ✅ `deleteExercise` - видалення вправи
 
-5. Валідація та обробка помилок
-   - Zod схеми для всіх DTO
-  - Для actions: уніфікований формат `{ data, error }` через `ok/err`, для services: tuple `[error, data]`
-   - Error handling в Server Actions
-   - Revalidation через `revalidatePath`
+5. ✅ Валідація та обробка помилок
+   - ✅ Zod схеми для всіх DTO
+   - ✅ Для actions: уніфікований формат `{ data, error }` через `ok/err`, для services: tuple `[error, data]`
+   - ✅ Error handling в Server Actions
+   - ✅ Revalidation через `revalidatePath`
 
 **Залежності:**
 
-- Потребує Фази 1 (автентифікація та БД)
-- Потребує базові типи (Фаза 0)
+- ✅ Потребує Фази 1 (автентифікація та БД) - виконано
+- ✅ Потребує базові типи (Фаза 0) - виконано
 
-**Мілестоун:** Server Actions працюють, дані зберігаються та отримуються
+**Мілестоун:** ✅ **ДОСЯГНУТО** - Server Actions працюють, дані зберігаються та отримуються.
 
 ---
 
@@ -4518,8 +4537,8 @@ console.error("Database connection failed", { error, userId });
 
 1. Layout Components
    - Header/Navbar компонент
-   - Footer компонент (якщо потрібно)
-   - Layout wrapper
+   - Footer компонент
+   - Інтеграція layout безпосередньо в `src/app/layout.tsx` (без окремого wrapper-компонента)
 
 2. shadcn/ui Components Setup
    - Додавання потрібних компонентів
@@ -4745,7 +4764,7 @@ graph TB
 | ---------------------------- | ------------------------------------------------------------------ | ------ |
 | **M1: Setup Complete**       | Проект налаштований, shadcn/ui готовий                             | Фаза 0 |
 | **M2: Auth Working**         | Автентифікація працює, користувачі можуть реєструватися та входити | Фаза 1 |
-| **M3: Server Actions Ready** | Server Actions працюють, дані зберігаються та отримуються          | Фаза 2 |
+| ✅ **M3: Server Actions Ready** | Server Actions працюють, дані зберігаються та отримуються          | Фаза 2 |
 | **M4: UI Components Ready**  | Базові UI компоненти готові                                        | Фаза 3 |
 | **M5: Dashboard Working**    | Дошка тренувань працює, тренування відображаються в календарі      | Фаза 4 |
 | **M6: CRUD Complete**        | Користувачі можуть створювати та редагувати тренування             | Фаза 5 |
