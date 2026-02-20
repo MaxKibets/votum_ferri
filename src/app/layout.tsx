@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Cinzel, Inter } from "next/font/google";
 import "./globals.css";
 import { Footer, Header } from "@/components/layout";
 import { Toaster } from "@/components/ui";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const cinzel = Cinzel({
+  variable: "--font-cinzel",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -27,9 +27,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${cinzel.variable} ${inter.variable} antialiased`}
       >
-        <div className="flex min-h-screen flex-col">
+        <div className="flex min-h-screen flex-col font-inter">
           <Header />
 
           <main className="container mx-auto flex-1 px-4 py-8 grid place-items-center bg-zinc-50 dark:bg-black">

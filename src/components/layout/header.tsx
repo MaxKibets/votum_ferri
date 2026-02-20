@@ -12,7 +12,7 @@ export default async function Header() {
       <div className="container mx-auto flex items-center justify-between gap-4 px-4 py-2">
         <Link
           href={ROUTE.HOME}
-          className="text-lg font-semibold tracking-tight"
+          className="text-xl font-semibold tracking-tight font-cinzel"
         >
           VOTUM FERRI
         </Link>
