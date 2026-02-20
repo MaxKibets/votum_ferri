@@ -1,28 +1,38 @@
 import { getCurrentUser } from "@/actions/auth";
-import { LogoutButton } from "@/components/auth";
+import { getTrainings } from "@/actions/training";
+import { TrainingCard } from "@/components/training";
 
 export default async function DashboardPage() {
-  const result = await getCurrentUser();
-  const user = result.data;
+  const { data: user } = await getCurrentUser();
 
   if (!user) {
     return null;
   }
 
+  const trainingsResult = await getTrainings({ limit: 6 });
+  const trainings = trainingsResult.data?.trainings ?? [];
+
   return (
-    <div className="container mx-auto py-8">
-      <div className="flex items-center justify-between mb-8">
+    <section className="space-y-8">
+      <div className="space-y-2">
         <h1 className="text-3xl font-semibold">Dashboard</h1>
-        <LogoutButton />
-      </div>
-      <div className="rounded-lg border bg-white p-6 shadow-sm dark:bg-zinc-900 dark:border-zinc-800">
         <p className="text-muted-foreground">
-          Welcome, {user.name || user.email}! This is your dashboard.
-        </p>
-        <p className="text-sm text-muted-foreground mt-2">
-          Training calendar and features will be available in Phase 4.
+          Welcome, {user.name || user.email}! Core UI components are ready, and
+          calendar integration is planned for Phase 4.
         </p>
       </div>
-    </div>
+
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {trainings.map((training) => (
+          <TrainingCard key={training.id} training={training} />
+        ))}
+      </div>
+
+      {trainings.length === 0 && (
+        <p className="text-sm text-muted-foreground">
+          You do not have any trainings yet.
+        </p>
+      )}
+    </section>
   );
 }

@@ -25,14 +25,16 @@ interface AuthFormProps {
   disabled: boolean;
 }
 
-export function AuthForm({
+export default function AuthForm({
   buttonText,
   fields,
   action,
   schema,
   disabled,
 }: AuthFormProps) {
-  const [{ error }, formAction, isPending] = useActionState(action, { data: null });
+  const [{ error }, formAction, isPending] = useActionState(action, {
+    data: null,
+  });
 
   const { handleSubmit, control } = useForm<AuthFormData>({
     resolver: zodResolver(schema),
