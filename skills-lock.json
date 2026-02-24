@@ -5,6 +5,16 @@
       "source": "constellos/claude-code-plugins",
       "sourceType": "github",
       "computedHash": "9b62422c24b985970d164e4dac2c17b9d5203f04d5ba4ca040c6e8a5e2d16a79"
+    },
+    "react-testing-library": {
+      "source": "itechmeat/llm-code",
+      "sourceType": "github",
+      "computedHash": "5bcd644eb6e16ef2dc5bbce79ac4d4be1e2f0b1615e4c8484b784f3b2b65d00d"
+    },
+    "vitest": {
+      "source": "antfu/skills",
+      "sourceType": "github",
+      "computedHash": "0efd9cf8c56aada060d418d009cfe621a7915d0c73a958fe611985bc0c2fa4b8"
     }
   }
 }
