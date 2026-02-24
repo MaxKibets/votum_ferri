@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "Feature-Sliced Design": {
+      "source": "constellos/claude-code-plugins",
+      "sourceType": "github",
+      "computedHash": "9b62422c24b985970d164e4dac2c17b9d5203f04d5ba4ca040c6e8a5e2d16a79"
+    }
+  }
+}
