@@ -7,11 +7,15 @@ import { Button } from "@/shared/ui/button";
 export function ThemeToggle() {
 	const { setTheme, resolvedTheme } = useTheme();
 
+	const handleThemeToggle = () => document.startViewTransition(() =>
+		setTheme(resolvedTheme === "dark" ? "light" : "dark")
+	);
+
 	return (
 		<Button
 			variant="ghost"
 			size="icon"
-			onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+			onClick={handleThemeToggle}
 			aria-label="Toggle theme"
 		>
 			<Sun className="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
