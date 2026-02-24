@@ -6,6 +6,11 @@
       "sourceType": "github",
       "computedHash": "9b62422c24b985970d164e4dac2c17b9d5203f04d5ba4ca040c6e8a5e2d16a79"
     },
+    "next-cache-components": {
+      "source": "vercel-labs/next-skills",
+      "sourceType": "github",
+      "computedHash": "844401be868754beba2e7dc2c66abbe08b740eeefdec69c630ff6cbd81cc4c62"
+    },
     "react-testing-library": {
       "source": "itechmeat/llm-code",
       "sourceType": "github",
