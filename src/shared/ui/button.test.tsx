@@ -31,7 +31,7 @@ describe("Button", () => {
     render(<Button variant="destructive">Delete</Button>);
     expect(screen.getByRole("button", { name: "Delete" })).toHaveAttribute(
       "data-variant",
-      "destructive"
+      "destructive",
     );
   });
 });
