@@ -5,24 +5,25 @@ import { useTheme } from "next-themes";
 import { Button } from "@/shared/ui/button";
 
 export function ThemeToggle() {
-	const { setTheme, resolvedTheme } = useTheme();
+  const { setTheme, resolvedTheme } = useTheme();
 
-	const handleThemeToggle = () => {
-		const toggleTheme = () => setTheme(resolvedTheme === "dark" ? "light" : "dark");
+  const handleThemeToggle = () => {
+    const toggleTheme = () =>
+      setTheme(resolvedTheme === "dark" ? "light" : "dark");
 
-		if (!document.startViewTransition) return toggleTheme();
-		document.startViewTransition(toggleTheme);
-	};
+    if (!document.startViewTransition) return toggleTheme();
+    document.startViewTransition(toggleTheme);
+  };
 
-	return (
-		<Button
-			variant="ghost"
-			size="icon"
-			onClick={handleThemeToggle}
-			aria-label="Toggle theme"
-		>
-			<Sun className="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-			<Moon className="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
-		</Button>
-	);
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={handleThemeToggle}
+      aria-label="Toggle theme"
+    >
+      <Sun className="size-4 scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
+      <Moon className="absolute size-4 scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+    </Button>
+  );
 }
