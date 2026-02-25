@@ -1,9 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactCompiler: true,
   cacheComponents: true,
+  optimizePackageImports: ["lucide-react"],
   experimental: {
     viewTransition: true,
   },
