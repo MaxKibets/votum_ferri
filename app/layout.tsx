@@ -5,24 +5,24 @@ import { CommonLayout } from "@/widgets/layout";
 import "@/app/styles/globals.css";
 
 export const metadata: Metadata = {
-	title: "Votum Ferri",
-	description: "Votum Ferri application",
+  title: "Votum Ferri",
+  description: "Votum Ferri application",
 };
 
 export default function RootLayout({
-	children,
+  children,
 }: Readonly<{
-	children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-	return (
-		<html lang="en" suppressHydrationWarning>
-			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-			>
-				<ThemeProvider>
-					<CommonLayout>{children}</CommonLayout>
-				</ThemeProvider>
-			</body>
-		</html>
-	);
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        <ThemeProvider>
+          <CommonLayout>{children}</CommonLayout>
+        </ThemeProvider>
+      </body>
+    </html>
+  );
 }
