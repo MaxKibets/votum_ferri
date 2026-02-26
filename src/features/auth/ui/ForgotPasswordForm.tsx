@@ -57,7 +57,9 @@ export function ForgotPasswordForm() {
       <CardHeader>
         <CardTitle>Reset your password</CardTitle>
         <CardDescription>
-          Enter your email and we&apos;ll send you a reset link
+          {!isSuccess
+            ? "Enter your email and we will send you a reset link"
+            : "Check your email for a password reset link."}
         </CardDescription>
         <CardAction>
           <Button variant="link" asChild className="px-0">
@@ -65,43 +67,39 @@ export function ForgotPasswordForm() {
           </Button>
         </CardAction>
       </CardHeader>
-      <CardContent>
-        {isSuccess ? (
-          <p className="text-sm text-muted-foreground">
-            Check your email for a password reset link.
-          </p>
-        ) : (
-          <form
-            id="forgot-password-form"
-            onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-4"
-          >
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                autoComplete="email"
-                {...register("email")}
-              />
-              <FormError message={errors.email?.message} />
-            </div>
-            <FormError message={serverError ?? undefined} />
-          </form>
-        )}
-      </CardContent>
-      {isSuccess ? null : (
-        <CardFooter className="border-t">
-          <Button
-            type="submit"
-            form="forgot-password-form"
-            className="w-full"
-            disabled={isPending}
-          >
-            {isPending ? "Sending..." : "Send reset link"}
-          </Button>
-        </CardFooter>
+      {!isSuccess && (
+        <>
+          <CardContent>
+            <form
+              id="forgot-password-form"
+              onSubmit={handleSubmit(onSubmit)}
+              className="flex flex-col gap-4"
+            >
+              <div className="flex flex-col gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  autoComplete="email"
+                  {...register("email")}
+                />
+                <FormError message={errors.email?.message} />
+              </div>
+              <FormError message={serverError ?? undefined} />
+            </form>
+          </CardContent>
+          <CardFooter className="border-t">
+            <Button
+              type="submit"
+              form="forgot-password-form"
+              className="w-full"
+              disabled={isPending}
+            >
+              {isPending ? "Sending..." : "Send reset link"}
+            </Button>
+          </CardFooter>
+        </>
       )}
     </Card>
   );
