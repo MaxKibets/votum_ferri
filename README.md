@@ -202,6 +202,12 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
+## Branch protection
+
+Direct pushes and merges to `master` are disabled. All changes must go through a **pull request**. CI (lint, test, build) runs on PRs targeting `master`. Rule is enforced for everyone, including admins.
+
+---
+
 ## Available Scripts
 
 | Script | Description |
