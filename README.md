@@ -40,18 +40,18 @@ src/
 ```mermaid
 flowchart TD
     Browser(["🌐 Browser Request"])
-    MW["Next.js Middleware\n(auth guard)"]
-    AppRouter["App Router\napp/"]
-    View["View Layer\nsrc/views/"]
-    Widget["Widget Layer\nsrc/widgets/"]
-    Feature["Feature Layer\nsrc/features/"]
-    Entity["Entity Layer\nsrc/entities/"]
-    Shared["Shared Layer\nsrc/shared/"]
+    MW["Next.js Middleware<br>(auth guard)"]
+    AppRouter["App Router<br>app/"]
+    View["View Layer<br>src/views/"]
+    Widget["Widget Layer<br>src/widgets/"]
+    Feature["Feature Layer<br>src/features/"]
+    Entity["Entity Layer<br>src/entities/"]
+    Shared["Shared Layer<br>src/shared/"]
     SA["Server Actions"]
-    Supabase[("Supabase\n(Auth + DB)")]
+    Supabase[("Supabase<br>(Auth + DB)")]
 
     Browser --> MW
-    MW -->|"Protected route,\nno session"| Redirect["↩ Redirect to /auth/login"]
+    MW -->|"Protected route,<br>no session"| Redirect["↩ Redirect to /auth/login"]
     MW -->|"OK"| AppRouter
     AppRouter --> View
     View --> Widget
@@ -64,7 +64,7 @@ flowchart TD
     Feature --> SA
     Entity --> SA
     SA --> Supabase
-    Shared -->|"Supabase clients\n(browser / server / middleware)"| Supabase
+    Shared -->|"Supabase clients<br>(browser / server / middleware)"| Supabase
 ```
 
 ### Layer Responsibilities
@@ -87,37 +87,37 @@ Authentication is handled via **Supabase Auth** using Server Actions and the `@s
 flowchart TD
     Start(["User visits app"])
 
-    Start --> MW{"Middleware:\nsession valid?"}
-    MW -->|"Yes"| Protected["/protected\n(authenticated area)"]
+    Start --> MW{"Middleware:<br>session valid?"}
+    MW -->|"Yes"| Protected["/protected<br>(authenticated area)"]
     MW -->|"No + protected route"| LoginPage["/auth/login"]
 
-    LoginPage -->|"Has account"| LoginForm["Login Form\n(email + password)"]
+    LoginPage -->|"Has account"| LoginForm["Login Form<br>(email + password)"]
     LoginPage -->|"No account"| SignUpPage["/auth/sign-up"]
     LoginPage -->|"Forgot password"| ForgotPage["/auth/forgot-password"]
 
-    LoginForm --> LoginAction["Server Action:\nsupabase.auth.signInWithPassword()"]
+    LoginForm --> LoginAction["Server Action:<br>supabase.auth.signInWithPassword()"]
     LoginAction -->|"Error"| LoginError["Show inline error"]
     LoginError --> LoginForm
     LoginAction -->|"Success"| Protected
 
-    SignUpPage --> SignUpForm["Sign Up Form\n(email + password + confirm)"]
-    SignUpForm --> SignUpAction["Server Action:\nsupabase.auth.signUp()"]
+    SignUpPage --> SignUpForm["Sign Up Form<br>(email + password + confirm)"]
+    SignUpForm --> SignUpAction["Server Action:<br>supabase.auth.signUp()"]
     SignUpAction -->|"Error"| SignUpError["Show inline error"]
     SignUpError --> SignUpForm
-    SignUpAction -->|"Success"| SuccessPage["/auth/sign-up-success\n(check your email)"]
+    SignUpAction -->|"Success"| SuccessPage["/auth/sign-up-success<br>(check your email)"]
 
-    SuccessPage --> Email[["📧 Supabase sends\nconfirmation email"]]
-    Email --> ConfirmLink["User clicks link\n→ /auth/confirm?code=..."]
-    ConfirmLink --> ConfirmRoute["Route Handler:\nexchangeCodeForSession()"]
+    SuccessPage --> Email[["📧 Supabase sends<br>confirmation email"]]
+    Email --> ConfirmLink["User clicks link<br>→ /auth/confirm?code=..."]
+    ConfirmLink --> ConfirmRoute["Route Handler:<br>exchangeCodeForSession()"]
     ConfirmRoute -->|"Error"| ErrorPage["/auth/error"]
     ConfirmRoute -->|"Success"| Protected
 
-    ForgotPage --> ForgotForm["Forgot Password Form\n(email)"]
-    ForgotForm --> ForgotAction["Server Action:\nsupabase.auth.resetPasswordForEmail()"]
-    ForgotAction --> ResetEmail[["📧 Supabase sends\npassword reset email"]]
-    ResetEmail --> UpdateLink["User clicks link\n→ /auth/update-password"]
-    UpdateLink --> UpdateForm["Update Password Form\n(new password + confirm)"]
-    UpdateForm --> UpdateAction["Server Action:\nsupabase.auth.updateUser()"]
+    ForgotPage --> ForgotForm["Forgot Password Form<br>(email)"]
+    ForgotForm --> ForgotAction["Server Action:<br>supabase.auth.resetPasswordForEmail()"]
+    ForgotAction --> ResetEmail[["📧 Supabase sends<br>password reset email"]]
+    ResetEmail --> UpdateLink["User clicks link<br>→ /auth/update-password"]
+    UpdateLink --> UpdateForm["Update Password Form<br>(new password + confirm)"]
+    UpdateForm --> UpdateAction["Server Action:<br>supabase.auth.updateUser()"]
     UpdateAction -->|"Error"| UpdateError["Show inline error"]
     UpdateError --> UpdateForm
     UpdateAction -->|"Success"| Protected

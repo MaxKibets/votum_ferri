@@ -81,7 +81,9 @@ export async function forgotPasswordAction(
 
   const { error } = await supabase.auth.resetPasswordForEmail(
     parsed.data.email,
-    { redirectTo: `${origin}${ROUTES.auth.updatePassword}` },
+    {
+      redirectTo: `${origin}${ROUTES.auth.confirm}?next=${ROUTES.auth.updatePassword}`,
+    },
   );
 
   if (error) {
