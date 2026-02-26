@@ -57,11 +57,9 @@ export function ForgotPasswordForm() {
       <CardHeader>
         <CardTitle>Reset your password</CardTitle>
         <CardDescription>
-          {!isSuccess ? (
-            "Enter your email and we will send you a reset link"
-          ) : (
-            "Check your email for a password reset link."
-          )}
+          {!isSuccess
+            ? "Enter your email and we will send you a reset link"
+            : "Check your email for a password reset link."}
         </CardDescription>
         <CardAction>
           <Button variant="link" asChild className="px-0">
