@@ -1,0 +1,1619 @@
+{
+  "version": "2.8",
+  "children": [
+    {
+      "type": "frame",
+      "id": "Cl4Mp",
+      "x": 0,
+      "y": 0,
+      "name": "Login Form",
+      "theme": {
+        "mode": "light"
+      },
+      "width": 400,
+      "fill": "$card",
+      "cornerRadius": "$radius",
+      "stroke": {
+        "align": "inside",
+        "thickness": 1,
+        "fill": "$border"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": [
+        24,
+        0
+      ],
+      "children": [
+        {
+          "type": "frame",
+          "id": "Grc1H",
+          "name": "CardHeader",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 6,
+          "padding": [
+            0,
+            24
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "hXxr4",
+              "name": "CardTitle",
+              "fill": "$card-foreground",
+              "content": "Login to your account",
+              "lineHeight": 1,
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "WOsSM",
+              "name": "CardDescription",
+              "fill": "$muted-foreground",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Enter your email below to login to your account",
+              "lineHeight": 1.4,
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "ATId9",
+          "name": "CardContent",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            0,
+            24
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "QtEXd",
+              "name": "Email Field",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "DVYkV",
+                  "name": "Email Label",
+                  "fill": "$card-foreground",
+                  "content": "Email",
+                  "lineHeight": 1,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "frame",
+                  "id": "EExPu",
+                  "name": "Email Input",
+                  "width": "fill_container",
+                  "height": 36,
+                  "fill": "$background",
+                  "cornerRadius": 6,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$input"
+                  },
+                  "padding": [
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "0DdjD",
+                      "name": "Placeholder",
+                      "fill": "$muted-foreground",
+                      "content": "m@example.com",
+                      "lineHeight": 1,
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "m5N9E",
+              "name": "Password Field",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "XqV9z",
+                  "name": "Password Label Row",
+                  "width": "fill_container",
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "uKXWa",
+                      "name": "Password Label",
+                      "fill": "$card-foreground",
+                      "content": "Password",
+                      "lineHeight": 1,
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "TzHi3",
+                      "name": "Forgot Password Link",
+                      "fill": "$primary",
+                      "content": "Forgot your password?",
+                      "lineHeight": 1,
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "JvSxU",
+                  "name": "Password Input",
+                  "width": "fill_container",
+                  "height": 36,
+                  "fill": "$background",
+                  "cornerRadius": 6,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$input"
+                  },
+                  "padding": [
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "30PZX",
+                      "name": "Password Mask",
+                      "fill": "$card-foreground",
+                      "content": "••••••••",
+                      "lineHeight": 1,
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "rectangle",
+          "id": "jyyFo",
+          "name": "Divider",
+          "fill": "$border",
+          "width": "fill_container",
+          "height": 1
+        },
+        {
+          "type": "frame",
+          "id": "hU8iB",
+          "name": "CardFooter",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            0,
+            24
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "7bD6E",
+              "name": "Login Button",
+              "width": "fill_container",
+              "height": 36,
+              "fill": "$primary",
+              "cornerRadius": 6,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "evh9D",
+                  "name": "Button Label",
+                  "fill": "$primary-foreground",
+                  "content": "Login",
+                  "lineHeight": 1,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "gldu7",
+              "name": "Sign Up Row",
+              "gap": 4,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "h56hA",
+                  "name": "Sign Up Prompt",
+                  "fill": "$muted-foreground",
+                  "content": "Don't have an account?",
+                  "lineHeight": 1,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "KNLR8",
+                  "name": "Sign Up Link",
+                  "fill": "$primary",
+                  "content": "Sign Up",
+                  "lineHeight": 1,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "6WpYb",
+      "x": 1370,
+      "y": 0,
+      "name": "Auth Error",
+      "width": 400,
+      "fill": "$card",
+      "cornerRadius": "$radius",
+      "stroke": {
+        "align": "inside",
+        "thickness": 1,
+        "fill": "$border"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": [
+        24,
+        0
+      ],
+      "children": [
+        {
+          "type": "frame",
+          "id": "Ptadh",
+          "name": "CardHeader",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 6,
+          "padding": [
+            0,
+            24
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "rreOW",
+              "name": "CardTitle",
+              "fill": "$card-foreground",
+              "content": "Something went wrong",
+              "lineHeight": 1,
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "KtcLb",
+          "name": "CardContent",
+          "width": "fill_container",
+          "layout": "vertical",
+          "padding": [
+            0,
+            24
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "2FJSp",
+              "name": "Error Message",
+              "fill": "$muted-foreground",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "An unexpected error occurred. Please try again.",
+              "lineHeight": 1.4,
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "rectangle",
+          "id": "NUmwY",
+          "name": "Divider",
+          "fill": "$border",
+          "width": "fill_container",
+          "height": 1
+        },
+        {
+          "type": "frame",
+          "id": "i5kaI",
+          "name": "CardFooter",
+          "width": "fill_container",
+          "layout": "vertical",
+          "padding": [
+            0,
+            24
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "CM87Y",
+              "name": "Back to Login Button",
+              "width": "fill_container",
+              "height": 36,
+              "fill": "$primary",
+              "cornerRadius": 6,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "ncg6q",
+                  "name": "Button Label",
+                  "fill": "$primary-foreground",
+                  "content": "Back to login",
+                  "lineHeight": 1,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "ju1tN",
+      "x": 920,
+      "y": 0,
+      "name": "Forgot Password",
+      "width": 400,
+      "fill": "$card",
+      "cornerRadius": "$radius",
+      "stroke": {
+        "align": "inside",
+        "thickness": 1,
+        "fill": "$border"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": [
+        24,
+        0
+      ],
+      "children": [
+        {
+          "type": "frame",
+          "id": "nyW07",
+          "name": "CardHeader",
+          "width": "fill_container",
+          "padding": [
+            0,
+            24
+          ],
+          "justifyContent": "space_between",
+          "children": [
+            {
+              "type": "frame",
+              "id": "VRmOX",
+              "name": "Header Text",
+              "layout": "vertical",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "IbPf1",
+                  "name": "CardTitle",
+                  "fill": "$card-foreground",
+                  "content": "Reset your password",
+                  "lineHeight": 1,
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "CGvoU",
+                  "name": "CardDescription",
+                  "fill": "$muted-foreground",
+                  "textGrowth": "fixed-width",
+                  "width": 260,
+                  "content": "Enter your email and we will send you a reset link",
+                  "lineHeight": 1.4,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "VSZHL",
+          "name": "CardContent",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            0,
+            24
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "ugLcw",
+              "name": "Email Field",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "W61xB",
+                  "name": "Email Label",
+                  "fill": "$card-foreground",
+                  "content": "Email",
+                  "lineHeight": 1,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "frame",
+                  "id": "7vnIJ",
+                  "name": "Email Input",
+                  "width": "fill_container",
+                  "height": 36,
+                  "fill": "$background",
+                  "cornerRadius": 6,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$input"
+                  },
+                  "padding": [
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "Ha13d",
+                      "name": "Placeholder",
+                      "fill": "$muted-foreground",
+                      "content": "m@example.com",
+                      "lineHeight": 1,
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "rectangle",
+          "id": "6NrvH",
+          "name": "Divider",
+          "fill": "$border",
+          "width": "fill_container",
+          "height": 1
+        },
+        {
+          "type": "frame",
+          "id": "1MnSD",
+          "name": "CardFooter",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            0,
+            24
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "HOlBj",
+              "name": "Send Reset Button",
+              "width": "fill_container",
+              "height": 36,
+              "fill": "$primary",
+              "cornerRadius": 6,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "uIA7i",
+                  "name": "Button Label",
+                  "fill": "$primary-foreground",
+                  "content": "Send reset link",
+                  "lineHeight": 1,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "6dJDj",
+              "name": "Back to Login Row",
+              "gap": 4,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "5sEx4",
+                  "name": "Back to Login Prompt",
+                  "fill": "$muted-foreground",
+                  "content": "Remember your password?",
+                  "lineHeight": 1,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "n4Hm2",
+                  "name": "Back to Login Link",
+                  "fill": "$primary",
+                  "content": "Back to login",
+                  "lineHeight": 1,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "ej1cg",
+      "x": 462,
+      "y": 0,
+      "name": "Sign Up",
+      "width": 400,
+      "fill": "$card",
+      "cornerRadius": "$radius",
+      "stroke": {
+        "align": "inside",
+        "thickness": 1,
+        "fill": "$border"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": [
+        24,
+        0
+      ],
+      "children": [
+        {
+          "type": "frame",
+          "id": "orntl",
+          "name": "CardHeader",
+          "width": "fill_container",
+          "padding": [
+            0,
+            24
+          ],
+          "justifyContent": "space_between",
+          "children": [
+            {
+              "type": "frame",
+              "id": "fhSCY",
+              "name": "Header Text",
+              "layout": "vertical",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "NYyFO",
+                  "name": "CardTitle",
+                  "fill": "$card-foreground",
+                  "content": "Create an account",
+                  "lineHeight": 1,
+                  "fontFamily": "Inter",
+                  "fontSize": 16,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "VrKHE",
+                  "name": "CardDescription",
+                  "fill": "$muted-foreground",
+                  "textGrowth": "fixed-width",
+                  "width": 260,
+                  "content": "Enter your details below to create your account",
+                  "lineHeight": 1.4,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "TD6cj",
+          "name": "CardContent",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            0,
+            24
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "bopHV",
+              "name": "Email Field",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "x3J3c",
+                  "name": "Email Label",
+                  "fill": "$card-foreground",
+                  "content": "Email",
+                  "lineHeight": 1,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "frame",
+                  "id": "qSWpA",
+                  "name": "Email Input",
+                  "width": "fill_container",
+                  "height": 36,
+                  "fill": "$background",
+                  "cornerRadius": 6,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$input"
+                  },
+                  "padding": [
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "n9gaI",
+                      "name": "Placeholder",
+                      "fill": "$muted-foreground",
+                      "content": "m@example.com",
+                      "lineHeight": 1,
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "IYlFD",
+              "name": "Password Field",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "n16PF",
+                  "name": "Password Label",
+                  "fill": "$card-foreground",
+                  "content": "Password",
+                  "lineHeight": 1,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "frame",
+                  "id": "opzfQ",
+                  "name": "Password Input",
+                  "width": "fill_container",
+                  "height": 36,
+                  "fill": "$background",
+                  "cornerRadius": 6,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$input"
+                  },
+                  "padding": [
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "JPtBL",
+                      "name": "Password Mask",
+                      "fill": "$card-foreground",
+                      "content": "••••••••",
+                      "lineHeight": 1,
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "zukol",
+              "name": "Confirm Password Field",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "qlb5S",
+                  "name": "Confirm Password Label",
+                  "fill": "$card-foreground",
+                  "content": "Confirm Password",
+                  "lineHeight": 1,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "frame",
+                  "id": "HlAyn",
+                  "name": "Confirm Password Input",
+                  "width": "fill_container",
+                  "height": 36,
+                  "fill": "$background",
+                  "cornerRadius": 6,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$input"
+                  },
+                  "padding": [
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "U9ACv",
+                      "name": "Password Mask",
+                      "fill": "$card-foreground",
+                      "content": "••••••••",
+                      "lineHeight": 1,
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "rectangle",
+          "id": "7hb5u",
+          "name": "Divider",
+          "fill": "$border",
+          "width": "fill_container",
+          "height": 1
+        },
+        {
+          "type": "frame",
+          "id": "D3JsC",
+          "name": "CardFooter",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            0,
+            24
+          ],
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "h2378",
+              "name": "Sign Up Button",
+              "width": "fill_container",
+              "height": 36,
+              "fill": "$primary",
+              "cornerRadius": 6,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "jm1Fd",
+                  "name": "Button Label",
+                  "fill": "$primary-foreground",
+                  "content": "Sign Up",
+                  "lineHeight": 1,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "gTH2O",
+              "name": "Sign In Row",
+              "gap": 4,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "7Dg3s",
+                  "name": "Sign In Prompt",
+                  "fill": "$muted-foreground",
+                  "content": "Already have an account?",
+                  "lineHeight": 1,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "SWbcA",
+                  "name": "Sign In Link",
+                  "fill": "$primary",
+                  "content": "Sign In",
+                  "lineHeight": 1,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "kewZJ",
+      "x": 1820,
+      "y": 0,
+      "name": "Sign Up Success",
+      "width": 400,
+      "fill": "$card",
+      "cornerRadius": "$radius",
+      "stroke": {
+        "align": "inside",
+        "thickness": 1,
+        "fill": "$border"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": [
+        24,
+        0
+      ],
+      "children": [
+        {
+          "type": "frame",
+          "id": "Re83i",
+          "name": "CardHeader",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 6,
+          "padding": [
+            0,
+            24
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "eg6Uq",
+              "name": "CardTitle",
+              "fill": "$card-foreground",
+              "content": "Registration successful!",
+              "lineHeight": 1,
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "Rkplw",
+              "name": "CardDescription",
+              "fill": "$muted-foreground",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "Please check your email to confirm your account.",
+              "lineHeight": 1.4,
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "b3hu3",
+          "name": "CardContent",
+          "width": "fill_container",
+          "layout": "vertical",
+          "padding": [
+            0,
+            24
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "TO6Cf",
+              "name": "Confirmation Message",
+              "fill": "$muted-foreground",
+              "textGrowth": "fixed-width",
+              "width": "fill_container",
+              "content": "We've sent a confirmation link to your email address. Click the link to activate your account.",
+              "lineHeight": 1.4,
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "KLNjb",
+      "x": 2300,
+      "y": 0,
+      "name": "Update Password",
+      "width": 400,
+      "fill": "$card",
+      "cornerRadius": "$radius",
+      "stroke": {
+        "align": "inside",
+        "thickness": 1,
+        "fill": "$border"
+      },
+      "layout": "vertical",
+      "gap": 24,
+      "padding": [
+        24,
+        0
+      ],
+      "children": [
+        {
+          "type": "frame",
+          "id": "ixg9j",
+          "name": "CardHeader",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 6,
+          "padding": [
+            0,
+            24
+          ],
+          "children": [
+            {
+              "type": "text",
+              "id": "akAPu",
+              "name": "CardTitle",
+              "fill": "$card-foreground",
+              "content": "Update your password",
+              "lineHeight": 1,
+              "fontFamily": "Inter",
+              "fontSize": 16,
+              "fontWeight": "600"
+            },
+            {
+              "type": "text",
+              "id": "d0phT",
+              "name": "CardDescription",
+              "fill": "$muted-foreground",
+              "content": "Enter your new password below",
+              "lineHeight": 1.4,
+              "fontFamily": "Inter",
+              "fontSize": 14,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "2CGOR",
+          "name": "CardContent",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "padding": [
+            0,
+            24
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "fm0aR",
+              "name": "New Password Field",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 8,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "H1QFQ",
+                  "name": "New Password Label",
+                  "fill": "$card-foreground",
+                  "content": "New Password",
+                  "lineHeight": 1,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "frame",
+                  "id": "SUqxF",
+                  "name": "Password Input",
+                  "width": "fill_container",
+                  "height": 36,
+                  "fill": "$background",
+                  "cornerRadius": 6,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$input"
+                  },
+                  "padding": [
+                    0,
+                    12
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "uPjnv",
+                      "name": "Password Mask",
+                      "fill": "$card-foreground",
+                      "content": "••••••••",
+                      "lineHeight": 1,
+                      "fontFamily": "Inter",
+                      "fontSize": 14,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "rectangle",
+          "id": "t7CLm",
+          "name": "Divider",
+          "fill": "$border",
+          "width": "fill_container",
+          "height": 1
+        },
+        {
+          "type": "frame",
+          "id": "qCtQw",
+          "name": "CardFooter",
+          "width": "fill_container",
+          "layout": "vertical",
+          "padding": [
+            0,
+            24
+          ],
+          "children": [
+            {
+              "type": "frame",
+              "id": "qw0px",
+              "name": "Update Password Button",
+              "width": "fill_container",
+              "height": 36,
+              "fill": "$primary",
+              "cornerRadius": 6,
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "StEaf",
+                  "name": "Button Label",
+                  "fill": "$primary-foreground",
+                  "content": "Update password",
+                  "lineHeight": 1,
+                  "fontFamily": "Inter",
+                  "fontSize": 14,
+                  "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "themes": {
+    "mode": [
+      "light",
+      "dark"
+    ]
+  },
+  "variables": {
+    "accent": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#f4f4f5",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#292524",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "accent-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#18181b",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#fafafa",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "background": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#ffffff",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#0c0a09",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "border": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#e4e4e7",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#27272a",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "card": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#ffffff",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#1c1917",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "card-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#09090b",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#f2f2f2",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "chart-1": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#e76e50",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#2662d9",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "chart-2": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#2a9d90",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#2eb88a",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "chart-3": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#274754",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#e88c30",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "chart-4": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#e8c468",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#af57db",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "chart-5": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#f4a462",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#e23670",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "destructive": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#ef4444",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#7f1d1d",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "destructive-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#fafafa",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#fef2f2",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#09090b",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#f2f2f2",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "input": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#e4e4e7",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#27272a",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "muted": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#f4f4f5",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#262626",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "muted-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#71717a",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#a1a1aa",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "popover": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#ffffff",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#171717",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "popover-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#09090b",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#f2f2f2",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "primary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#16a34a",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#22c55e",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "primary-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#fff1f2",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#052e16",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "radius": {
+      "type": "number",
+      "value": 10.4
+    },
+    "ring": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#16a34a",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#15803d",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "secondary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#f4f4f5",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#27272a",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "secondary-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#18181b",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#fafafa",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    }
+  }
+}
