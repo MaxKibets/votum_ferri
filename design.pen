@@ -1614,6 +1614,142 @@
           }
         }
       ]
+    },
+    "sidebar": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#fafafa",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#18181b",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "sidebar-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#09090b",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#fafafa",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "sidebar-primary": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#5ea500",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#7ccf00",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "sidebar-primary-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#f7fee7",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#f7fee7",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "sidebar-accent": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#f4f4f5",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#27272a",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "sidebar-accent-foreground": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#18181b",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#fafafa",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "sidebar-border": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#e4e4e7",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#27272a",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
+    },
+    "sidebar-ring": {
+      "type": "color",
+      "value": [
+        {
+          "value": "#9ae600",
+          "theme": {
+            "mode": "light"
+          }
+        },
+        {
+          "value": "#35530e",
+          "theme": {
+            "mode": "dark"
+          }
+        }
+      ]
     }
   }
 }
