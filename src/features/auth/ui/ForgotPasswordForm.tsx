@@ -8,7 +8,6 @@ import { ROUTES } from "@/shared/config/routes";
 import { Button } from "@/shared/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -61,11 +60,6 @@ export function ForgotPasswordForm() {
             ? "Enter your email and we will send you a reset link"
             : "Check your email for a password reset link."}
         </CardDescription>
-        <CardAction>
-          <Button variant="link" asChild className="px-0">
-            <Link href={ROUTES.auth.login}>Back to login</Link>
-          </Button>
-        </CardAction>
       </CardHeader>
       {!isSuccess && (
         <>
@@ -89,7 +83,7 @@ export function ForgotPasswordForm() {
               <FormError message={serverError ?? undefined} />
             </form>
           </CardContent>
-          <CardFooter className="border-t">
+          <CardFooter className="border-t flex-col gap-3">
             <Button
               type="submit"
               form="forgot-password-form"
@@ -98,6 +92,16 @@ export function ForgotPasswordForm() {
             >
               {isPending ? "Sending..." : "Send reset link"}
             </Button>
+            <p className="text-muted-foreground text-sm">
+              Remember your password?{" "}
+              <Button
+                variant="link"
+                asChild
+                className="h-auto p-0 font-medium"
+              >
+                <Link href={ROUTES.auth.login}>Back to login</Link>
+              </Button>
+            </p>
           </CardFooter>
         </>
       )}

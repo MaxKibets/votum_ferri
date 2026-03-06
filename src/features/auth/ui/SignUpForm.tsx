@@ -9,7 +9,6 @@ import { ROUTES } from "@/shared/config/routes";
 import { Button } from "@/shared/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -56,11 +55,6 @@ export function SignUpForm() {
         <CardDescription>
           Enter your details below to create your account
         </CardDescription>
-        <CardAction>
-          <Button variant="link" asChild className="px-0">
-            <Link href={ROUTES.auth.login}>Sign In</Link>
-          </Button>
-        </CardAction>
       </CardHeader>
       <CardContent>
         <form
@@ -102,7 +96,7 @@ export function SignUpForm() {
           <FormError message={serverError ?? undefined} />
         </form>
       </CardContent>
-      <CardFooter className="border-t">
+      <CardFooter className="border-t flex-col gap-3">
         <Button
           type="submit"
           form="sign-up-form"
@@ -111,6 +105,12 @@ export function SignUpForm() {
         >
           {isPending ? "Creating account..." : "Sign Up"}
         </Button>
+        <p className="text-muted-foreground text-sm">
+          Already have an account?{" "}
+          <Button variant="link" asChild className="h-auto p-0 font-medium">
+            <Link href={ROUTES.auth.login}>Sign In</Link>
+          </Button>
+        </p>
       </CardFooter>
     </Card>
   );
